@@ -1,0 +1,13 @@
+/* layar memuat (sebelum data dari Google Sheet datang) */
+#jpcc-muat { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: #F6F3FA; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transition: opacity .25s ease; }
+#jpcc-muat.selesai { opacity: 0; pointer-events: none; }
+#jpcc-muat .jm-kotak { display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 320px; text-align: center; }
+#jpcc-muat .jm-putar { width: 36px; height: 36px; border-radius: 50%; border: 3px solid #DDD3EC; border-top-color: #4B2E83; animation: jm-putar .8s linear infinite; }
+#jpcc-muat .jm-teks { font-size: 15px; line-height: 1.5; color: #3D3646; }
+#jpcc-muat.gagal .jm-putar { display: none; }
+#jpcc-muat .jm-ulang { height: 44px; padding: 0 22px; border: 0; border-radius: 12px; background: #4B2E83; color: #fff; font: inherit; font-size: 15px;
+  font-weight: 800; cursor: pointer; }
+@keyframes jm-putar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { #jpcc-muat .jm-putar { animation-duration: 2.4s; } }
