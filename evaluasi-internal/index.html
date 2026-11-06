@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<base target="_blank">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluasi Pelayanan · JPCC Worship People</title>
+<meta name="description" content="Form evaluasi pelayanan internal tim JPCC Worship.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234B2E83'/%3E%3Cpath d='M38 14v24.5a8 8 0 1 1-4-6.9V20l-10 2.5v20a8 8 0 1 1-4-6.9V19l18-5z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/jpcc.css">
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #1F1B24; --muted: #6B6575; --line: #E7E3EE; --bg: #FFFFFF; --soft: #F6F3FB;
+    --brand: #4B2E83; --ok: #137333; --ease: cubic-bezier(.2, .7, .2, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 14px 16px 56px; }
+  .atas { padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--brand); text-transform: uppercase; }
+  .eyebrow .people { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 10px; letter-spacing: .16em; vertical-align: 1px; }
+  h1 { font-size: 22px; line-height: 1.2; margin: 4px 0 0; letter-spacing: -.01em; }
+  .intro { color: #4A4155; font-size: 14.5px; line-height: 1.6; margin: 0 0 6px; }
+  .l { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; font-size: 15px; font-weight: 800; }
+  .l .no { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-size: 13px; }
+  [hidden] { display: none !important; }
+
+  .kotak { position: relative; }
+  .kotak input { width: 100%; height: 52px; border: 1.5px solid #CFC7DD; border-radius: 14px; padding: 0 44px 0 16px; font-size: 17px; color: var(--ink);
+    background: #fff; outline: none; -webkit-appearance: none; appearance: none; }
+  .kotak input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(75, 46, 131, .12); }
+  .kotak input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+  .hapus { position: absolute; right: 8px; top: 10px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 20px; cursor: pointer; display: none; }
+  .saran { position: absolute; left: 0; right: 0; top: 58px; z-index: 5; background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(31, 27, 36, .12); overflow: hidden; display: none; }
+  .saran button { display: block; width: 100%; text-align: left; padding: 12px 16px; border: 0; background: #fff; font-size: 16px; color: var(--ink); cursor: pointer; }
+  .saran button + button { border-top: 1px solid #F1EEF5; }
+  .saran button.aktif, .saran button:hover { background: var(--soft); }
+  .saran b { color: var(--brand); }
+
+  .pesan { margin-top: 14px; border-radius: 14px; padding: 12px 14px; font-size: 14px; line-height: 1.55; }
+  .pesan.muat { background: var(--soft); color: #4A4155; }
+  .pesan.kosong { background: var(--soft); color: #4A4155; }
+  .pesan.ok { background: #E6F4EA; border: 1px solid #B7DFC2; color: #0D652D; }
+  .pesan.gagal { background: #FCE8E6; border: 1px solid #F5C2BD; color: #A50E0E; }
+
+  .jd { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; border: 1.5px solid var(--line);
+    border-radius: 16px; background: #fff; cursor: pointer; font: inherit; color: var(--ink); transition: border-color .15s, background .15s; }
+  .jd:hover { border-color: #C7B9E0; }
+  .jd.on { border-color: var(--brand); background: #FBF9FE; box-shadow: 0 0 0 3px rgba(75, 46, 131, .1); }
+  .jd .tg { flex: none; width: 54px; height: 58px; border-radius: 12px; border: 2px solid var(--brand); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .jd .tg small { font-size: 10.5px; font-weight: 800; letter-spacing: .06em; color: var(--brand); }
+  .jd .tg b { font-size: 22px; line-height: 1; margin-top: 2px; }
+  .jd .tx { flex: 1; min-width: 0; }
+  .jd .tx b { display: block; font-size: 15px; line-height: 1.35; }
+  .jd .tx small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .jd .pr { flex: none; font-size: 13px; font-weight: 800; color: var(--brand); }
+  .jd .pr.lengkap { color: var(--ok); }
+
+  .prog { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 14px; color: #4A4155; }
+  .prog .bar { flex: 1; height: 10px; border-radius: 999px; background: #EEEAF4; overflow: hidden; }
+  .prog .bar i { display: block; height: 100%; background: var(--brand); border-radius: 999px; transition: width .4s var(--ease); }
+  .prog.lengkap .bar i { background: var(--ok); }
+  .grp { margin: 14px 0 6px; font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .rv { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 6px; border: 1.5px solid var(--line);
+    border-radius: 14px; background: #fff; cursor: pointer; font: inherit; color: var(--ink); transition: border-color .15s, background .15s; }
+  .rv:hover:not(:disabled) { border-color: #C7B9E0; background: #FBF9FE; }
+  .rv.on { border-color: var(--brand); background: #F3EEFA; }
+  .rv .av { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #fff; background: var(--brand); }
+  .rv .who { flex: 1; min-width: 0; }
+  .rv .who b { display: block; font-size: 14.5px; }
+  .rv .who small { display: block; font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .rv .st { flex: none; font-size: 12px; font-weight: 800; color: var(--brand); }
+  .rv:disabled { background: #F4F3F6; border-color: #ECEAF0; cursor: default; }
+  .rv:disabled .av { background: #B9B4C0 !important; }
+  .rv:disabled .who b, .rv:disabled .who small { color: #9C97A3; }
+  .rv:disabled .st { color: var(--ok); }
+
+  .panel { margin-top: 16px; border: 1.5px solid #D9CBF0; border-radius: 18px; padding: 16px; background: #fff; box-shadow: 0 10px 30px rgba(75, 46, 131, .08); }
+  .ph { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .ph small { font-size: 12px; font-weight: 800; letter-spacing: .04em; color: var(--brand); text-transform: uppercase; }
+  .ph h3 { margin: 3px 0 0; font-size: 19px; }
+  .ph .tutup { border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; }
+  .skala { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 10px 0 4px; font-size: 12px; color: var(--muted); }
+  .skala b { color: var(--ink); }
+  .aspek { margin: 16px 0 6px; font-size: 13px; font-weight: 800; color: var(--brand); }
+  .butir { padding: 10px 0; border-top: 1px solid #F1EEF5; }
+  .butir .bl b { display: block; font-size: 14.5px; line-height: 1.35; }
+  .butir .bl small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .nilai { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+  .nilai button { height: 42px; border: 1.5px solid #DCD3EC; border-radius: 10px; background: #fff; font-size: 16px; font-weight: 800; color: #4A4155; cursor: pointer;
+    transition: background .12s, border-color .12s, color .12s; -webkit-tap-highlight-color: transparent; }
+  .nilai button:hover { border-color: #B9A5DC; }
+  .nilai button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .std { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 3px; font-size: 10.5px; color: var(--muted); text-align: center; }
+  .nilai button[data-v="3"] { border-color: #BBA8DE; }
+  .arti { display: none; margin-top: 8px; padding: 9px 11px; border-radius: 10px; font-size: 13px; line-height: 1.5; background: var(--soft); color: var(--ink); }
+  .arti.on { display: block; }
+  .arti b { color: var(--brand); }
+  .arti.bawah { background: #FDF3E1; } .arti.bawah b { color: #8A5300; }
+  .arti.atas { background: #E9F6EE; } .arti.atas b { color: #137333; }
+  .patokan { margin: 4px 0 2px; font-size: 12.5px; color: #4A4155; line-height: 1.5; background: var(--soft); border-radius: 10px; padding: 8px 10px; }
+  .panel textarea { width: 100%; min-height: 84px; margin-top: 6px; border: 1.5px solid #CFC7DD; border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 15px;
+    line-height: 1.5; color: var(--ink); resize: vertical; outline: none; }
+  .panel textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(75, 46, 131, .12); }
+  .kirim-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .btn { height: 50px; padding: 0 24px; border: 0; border-radius: 14px; background: var(--brand); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; }
+  .btn:disabled { background: #D6CFE2; cursor: not-allowed; }
+  .btn.kecil { height: 42px; padding: 0 16px; font-size: 14px; }
+  .kurang { font-size: 13px; color: var(--muted); }
+  .kaki { margin-top: 32px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+  @media (max-width: 640px) {
+    .wrap { padding: 12px 14px 48px; }
+    h1 { font-size: 20px; }
+    .panel { padding: 14px 12px; border-radius: 16px; }
+    .nilai button { height: 46px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="jpcc-muat" role="status" aria-live="polite"><div class="jm-kotak"><div class="jm-putar" aria-hidden="true"></div><div class="jm-teks">Memuat form evaluasi…</div><button type="button" class="jm-ulang" hidden>Coba lagi</button></div></div>
+<div class="wrap">
+  <header class="atas">
+    <div class="eyebrow">JPCC Worship<span class="people">People</span></div>
+    <h1>Evaluasi Pelayanan</h1>
+  </header>
+  <p class="intro">Isi setelah selesai melayani: nilai rekan satu tim sesuai peranmu (MD, musisi, WL, atau singer). Semua penilaian di jadwalmu perlu dikirim, paling lambat <b id="batas"></b> hari setelah tanggal pelayanan. Cukup klik angka 1–5 (<b>3 = sesuai standar</b>), sekitar 1–2 menit per orang.</p>
+
+  <div class="l"><span class="no">1</span>Nama kamu</div>
+  <div class="kotak">
+    <input id="q" type="search" enterkeyhint="done" placeholder="Ketik namamu, lalu pilih dari daftar…" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Nama">
+    <button class="hapus" id="hapus" type="button" aria-label="Hapus">×</button>
+    <div class="saran" id="saran" role="listbox"></div>
+  </div>
+  <div id="pesan"></div>
+
+  <section id="s2" hidden>
+    <div class="l"><span class="no">2</span>Jadwal yang dievaluasi</div>
+    <div id="jadwal"></div>
+  </section>
+
+  <section id="s3" hidden>
+    <div class="l"><span class="no">3</span>Yang perlu kamu nilai</div>
+    <div class="prog" id="prog"></div>
+    <div id="daftar"></div>
+  </section>
+
+  <div class="panel" id="panel" hidden></div>
+  <p class="kaki">Penilaianmu hanya dibaca tim People untuk pengembangan pelayan dan tidak ditampilkan ke yang dinilai.<br>Ada kendala? Hubungi PIC service-mu.</p>
+</div>
+
+<script type="text/plain" id="jpcc-app">
+var DATA = window.__DATA__;
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var HARI = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+  var AVA = ['#4B2E83', '#00695C', '#C0510A', '#1565C0', '#AC1356', '#5D4037'];
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function norm(s) { return String(s || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+  function inisial(n) { return n.split(/\s+/).filter(String).slice(0, 2).map(function (w) { return w.charAt(0).toUpperCase(); }).join(''); }
+  function run() { return window.google && google.script && google.script.run; }
+  $('batas').textContent = (DATA.hari || 7) - 1;
+
+  var st = { nama: '', jadwal: [], pilih: -1, aktif: '', nilai: {}, kirim: false };
+  var q = $('q'), saran = $('saran'), hapus = $('hapus');
+  var daftarNama = (DATA.nama || []).map(function (n) { return { n: n, k: norm(n) }; });
+  var byNorm = {};
+  daftarNama.forEach(function (d) { byNorm[d.k] = d; });
+
+  function pesan(jenis, html) { $('pesan').innerHTML = html ? '<div class="pesan ' + jenis + '">' + html + '</div>' : ''; }
+
+  /* ---------- 1. nama (dari Database) ---------- */
+  var pilihan = [], aktifSaran = -1;
+  function cocok(teks) {
+    var k = norm(teks);
+    if (!k) return [];
+    var awal = [], kata = [], isi = [];
+    daftarNama.forEach(function (d) {
+      var p = d.k.indexOf(k);
+      if (p === 0) awal.push(d); else if (p > 0 && d.k.charAt(p - 1) === ' ') kata.push(d); else if (p > 0) isi.push(d);
+    });
+    return awal.concat(kata, isi).slice(0, 8);
+  }
+  function tampilSaran() {
+    pilihan = cocok(q.value); aktifSaran = -1;
+    hapus.style.display = q.value ? 'block' : 'none';
+    if (!pilihan.length) { saran.style.display = 'none'; return; }
+    var k = norm(q.value);
+    saran.innerHTML = pilihan.map(function (d, i) {
+      var p = d.k.indexOf(k), n = d.n;
+      return '<button type="button" data-i="' + i + '">' + esc(n.slice(0, p)) + '<b>' + esc(n.slice(p, p + k.length)) + '</b>' + esc(n.slice(p + k.length)) + '</button>';
+    }).join('');
+    saran.style.display = 'block';
+  }
+  function pilihNama(d) {
+    q.value = d.n; saran.style.display = 'none'; hapus.style.display = 'block';
+    reset();
+    var r = run();
+    if (!r) { pesan('gagal', 'Halaman ini perlu dibuka lewat link resmi Evaluasi Pelayanan.'); return; }
+    pesan('muat', 'Memuat jadwal pelayananmu…');
+    r.withSuccessHandler(function (x) {
+      if (norm(q.value) !== norm(d.n)) return;
+      st.nama = x.nama; st.jadwal = x.jadwal || [];
+      gambarJadwal();
+    }).withFailureHandler(function (e) { pesan('gagal', esc(e && e.message ? e.message : e)); }).evaluasiSaya(d.n);
+  }
+  function reset() {
+    st = { nama: '', jadwal: [], pilih: -1, aktif: '', nilai: {}, kirim: false };
+    $('s2').hidden = true; $('s3').hidden = true; $('panel').hidden = true; pesan('', '');
+  }
+  q.addEventListener('input', function () { if (st.nama && norm(q.value) !== norm(st.nama)) reset(); tampilSaran(); });
+  q.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' && pilihan.length) { aktifSaran = Math.min(aktifSaran + 1, pilihan.length - 1); tandaiSaran(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp' && pilihan.length) { aktifSaran = Math.max(aktifSaran - 1, 0); tandaiSaran(); e.preventDefault(); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (aktifSaran >= 0 && saran.style.display === 'block') pilihNama(pilihan[aktifSaran]);
+      else if (byNorm[norm(q.value)]) pilihNama(byNorm[norm(q.value)]);
+      else if (cocok(q.value).length === 1) pilihNama(cocok(q.value)[0]);
+    }
+    else if (e.key === 'Escape') saran.style.display = 'none';
+  });
+  function tandaiSaran() { Array.prototype.forEach.call(saran.children, function (b, i) { b.classList.toggle('aktif', i === aktifSaran); }); }
+  q.addEventListener('blur', function () { setTimeout(function () { if (!st.nama && byNorm[norm(q.value)]) pilihNama(byNorm[norm(q.value)]); }, 150); });
+  saran.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  saran.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pilihNama(pilihan[Number(b.getAttribute('data-i'))]); });
+  hapus.addEventListener('click', function () { q.value = ''; hapus.style.display = 'none'; saran.style.display = 'none'; reset(); q.focus(); });
+  document.addEventListener('click', function (e) { if (!e.target.closest('.kotak')) saran.style.display = 'none'; });
+
+  /* ---------- 2. jadwal ---------- */
+  function hitung(j) { return j.review.filter(function (r) { return r.sudah; }).length; }
+  function tglObj(t) { return new Date(+t.slice(0, 4), +t.slice(5, 7) - 1, +t.slice(8, 10)); }
+  function gambarJadwal() {
+    if (!st.jadwal.length) {
+      pesan('kosong', 'Tidak ada jadwal pelayanan <b>' + esc(st.nama) + '</b> yang masih bisa dievaluasi. Evaluasi dibuka di hari pelayanan sampai ' +
+        ((DATA.hari || 7) - 1) + ' hari sesudahnya. Kalau menurutmu ini keliru, hubungi PIC service-mu.');
+      return;
+    }
+    pesan('', '');
+    $('s2').hidden = false;
+    $('jadwal').innerHTML = st.jadwal.map(function (j, i) {
+      var d = tglObj(j.tanggal), n = hitung(j), tot = j.review.length, beres = tot ? n === tot : j.lengkap;
+      return '<button type="button" class="jd' + (i === st.pilih ? ' on' : '') + '" data-i="' + i + '">' +
+        '<span class="tg"><small>' + HARI[d.getDay()] + '</small><b>' + d.getDate() + '</b></span>' +
+        '<span class="tx"><b>' + esc(j.label) + '</b><small>Peranmu: ' + esc(j.peran) + ' · bisa diisi sampai ' + esc(j.tutup) + '</small></span>' +
+        '<span class="pr' + (beres ? ' lengkap' : '') + '">' + (beres ? '✓ Lengkap' : n + ' / ' + tot) + '</span></button>';
+    }).join('');
+    if (st.pilih < 0 && st.jadwal.length === 1) pilihJadwal(0);
+  }
+  $('jadwal').addEventListener('click', function (e) {
+    var b = e.target.closest('.jd');
+    if (b) { pilihJadwal(Number(b.getAttribute('data-i'))); $('s3').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+  function pilihJadwal(i) {
+    st.pilih = i; st.aktif = ''; $('panel').hidden = true;
+    gambarJadwal(); gambarDaftar();
+  }
+
+  /* ---------- 3. daftar yang dinilai ---------- */
+  var JENIS = ['Review MD', 'Review WL', 'Review WL (sisi band)', 'Review musisi', 'Review singer'];
+  var KELOMPOK = [
+    ['Music director', function (r) { return r.jenis === 'Review MD'; }],
+    ['Worship leader', function (r) { return r.jenis === 'Review WL' || r.jenis === 'Review WL (sisi band)'; }],
+    ['Musisi', function (r) { return r.jenis === 'Review musisi'; }],
+    ['Singer', function (r) { return r.jenis === 'Review singer'; }],
+    ['Lainnya', function (r) { return JENIS.indexOf(r.jenis) < 0; }]
+  ];
+  function gambarDaftar() {
+    var j = st.jadwal[st.pilih];
+    if (!j) return;
+    $('s3').hidden = false;
+    var n = hitung(j), tot = j.review.length;
+    if (!tot) {
+      $('prog').innerHTML = '';
+      var lain = st.jadwal.filter(function (x) { return x !== j && x.tanggal === j.tanggal && x.review.length; }).length;
+      $('daftar').innerHTML = j.lengkap ? '<div class="pesan ok">✓ Evaluasimu untuk tanggal ini sudah tercatat selesai. Terima kasih!</div>' :
+        lain ? '<div class="pesan kosong">Tidak ada yang perlu kamu nilai di jadwal ini. Status selesaimu tercatat otomatis setelah penilaian di jadwal lain di tanggal yang sama terkirim.</div>' :
+        '<div class="pesan kosong">Tidak ada yang perlu kamu nilai di jadwal ini (peranmu tidak masuk penilaian musik / vokal).<br><br>' +
+        '<button type="button" class="btn kecil" id="konfirmasi">Tandai selesai</button></div>';
+      return;
+    }
+    $('prog').className = 'prog' + (n === tot ? ' lengkap' : '');
+    $('prog').innerHTML = '<span><b>' + n + '</b> dari ' + tot + ' terkirim</span><span class="bar"><i style="width:' + Math.round(n / tot * 100) + '%"></i></span>';
+    var urut = 0, h = '';
+    KELOMPOK.forEach(function (g) {
+      var isi = j.review.filter(g[1]);
+      if (!isi.length) return;
+      h += '<div class="grp">' + esc(g[0]) + '</div>' + isi.map(function (r) {
+        return '<button type="button" class="rv' + (r.id === st.aktif ? ' on' : '') + '" data-id="' + esc(r.id) + '"' + (r.sudah ? ' disabled' : '') + '>' +
+          '<span class="av" style="background:' + AVA[(urut++) % AVA.length] + '">' + esc(inisial(r.nama)) + '</span>' +
+          '<span class="who"><b>' + esc(r.nama) + '</b><small>' + esc(r.peran) + (r.inst ? ' · ' + esc(r.inst) : '') + ' · ' + (r.soal2 ? 12 : 8) + ' butir</small></span>' +
+          '<span class="st">' + (r.sudah ? '✓ Terkirim' : r.id === st.aktif ? 'Sedang diisi' : 'Isi ›') + '</span></button>';
+      }).join('');
+    });
+    if (n === tot) h = '<div class="pesan ok">✓ <b>Semua penilaian untuk jadwal ini sudah terkirim.</b> Terima kasih sudah melayani dan mengisi evaluasi!</div>' + h;
+    $('daftar').innerHTML = h;
+  }
+  $('daftar').addEventListener('click', function (e) {
+    if (e.target.id === 'konfirmasi') return konfirmasi(e.target);
+    var b = e.target.closest('.rv');
+    if (b && !b.disabled) bukaForm(b.getAttribute('data-id'), true);
+  });
+  function konfirmasi(btn) {
+    var j = st.jadwal[st.pilih], r = run();
+    if (!r) return;
+    btn.disabled = true; btn.textContent = 'Menyimpan…';
+    r.withSuccessHandler(function () { st.jadwal.forEach(function (x) { if (x.tanggal === j.tanggal) x.lengkap = true; }); gambarJadwal(); gambarDaftar(); })
+      .withFailureHandler(function (e) { btn.disabled = false; btn.textContent = 'Tandai selesai'; pesan('gagal', esc(e && e.message ? e.message : e)); })
+      .konfirmasiEvaluasi(st.nama, j.kunci);
+  }
+
+  /* ---------- form penilaian ---------- */
+  function cariReview(id) { return (st.jadwal[st.pilih] || { review: [] }).review.filter(function (r) { return r.id === id; })[0]; }
+  function bukaForm(id, gulir, info) {
+    var r = cariReview(id);
+    if (!r) return;
+    st.aktif = id; st.nilai = {};
+    var tek = (DATA.soal[r.soal] || []), tek2 = r.soal2 ? (DATA.soal[r.soal2] || []) : [], umum = DATA.soal['Umum'] || [];
+    var butir = tek.map(function (b, i) { return { k: 't' + i, b: b }; }).concat(tek2.map(function (b, i) { return { k: 's' + i, b: b }; }),
+      umum.map(function (b, i) { return { k: 'u' + i, b: b }; }));
+    st.kunciButir = butir.map(function (x) { return x.k; });
+    var judul1 = r.soal2 === 'MD' ? 'Teknikal instrumen · ' + (r.inst || r.soal) : r.soal2 ? 'Teknikal vokal' :
+      DATA.aspek[0] + ' · ' + r.peran + (r.jenis === 'Review WL (sisi band)' ? ' (dari sisi band)' : '');
+    var judul2 = r.soal2 === 'MD' ? 'Teknikal music director' : r.soal2 === 'WL' ? 'Teknikal worship leader' : '';
+    var nTek = r.soal2 ? 8 : 4;
+    var tombol = function (k) {
+      return '<div class="nilai" role="radiogroup">' + [1, 2, 3, 4, 5].map(function (v) {
+        return '<button type="button" data-k="' + k + '" data-v="' + v + '" aria-label="' + v + ' ' + esc(DATA.skala[v - 1]) + '">' + v + '</button>';
+      }).join('') + '</div><div class="std"><span></span><span></span><span>standar</span><span></span><span></span></div>' +
+        '<div class="arti" id="arti-' + k + '" aria-live="polite"></div>';
+    };
+    st.deskripsi = {};
+    butir.forEach(function (x) { st.deskripsi[x.k] = x.b[2] || []; });
+    var blok = function (x, i) {
+      return '<div class="butir"><div class="bl"><b>' + (i + 1) + '. ' + esc(x.b[0]) + '</b><small>' + esc(x.b[1]) + '</small></div>' + tombol(x.k) + '</div>';
+    };
+    var p = $('panel');
+    p.innerHTML = (info ? '<div class="pesan ok" style="margin:0 0 12px">' + info + '</div>' : '') +
+      '<div class="ph"><div><small>' + esc(r.peran) + (r.inst ? ' · ' + esc(r.inst) : '') + ' · ' + butir.length + ' butir</small><h3>' + esc(r.nama) + '</h3></div>' +
+      '<button type="button" class="tutup" id="tutup">Tutup</button></div>' +
+      '<div class="skala">' + DATA.skala.map(function (s, i) { return '<span><b>' + (i + 1) + '</b> ' + esc(s) + '</span>'; }).join('') + '</div>' +
+      '<div class="patokan"><b>3 = sesuai standar</b> (yang diharapkan dari setiap pelayan). Beri 4–5 hanya kalau memang di atas standar, 1–2 kalau di bawah. Pilih angka untuk melihat gambarannya.</div>' +
+      '<div class="aspek">' + esc(judul1) + '</div>' + butir.slice(0, 4).map(blok).join('') +
+      (judul2 ? '<div class="aspek">' + esc(judul2) + '</div>' + butir.slice(4, 8).map(function (x, i) { return blok(x, i + 4); }).join('') : '') +
+      '<div class="aspek">Soft skill · worship, kesiapan &amp; karakter</div>' + butir.slice(nTek).map(function (x, i) { return blok(x, i + nTek); }).join('') +
+      '<div class="aspek">Catatan (opsional)</div>' +
+      '<textarea id="catatan" maxlength="1000" placeholder="' + (r.self ? 'Apa yang mau kamu tingkatkan?' : 'Pesan membangun untuk ' + esc(r.nama.split(' ')[0]) + '…') + '"></textarea>' +
+      '<div class="kirim-bar"><button type="button" class="btn" id="kirim" disabled>Kirim penilaian</button><span class="kurang" id="kurang"></span></div>' +
+      '<div id="hasil"></div>';
+    p.hidden = false;
+    cekForm();
+    gambarDaftar();
+    if (gulir) setTimeout(function () { p.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  }
+  function cekForm() {
+    var sisa = (st.kunciButir || []).filter(function (k) { return !st.nilai[k]; }).length;
+    var k = $('kirim');
+    if (!k) return;
+    k.disabled = sisa > 0 || st.kirim;
+    $('kurang').textContent = st.kirim ? '' : sisa > 0 ? 'Belum dinilai: ' + sisa + ' butir' : 'Siap dikirim.';
+  }
+  $('panel').addEventListener('click', function (e) {
+    if (e.target.id === 'tutup') { st.aktif = ''; $('panel').hidden = true; gambarDaftar(); return; }
+    if (e.target.id === 'kirim') return kirim();
+    var b = e.target.closest('.nilai button');
+    if (!b) return;
+    var k = b.getAttribute('data-k'), v = Number(b.getAttribute('data-v'));
+    st.nilai[k] = v;
+    Array.prototype.forEach.call(b.parentNode.children, function (x) { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+    var arti = $('arti-' + k), d = (st.deskripsi[k] || [])[v - 1];
+    arti.className = 'arti on' + (v < 3 ? ' bawah' : v > 3 ? ' atas' : '');
+    arti.innerHTML = '<b>' + v + ' · ' + esc(DATA.skala[v - 1]) + '</b>' + (d ? ' — ' + esc(d) : '');
+    cekForm();
+  });
+  function kirim() {
+    var j = st.jadwal[st.pilih], r = cariReview(st.aktif), g = run();
+    var kb = st.kunciButir || [];
+    if (!j || !r || st.kirim || !kb.length || kb.some(function (k) { return !st.nilai[k]; })) return;
+    if (!g) { $('hasil').innerHTML = '<div class="pesan gagal">Halaman ini perlu dibuka lewat link resmi.</div>'; return; }
+    var nilai = kb.map(function (k) { return st.nilai[k]; });
+    st.kirim = true; $('kirim').textContent = 'Mengirim…'; cekForm();
+    g.withSuccessHandler(function (x) {
+      st.kirim = false;
+      r.sudah = true;
+      if (x.hariLengkap) st.jadwal.forEach(function (y) { if (y.tanggal === j.tanggal) y.lengkap = true; });
+      gambarJadwal();
+      var lanjut = j.review.filter(function (v) { return !v.sudah; })[0];
+      if (lanjut) {
+        bukaForm(lanjut.id, true, '✓ Penilaian untuk <b>' + esc(r.nama) + '</b> terkirim (' + x.selesai + ' dari ' + x.total + '). Lanjut ke berikutnya:');
+      } else {
+        st.aktif = ''; $('panel').hidden = true; gambarDaftar();
+        $('s3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }).withFailureHandler(function (e) {
+      st.kirim = false; $('kirim').textContent = 'Kirim penilaian'; cekForm();
+      $('hasil').innerHTML = '<div class="pesan gagal">✗ ' + esc(e && e.message ? e.message : e) + '</div>';
+    }).simpanEvaluasi({ nama: st.nama, kunci: j.kunci, id: r.id, nilai: nilai, catatan: ($('catatan').value || '').trim() });
+  }
+})();
+</script>
+<script src="../assets/jpcc.js"></script>
+<script>JPCC.mulai("evaluasi");</script>
+</body>
+</html>
