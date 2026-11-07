@@ -70,5 +70,5 @@
     muat();
   }
 
-  window.JPCC = { mulai: mulai, kirim: kirim };
+  window.JPCC = { mulai: mulai, kirim: kirim, api: API };   // api: link web app (dipakai tombol Simpan ke kalender HP)
 })();

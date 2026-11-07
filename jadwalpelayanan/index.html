@@ -60,8 +60,10 @@
   .kotak input { width: 100%; height: 52px; border: 1.5px solid #CFC7DD; border-radius: 14px; padding: 0 44px 0 16px;
     font-size: 17px; color: var(--ink); background: #fff; outline: none; transition: border-color .15s, box-shadow .15s; }
   .kotak input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(75,46,131,.12); }
-  .hapus { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; border-radius: 50%;
-    background: transparent; color: var(--muted); font-size: 20px; line-height: 32px; cursor: pointer; display: none; }
+  .hapus { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; border-radius: 50%;
+    padding: 0; margin: 0; background: transparent; color: var(--muted); line-height: 0; cursor: pointer; display: none;
+    align-items: center; justify-content: center; -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; }
+  .hapus svg { display: block; flex: none; pointer-events: none; }
   .hapus:hover { background: var(--soft); }
   .kotak input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
   .kotak input { -webkit-appearance: none; appearance: none; }
@@ -339,8 +341,9 @@
   .izin-lapis[hidden] { display: none; }
   .izin-kotak { position: relative; width: 100%; max-width: 460px; max-height: calc(100vh - 32px); overflow-y: auto; background: #fff; border-radius: 20px;
     padding: 22px 22px 20px; box-shadow: 0 20px 60px rgba(20, 10, 40, .28); }
-  .izin-x { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; font-size: 24px;
-    line-height: 1; color: var(--muted); cursor: pointer; }
+  .izin-x { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; padding: 0;
+    line-height: 0; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-appearance: none; appearance: none; }
+  .izin-x svg { display: block; flex: none; pointer-events: none; }
   .izin-x:hover { background: var(--soft); }
   .izin-eb { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #9A3412; }
   .izin-kotak h3 { margin: 4px 40px 10px 0; font-size: 21px; line-height: 1.25; }
@@ -363,6 +366,11 @@
   .izin-sdh small.perlu { color: #C5221F; font-weight: 700; }
   .izin-blm { margin-top: 16px; text-align: center; }
   .izin-blm a { font-size: 14px; font-weight: 700; color: var(--brand); }
+  .kal-eb { color: var(--brand); }
+  .izin-wa.kal-hp { margin-top: 16px; background: var(--brand); }
+  .izin-wa.kal-hp svg { width: 19px; height: 19px; }
+  .kal-ket { display: block; margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+  .kal-ok { margin: 10px 0 0; padding: 8px 12px; border-radius: 10px; background: #E6F4EA; color: #0B5A2A; font-size: 13px; font-weight: 700; }
   @media (max-width: 560px) {
     .izin-lapis { align-items: flex-end; padding: 0; }
     .izin-kotak { max-width: none; max-height: 92vh; border-radius: 20px 20px 0 0; padding-bottom: 26px; }
@@ -419,7 +427,7 @@
     <div class="cari">
       <div class="kotak">
         <input id="q" type="search" enterkeyhint="search" placeholder="Ketik namamu, lalu pilih dari daftar…" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Nama">
-        <button class="hapus" id="hapus" type="button" aria-label="Hapus">×</button>
+        <button class="hapus" id="hapus" type="button" aria-label="Hapus"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         <div class="saran" id="saran" role="listbox"></div>
       </div>
     </div>
@@ -450,7 +458,7 @@
       <div class="bo-l"><span class="no">1</span>Nama <span class="w">*</span></div>
       <div class="kotak">
         <input id="boQ" type="search" enterkeyhint="done" placeholder="Ketik namamu, lalu pilih dari daftar…" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Nama">
-        <button class="hapus" id="boHapus" type="button" aria-label="Hapus">×</button>
+        <button class="hapus" id="boHapus" type="button" aria-label="Hapus"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
         <div class="saran" id="boSaran" role="listbox"></div>
       </div>
       <div class="bo-info" id="boInfo" hidden>
@@ -535,7 +543,7 @@ var PARAM = window.__PARAM__;
   var pilihan = [], aktif = -1;
   function tampilSaran() {
     pilihan = cocok(q.value); aktif = -1;
-    hapus.style.display = q.value ? 'block' : 'none';
+    hapus.style.display = q.value ? 'flex' : 'none';
     if (!pilihan.length) { saran.style.display = 'none'; return; }
     var k = norm(q.value);
     saran.innerHTML = pilihan.map(function (d, i) {
@@ -547,7 +555,7 @@ var PARAM = window.__PARAM__;
   function tutupSaran() { saran.style.display = 'none'; }
   function tandai() { Array.prototype.forEach.call(saran.children, function (b, i) { b.classList.toggle('aktif', i === aktif); }); }
   function pilih(d) {
-    q.value = d.n; tutupSaran(); hapus.style.display = 'block'; info.textContent = '';
+    q.value = d.n; tutupSaran(); hapus.style.display = 'flex'; info.textContent = '';
     tampilkan(d);
   }
   function cari() {
@@ -571,19 +579,72 @@ var PARAM = window.__PARAM__;
     }
     return daftarJam[0].j;
   }
-  function linkKalender(x, mn, peran, ket) {
-    var tgl = x[0].replace(/-/g, ''), jam = jamCall(x[7], ket), dates;
+  // bahan acara kalender: a / b = mulai / selesai (WIB) "YYYYMMDDTHHMM", atau "YYYYMMDD" kalau tanpa jam (seharian)
+  function acaraKalender(x, mn, peran, ket) {
+    var tgl = x[0].replace(/-/g, ''), jam = jamCall(x[7], ket), a, b;
     if (jam) {
       var mnt = Math.min(Number(jam.slice(0, 2)) * 60 + Number(jam.slice(2)) + 180, 23 * 60 + 59);
-      dates = tgl + 'T' + jam + '00/' + tgl + 'T' + pad(Math.floor(mnt / 60)) + pad(mnt % 60) + '00';
+      a = tgl + 'T' + jam; b = tgl + 'T' + pad(Math.floor(mnt / 60)) + pad(mnt % 60);
     } else {
-      var b = tglObj(x[0]); b.setDate(b.getDate() + 1);
-      dates = tgl + '/' + b.getFullYear() + pad(b.getMonth() + 1) + pad(b.getDate());
+      var bs = tglObj(x[0]); bs.setDate(bs.getDate() + 1);
+      a = tgl; b = bs.getFullYear() + pad(bs.getMonth() + 1) + pad(bs.getDate());
     }
     var det = [x[2] + (x[3] ? ' · ' + x[3] : ''), x[5] + ' · ' + x[6], x[7] ? 'Call time ' + x[7] : '', x[8] ? 'Latihan ' + x[8] : '', x[9] ? 'Firman: ' + x[9] : '']
       .filter(String).join('\n');
-    return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('Pelayanan ' + mn + ' · ' + peran) +
-      '&dates=' + dates + '&ctz=Asia/Jakarta&location=' + encodeURIComponent(x[5]) + '&details=' + encodeURIComponent(det);
+    return { t: 'Pelayanan ' + mn + ' · ' + peran, a: a, b: b, l: x[5] || '', d: det, u: x[0] + '|' + mn + '|' + x[5] + '|' + x[6] + '|' + peran };
+  }
+  function linkKalender(x, mn, peran, ket) {
+    var k = acaraKalender(x, mn, peran, ket), jam = k.a.length > 8;
+    return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(k.t) +
+      '&dates=' + k.a + (jam ? '00' : '') + '/' + k.b + (jam ? '00' : '') + '&ctz=Asia/Jakarta&location=' + encodeURIComponent(k.l) + '&details=' + encodeURIComponent(k.d);
+  }
+  // file kalender (.ics) untuk aplikasi kalender di HP (Apple Calendar, Google Calendar, Samsung Calendar)
+  function icsKalender(k) {
+    var utc = function (v) {   // WIB (UTC+7) -> UTC
+      var d = new Date(Date.UTC(+v.slice(0, 4), +v.slice(4, 6) - 1, +v.slice(6, 8), +v.slice(9, 11) - 7, +v.slice(11, 13)));
+      return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + '00Z';
+    };
+    var teks = function (v) { return String(v || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); };
+    var lipat = function (baris) {   // maks. 75 byte per baris (RFC 5545)
+      var out = [], kini = '', n = 0;
+      for (var i = 0; i < baris.length; i++) {
+        var ch = baris.charAt(i), cc = baris.charCodeAt(i), bt = cc < 128 ? 1 : cc < 2048 ? 2 : cc >= 0xD800 && cc < 0xDC00 ? 4 : cc >= 0xDC00 && cc < 0xE000 ? 0 : 3;
+        if (n + bt > (out.length ? 74 : 75) && bt) { out.push(kini); kini = ''; n = 0; }
+        kini += ch; n += bt;
+      }
+      out.push(kini);
+      return out.join('\r\n ');
+    };
+    var kini = new Date(), jam = k.a.length > 8, h = 0;
+    for (var i = 0; i < k.u.length; i++) h = (h * 31 + k.u.charCodeAt(i)) >>> 0;
+    var stamp = kini.getUTCFullYear() + pad(kini.getUTCMonth() + 1) + pad(kini.getUTCDate()) + 'T' + pad(kini.getUTCHours()) + pad(kini.getUTCMinutes()) + pad(kini.getUTCSeconds()) + 'Z';
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//JPCC Worship//Jadwal Pelayanan//ID', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+      'BEGIN:VEVENT', 'UID:jpcc-' + k.a.slice(0, 8) + '-' + h.toString(36) + '@jpccworship.github.io', 'DTSTAMP:' + stamp,
+      jam ? 'DTSTART:' + utc(k.a) : 'DTSTART;VALUE=DATE:' + k.a, jam ? 'DTEND:' + utc(k.b) : 'DTEND;VALUE=DATE:' + k.b,
+      'SUMMARY:' + teks(k.t), 'LOCATION:' + teks(k.l), 'DESCRIPTION:' + teks(k.d),
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + teks('Besok: ' + k.t), 'TRIGGER:-P1D', 'END:VALARM',
+      'END:VEVENT', 'END:VCALENDAR'].map(lipat).join('\r\n') + '\r\n';
+  }
+  var UA = navigator.userAgent || '';
+  var HP_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var HP_ANDROID = /Android/i.test(UA);
+  // iPhone: buka file .ics dari server (langsung muncul "Tambahkan ke Kalender"); Android: unduh file .ics lalu Buka
+  function simpanKeHP(k) {
+    var nama = 'jadwal-pelayanan-' + k.a.slice(0, 8) + '.ics', ics = icsKalender(k);
+    var api = (window.JPCC && window.JPCC.api) || '';
+    if (HP_IOS) {
+      if (api) { location.href = api + '?api=ics&t=' + encodeURIComponent(k.t) + '&a=' + k.a + '&b=' + k.b + '&l=' + encodeURIComponent(k.l) + '&d=' + encodeURIComponent(k.d) + '&u=' + encodeURIComponent(k.u); return; }
+      location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+      return;
+    }
+    try {
+      var url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' })), a = document.createElement('a');
+      a.href = url; a.download = nama; a.rel = 'noopener';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 4000);
+    } catch (err) {
+      location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+    }
   }
 
   // buka tab jadwal tepat di ministry, tanggal & kelas sebuah slot
@@ -594,7 +655,8 @@ var PARAM = window.__PARAM__;
   var IK = {   // ikon garis sederhana untuk tombol aksi
     tim: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 13.6c2.7.2 4.5 2.2 4.5 5"/></svg>',
     kal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>',
-    tukar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>'
+    tukar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14l-4-4M20 16H6l4 4"/></svg>',
+    x: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'
   };
   function tampilkan(d) {
     var hi = hariIni();
@@ -630,7 +692,7 @@ var PARAM = window.__PARAM__;
           (t[5] ? ' <small>(' + esc(t[5]) + ')</small>' : '') + '</span></div>';
       }).join('');
       var peran = perS[s].join(', ');
-      IZIN[s] = { pc: picSlot(s, d.i, ketS[s]), x: x, mn: mn, peran: peran, dt: dt, saya: d.n };
+      IZIN[s] = { pc: picSlot(s, d.i, ketS[s]), x: x, mn: mn, peran: peran, dt: dt, saya: d.n, ket: ketS[s] };
       var izin = '<button type="button" class="izin" data-izin="' + s + '">' + IK.tukar +
         '<span class="pjg">Izin / tukar jadwal</span><span class="pdk">Izin / tukar</span></button>';
       h += '<div class="item' + (idx === 0 ? ' berikut' : '') + '" style="--c:' + warna + '">' +
@@ -645,7 +707,7 @@ var PARAM = window.__PARAM__;
         '</div>' +
         // 3 tombol aksi terpisah (di HP jadi satu baris selebar kartu)
         '<div class="aksi"><button class="timbtn" type="button">' + IK.tim + '<span class="t">Lihat tim</span></button>' +
-          '<a href="' + esc(linkKalender(x, mn, peran, ketS[s])) + '" rel="noopener">' + IK.kal + '<span class="pjg">Simpan ke kalender</span><span class="pdk">Kalender</span></a>' +
+          '<a href="' + esc(linkKalender(x, mn, peran, ketS[s])) + '" data-kal="' + s + '" target="_blank" rel="noopener">' + IK.kal + '<span class="pjg">Simpan ke kalender</span><span class="pdk">Kalender</span></a>' +
           izin + '</div>' +
         '<div class="tim">' + timHtml + '</div>' +
         '</div>';
@@ -727,7 +789,7 @@ var PARAM = window.__PARAM__;
     var f = infoIzin(z), pic = z.pc ? z.pc.nm : '';
     var kabari = pic ? 'PIC ibadah ini, <b>' + esc(pic) + '</b>,' : '<b>Coordinator</b> campus / ministry-mu';
     izinLapis.innerHTML = '<div class="izin-kotak">' +
-      '<button type="button" class="izin-x" data-tutup aria-label="Tutup">×</button>' +
+      '<button type="button" class="izin-x" data-tutup aria-label="Tutup">' + IK.x + '</button>' +
       '<div class="izin-eb">Izin / tukar jadwal</div>' +
       '<h3 id="izinJudul">Berhalangan melayani?</h3>' +
       '<div class="izin-jd"><b>' + esc(z.peran) + '</b> · ' + esc(f.tgl) + '<br>' + esc(f.ibadah) + '</div>' +
@@ -756,7 +818,7 @@ var PARAM = window.__PARAM__;
   function bukaIzinSpesial(z) {
     var f = infoIzin(z), k = kontakPeople(z);
     izinLapis.innerHTML = '<div class="izin-kotak">' +
-      '<button type="button" class="izin-x" data-tutup aria-label="Tutup">×</button>' +
+      '<button type="button" class="izin-x" data-tutup aria-label="Tutup">' + IK.x + '</button>' +
       '<div class="izin-eb">Izin / tukar jadwal · Special event</div>' +
       '<h3 id="izinJudul">Berhalangan melayani?</h3>' +
       '<div class="izin-jd"><b>' + esc(z.peran) + '</b> · ' + esc(f.tgl) + '<br>' + esc(f.ibadah) + '</div>' +
@@ -779,8 +841,31 @@ var PARAM = window.__PARAM__;
     document.documentElement.classList.add('kunci');
   }
   function tutupIzin() {
-    izinLapis.hidden = true; izinLapis.innerHTML = ''; izinAktif = null;
+    izinLapis.hidden = true; izinLapis.innerHTML = ''; izinAktif = null; kalAktif = null;
     document.documentElement.classList.remove('kunci');
+  }
+  // HP: pilih simpan ke aplikasi kalender di HP (bukan akun Google yang sedang login di browser)
+  var kalAktif = null;
+  function bukaKalender(s) {
+    var z = IZIN[s];
+    if (!z) return;
+    var k = acaraKalender(z.x, z.mn, z.peran, z.ket), f = infoIzin(z);
+    kalAktif = k;
+    var jam = k.a.length > 8 ? k.a.slice(9, 11) + '.' + k.a.slice(11, 13) + '–' + k.b.slice(9, 11) + '.' + k.b.slice(11, 13) + ' WIB' : 'Seharian';
+    izinLapis.innerHTML = '<div class="izin-kotak">' +
+      '<button type="button" class="izin-x" data-tutup aria-label="Tutup">' + IK.x + '</button>' +
+      '<div class="izin-eb kal-eb">Simpan ke kalender</div>' +
+      '<h3 id="izinJudul">' + esc(k.t) + '</h3>' +
+      '<div class="izin-jd">' + esc(f.tgl) + ' · ' + esc(jam) + '<br>' + esc(f.ibadah) + '</div>' +
+      '<button type="button" class="izin-wa kal-hp" id="kalHP">' + IK.kal + 'Simpan ke kalender HP</button>' +
+      '<small class="kal-ket">' + (HP_IOS ? 'Terbuka di aplikasi <b>Kalender</b> iPhone. Ketuk <b>Tambahkan</b> / <b>Add</b>.' :
+        'File jadwal (.ics) terunduh. Ketuk <b>Buka</b> (atau notifikasi unduhan), lalu pilih <b>Google Calendar</b> / <b>Samsung Calendar</b>. Akun kalendernya dipilih di aplikasi.') + '</small>' +
+      '<p class="kal-ok" id="kalOK" hidden></p>' +
+      '<div class="izin-blm"><a id="kalWeb" href="' + esc(linkKalender(z.x, z.mn, z.peran, z.ket)) + '" target="_blank" rel="noopener">Buka di Google Calendar (browser)</a>' +
+        '<small>Kalau yang terbuka akun Google lain (mis. akun kantor), ganti akunnya dulu di foto profil kanan atas.</small></div>' +
+      '</div>';
+    izinLapis.hidden = false;
+    document.documentElement.classList.add('kunci');
   }
   izinLapis.addEventListener('input', function (e) {
     if (e.target.id !== 'izinNama' || !izinAktif) return;
@@ -791,6 +876,13 @@ var PARAM = window.__PARAM__;
   });
   izinLapis.addEventListener('click', function (e) {
     if (e.target === izinLapis || e.target.closest('[data-tutup]')) { tutupIzin(); return; }
+    if (e.target.closest('#kalHP') && kalAktif) {
+      simpanKeHP(kalAktif);
+      var ok = $('kalOK');
+      if (ok) { ok.hidden = false; ok.textContent = HP_IOS ? 'Membuka Kalender…' : 'File terunduh. Buka filenya untuk menyimpan ke kalender.'; }
+      return;
+    }
+    if (e.target.closest('#kalWeb')) { setTimeout(tutupIzin, 0); return; }
     var k = e.target.closest('#izinKabari');
     if (k && k.getAttribute('aria-disabled') === 'true') {
       e.preventDefault();
@@ -806,6 +898,9 @@ var PARAM = window.__PARAM__;
   hasil.addEventListener('click', function (e) {
     var iz = e.target.closest('[data-izin]');
     if (iz) { bukaIzin(Number(iz.getAttribute('data-izin'))); return; }
+    var kl = e.target.closest('[data-kal]');
+    if (kl && (HP_IOS || HP_ANDROID)) { e.preventDefault(); bukaKalender(Number(kl.getAttribute('data-kal'))); return; }
+    if (kl) return;   // laptop: langsung ke Google Calendar (tab baru)
     var b = e.target.closest('.timbtn');
     if (!b) return;
     var t = b.parentNode.nextElementSibling, buka = !t.classList.contains('buka');
@@ -1162,7 +1257,7 @@ var PARAM = window.__PARAM__;
   }
   function boTampilSaran() {
     boPilihan = boCocok(boQ.value); boAktif = -1;
-    boHapus.style.display = boQ.value ? 'block' : 'none';
+    boHapus.style.display = boQ.value ? 'flex' : 'none';
     if (!boPilihan.length) { boSaran.style.display = 'none'; return; }
     var k = norm(boQ.value);
     boSaran.innerHTML = boPilihan.map(function (d, i) {
@@ -1174,7 +1269,7 @@ var PARAM = window.__PARAM__;
   function boTandai() { Array.prototype.forEach.call(boSaran.children, function (b, i) { b.classList.toggle('aktif', i === boAktif); }); }
   function boPilihNama(d) {
     bo.o = d; bo.sudah = [];
-    boQ.value = d.n; boSaran.style.display = 'none'; boHapus.style.display = 'block';
+    boQ.value = d.n; boSaran.style.display = 'none'; boHapus.style.display = 'flex';
     $('boPos').textContent = d.pos || '–'; $('boKamp').textContent = d.kamp || '–'; $('boMin').textContent = d.min || '–';
     $('boInfo').hidden = false;
     $('boSudah').textContent = '';
@@ -1414,7 +1509,7 @@ var PARAM = window.__PARAM__;
     if (!b) return;
     var d = byNorm[norm(b.getAttribute('data-n'))];
     if (!d) return;
-    q.value = d.n; hapus.style.display = 'block'; info.textContent = ''; tampilkan(d);
+    q.value = d.n; hapus.style.display = 'flex'; info.textContent = ''; tampilkan(d);
     setMode('cari');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
