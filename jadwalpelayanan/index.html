@@ -76,6 +76,57 @@
   .saran b { color: var(--brand); }
   .info { color: var(--muted); font-size: 14px; margin: 14px 2px 0; min-height: 20px; }
   .awal { margin-top: 36px; text-align: center; color: var(--muted); }
+
+  /* ---------- Timeline siklus jadwal (blockout -> penyusunan -> terbit, berulang tiap paket) ---------- */
+  .sik { margin: 16px 0 0; border: 1px solid var(--line); border-radius: 18px; background: #fff; overflow: hidden; text-align: left; }
+  .sik-bo { max-width: 640px; margin: 0 auto 18px; }
+  .sik-kepala { width: 100%; display: flex; align-items: center; gap: 12px; padding: 13px 14px 12px 16px; border: 0; background: var(--soft);
+    font: inherit; color: var(--ink); text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .sik-ikon { flex: none; width: 38px; height: 38px; border-radius: 12px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; }
+  .sik-ikon svg { width: 20px; height: 20px; }
+  .sik-tx { flex: 1; min-width: 0; }
+  .sik-eb { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); }
+  .sik-utama { font-size: 15.5px; font-weight: 800; line-height: 1.3; margin-top: 2px; }
+  .sik-sub { font-size: 13px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+  .sik-sub b { color: #9A3412; }
+  .sik-chev { flex: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: transform .25s var(--ease); }
+  .sik-chev svg { width: 18px; height: 18px; }
+  .sik.buka .sik-chev { transform: rotate(180deg); }
+  .sik-bar { height: 4px; background: #E7E3EE; }
+  .sik-bar i { display: block; height: 100%; width: 0; background: var(--brand); transition: width .8s var(--ease); }
+  .sik-isi { display: none; padding: 18px 14px 4px 6px; }
+  .sik.buka .sik-isi { display: block; }
+  .sik-tl { position: relative; list-style: none; margin: 0; padding: 0; }
+  .sik-tl li { position: relative; display: grid; grid-template-columns: 74px 34px minmax(0, 1fr); align-items: start; }
+  .sik-tgl { text-align: right; font-size: 14px; font-weight: 800; line-height: 1.2; padding-top: 1px; }
+  .sik-tgl small { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 1px; }
+  .sik-node { position: relative; z-index: 2; justify-self: center; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; background: #fff;
+    border: 2.5px solid #CFC7DD; display: flex; align-items: center; justify-content: center; color: #fff; transition: background .3s, border-color .3s; }
+  .sik-node svg { width: 12px; height: 12px; display: none; }
+  .sik-tl li.lewat .sik-node { background: var(--brand); border-color: var(--brand); }
+  .sik-tl li.lewat .sik-node svg { display: block; }
+  .sik-tl li.kini .sik-node { border-color: var(--brand); box-shadow: 0 0 0 5px rgba(75, 46, 131, .14); animation: sikDenyut 2.2s var(--ease) infinite; }
+  .sik-tl li.tunggu .sik-node { border-color: #E8A33D; box-shadow: 0 0 0 5px rgba(232, 163, 61, .2); }
+  @keyframes sikDenyut { 0%, 100% { box-shadow: 0 0 0 4px rgba(75, 46, 131, .16); } 50% { box-shadow: 0 0 0 9px rgba(75, 46, 131, .05); } }
+  .sik-ket { padding: 0 2px 20px 4px; }
+  .sik-tl li:last-child .sik-ket { padding-bottom: 12px; }
+  .sik-judul { font-size: 14.5px; font-weight: 800; line-height: 1.3; }
+  .sik-tl li.nanti .sik-judul { color: #4A4155; }
+  .sik-desk { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 2px; }
+  .sik-rel { display: inline-block; margin-top: 5px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 800; background: #F3EEFA; color: var(--brand); }
+  .sik-tl li.lewat .sik-rel { background: transparent; padding: 0; color: var(--muted); font-weight: 700; }
+  .sik-tl li.tunggu .sik-rel { background: #FFF3E0; color: #9A3412; }
+  .sik-chip { display: inline-block; margin: 6px 6px 0 0; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--soft); color: #4A4155; }
+  .sik-chip.ok { background: #E6F4EA; color: #0B5A2A; }
+  .sik-jalur { position: absolute; z-index: 1; left: 89px; width: 4px; margin-left: -2px; border-radius: 2px; background: #E7E3EE; }
+  .sik-isian { position: absolute; left: 0; right: 0; top: 0; height: 0; border-radius: 2px; background: linear-gradient(180deg, #7A5BC2, var(--brand));
+    transition: height 1s var(--ease); }
+  .sik-kepala-kini { position: absolute; z-index: 3; left: 89px; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #fff;
+    border: 3px solid var(--brand); transition: top 1s var(--ease); }
+  .sik-hariini { position: absolute; z-index: 3; left: 0; width: 70px; margin-top: -10px; text-align: right; transition: top 1s var(--ease); }
+  .sik-hariini span { display: inline-block; padding: 2px 7px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 800; white-space: nowrap; }
+  .sik-catat { margin: 2px 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--soft); font-size: 12.5px; line-height: 1.5; color: #4A4155; }
+  @media (prefers-reduced-motion: reduce) { .sik-tl li.kini .sik-node { animation: none; } }
   .langkah { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
   .langkah span { background: var(--soft); border-radius: 999px; padding: 8px 14px; font-size: 13px; color: #4A4155; }
   .ringkas { margin: 22px 0 4px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -431,6 +482,7 @@
         <div class="saran" id="saran" role="listbox"></div>
       </div>
     </div>
+    <div class="sik" id="siklus" hidden></div>
     <div class="info" id="info"></div>
     <div id="hasil">
       <div class="awal">
@@ -454,6 +506,7 @@
       <h2>Blockout date</h2>
       <p>Tandai tanggal kamu tidak bisa melayani. Tim scheduling tidak akan memasukkan namamu di tanggal itu.</p>
     </div>
+    <div class="sik sik-bo" id="siklusBo" hidden></div>
     <form id="boForm" class="bo" novalidate autocomplete="off">
       <div class="bo-l"><span class="no">1</span>Nama <span class="w">*</span></div>
       <div class="kotak">
@@ -661,6 +714,7 @@ var PARAM = window.__PARAM__;
   function tampilkan(d) {
     var hi = hariIni();
     namaAktif = d.n; idxAktif = d.i;
+    if (sikUser === null && sikEl[0] && !sikEl[0].hidden) { sikEl[0].classList.remove('buka'); sikEl[0].querySelector('.sik-kepala').setAttribute('aria-expanded', 'false'); sikTata(sikEl[0]); }
     var perS = {}, ketS = {}, urut = [];
     IZIN = {};
     (perNama[d.i] || []).forEach(function (t) {
@@ -676,7 +730,7 @@ var PARAM = window.__PARAM__;
       (urut.length ? urut.length + ' jadwal ke depan' : 'Belum ada jadwal ke depan') + '</div></div>' +
       '<div class="legend"><span><i style="background:' + WARNA.Umum + '"></i>Umum</span><span><i style="background:' + WARNA.Youth + '"></i>Youth</span><span><i style="background:' + WARNA.Kids + '"></i>Kids</span></div>';
     if (!urut.length) {
-      hasil.innerHTML = h + '<div class="kosong">Belum ada jadwal ke depan untuk <b>' + esc(d.n) + '</b>. Jadwal baru muncul di sini setelah dipublish. Kalau menurutmu ini keliru, <button type="button" class="kelink" data-ke="tim">hubungi tim People</button>.</div>';
+      hasil.innerHTML = h + '<div class="kosong">Belum ada jadwal ke depan untuk <b>' + esc(d.n) + '</b>. Jadwal baru muncul di sini setelah dipublish.' + esc(sikTarget()) + ' Kalau menurutmu ini keliru, <button type="button" class="kelink" data-ke="tim">hubungi tim People</button>.</div>';
       return;
     }
     var bln = '';
@@ -923,6 +977,7 @@ var PARAM = window.__PARAM__;
   hapus.addEventListener('click', function () {   // hapus nama = tanda di jadwal ministry ikut hilang
     q.value = ''; hapus.style.display = 'none'; tutupSaran(); info.textContent = '';
     namaAktif = ''; idxAktif = -1; hasil.innerHTML = awalHasil; q.focus();
+    if (sikUser === null && sikEl[0] && !sikEl[0].hidden) { sikEl[0].classList.add('buka'); sikTata(sikEl[0]); }
   });
   $('kaki').innerHTML = 'Ada pertanyaan? <button type="button" class="kelink" data-ke="tim">Hubungi tim People</button><br>' +
     'Jadwal yang sudah lewat otomatis tidak ditampilkan · diperbarui ' + esc(DATA.diperbarui);
@@ -1042,7 +1097,7 @@ var PARAM = window.__PARAM__;
     DATA.slot.forEach(function (x, s) { if (x[1] === pilihMn && x[0].slice(0, 7) === pilihYm) semuaKol.push(s); });
     if (!semuaKol.length) {
       tglBar.hidden = true; kelasEl.hidden = true;
-      grid.innerHTML = '<div class="gw"><div class="kosong-g">Belum ada jadwal ' + esc(pilihMn) + ' terbit untuk ' + esc(blnLbl.textContent) + '.</div></div>';
+      grid.innerHTML = '<div class="gw"><div class="kosong-g">Belum ada jadwal ' + esc(pilihMn) + ' terbit untuk ' + esc(blnLbl.textContent) + '.' + esc(sikTarget()) + '</div></div>';
       simpanUrl(); return;
     }
 
@@ -1206,6 +1261,191 @@ var PARAM = window.__PARAM__;
     gw.classList.add('d1');
     if (bawah() <= batas) return;
     gw.classList.remove('d1'); gw.classList.add('d2');
+  }
+
+  /* ---------- Timeline siklus jadwal ----------
+   * Satu cycle = satu paket jadwal (mis. Jan–Feb): 1 jadwal paket sebelumnya terbit -> 2 blockout ditutup -> 3 penyusunan
+   * -> 4 jadwal paket ini terbit -> 5 cycle berikutnya (penyusunan paket berikutnya). Semua tanggal dihitung otomatis dari
+   * pengaturan paket; status terbit dari publish di spreadsheet. Pindah ke cycle berikutnya di tanggal tahap 5, asal paket
+   * ini sudah terbit (kalau belum, ditunggu paling lama SK.tunggu hari).
+   */
+  var SK = DATA.siklus || null;
+  var IK_SIK = {
+    kal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3M8 17h6"/></svg>',
+    chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+    cek: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+  };
+  function sikYm(i) { return Math.floor(i / 12) + '-' + pad(i % 12 + 1); }
+  function sikTgl(i, d) { return sikYm(i) + '-' + pad(d || 1); }
+  function sikNama(i) {   // indeks bulan pertama paket -> "Jan–Feb 2027"
+    var n = (SK.paket || {}).bulan || 2, z = i + n - 1;
+    var b = function (k) { return BLN3[k % 12].charAt(0) + BLN3[k % 12].slice(1).toLowerCase(); };
+    var ya = Math.floor(i / 12), yz = Math.floor(z / 12);
+    return z === i ? b(i) + ' ' + ya : ya === yz ? b(i) + '–' + b(z) + ' ' + yz : b(i) + ' ' + ya + '–' + b(z) + ' ' + yz;
+  }
+  function sikPub(i) {   // { Umum: tgl, ... } paket mulai bulan i yang sudah terbit
+    return (SK.pub || {})[sikYm(i)] || {};
+  }
+  function sikAwalTerbit(p) {
+    var t = Object.keys(p).map(function (k) { return p[k]; }).filter(String).sort();
+    return t.length ? t[0] : '';
+  }
+  function sikHitung(kini) {
+    var P = SK.paket || { bulan: 2, mulai: 1, buatSebelum: 2 }, ts = SK.terbitSebelum || 1, td = SK.tglTerbit || 1, tunggu = SK.tunggu || 30;
+    var awal = +kini.slice(0, 4) * 12 + (+kini.slice(5, 7) - 1) - 12;
+    for (var k = 0; k < 40; k++) {
+      var i = awal + k, bln = i % 12 + 1;
+      if (((bln - P.mulai) % P.bulan + P.bulan) % P.bulan) continue;
+      var pub = sikPub(i), mns = Object.keys(pub), terbit = mns.length > 0;
+      var t3 = sikTgl(i - P.buatSebelum, P.mulai), t5 = sikTgl(i + P.bulan - P.buatSebelum, P.mulai);
+      if (kini >= t5 && (terbit || kini >= tambahHari(t5, tunggu))) continue;   // cycle ini sudah selesai
+      var iPrev = i - P.bulan, pubPrev = sikPub(iPrev);
+      var t1 = sikAwalTerbit(pubPrev) || sikTgl(iPrev - ts, td), t4plan = sikTgl(i - ts, td);
+      var t4 = terbit ? (sikAwalTerbit(pub) || t4plan) : t4plan;
+      if (terbit && t4 < t3) t4 = t3;
+      return { i: i, nama: sikNama(i), namaPrev: sikNama(iPrev), namaNext: sikNama(i + P.bulan), terbit: terbit, pub: pub, t4plan: t4plan,
+        t: [t1, tambahHari(t3, -1), t3, t4, t5], tutupNext: tambahHari(t5, -1) };
+    }
+    return null;
+  }
+  function sikRel(t, kini) {
+    var n = Math.round((tglObj(t) - tglObj(kini)) / 864e5);
+    return n === 0 ? 'hari ini' : n === 1 ? 'besok' : n === -1 ? 'kemarin' : n > 0 ? n + ' hari lagi' : -n + ' hari lalu';
+  }
+  function sikTglPdk(t) { var d = tglObj(t); return d.getDate() + ' ' + BLN3[d.getMonth()].charAt(0) + BLN3[d.getMonth()].slice(1).toLowerCase(); }
+  /** Posisi hari ini di jalur: indeks tahap + pecahan menuju tahap berikutnya (0..4). */
+  function sikPosisi(S, kini) {
+    var t = S.t;
+    if (kini < t[0]) return 0;
+    for (var j = 0; j < 4; j++) {
+      if (j === 3 && !S.terbit) return 3;                   // belum terbit: berhenti di tahap 4 (menunggu)
+      if (kini < t[j + 1] || (j === 2 && !S.terbit)) {
+        var a = tglObj(t[j]), b = tglObj(t[j + 1]), f = b > a ? (tglObj(kini) - a) / (b - a) : 1;
+        f = Math.max(0, Math.min(1, f));
+        if (j === 2 && !S.terbit && kini >= S.t4plan) f = 1;
+        return j + f;
+      }
+    }
+    return 4;
+  }
+  function sikRingkas(S, kini) {
+    var t = S.t;
+    if (S.terbit) return { utama: 'Jadwal ' + S.nama + ' sudah terbit ✓',
+      sub: 'Berikutnya: blockout ' + S.namaNext + ' ditutup ' + labelTgl(S.tutupNext) + ' · <b>' + sikRel(S.tutupNext, kini) + '</b>' };
+    if (kini <= t[1]) return { utama: 'Blockout ' + S.nama + ' ditutup ' + labelTgl(t[1]),
+      sub: '<b>' + sikRel(t[1], kini) + '</b> · jadwalnya terbit ' + labelTgl(S.t4plan) };
+    if (kini < S.t4plan) return { utama: 'Jadwal ' + S.nama + ' terbit ' + labelTgl(S.t4plan),
+      sub: '<b>' + sikRel(S.t4plan, kini) + '</b> · sedang disusun Tim People' };
+    return { utama: 'Jadwal ' + S.nama + ' sebentar lagi terbit', sub: 'Target ' + labelTgl(S.t4plan) + ' · <b>sedang difinalkan</b>' };
+  }
+  var sikUser = null;   // null = belum pernah dibuka / ditutup sendiri
+  try { var sv = localStorage.getItem('jpccSiklus'); if (sv === '1' || sv === '0') sikUser = sv === '1'; } catch (x) {}
+  function sikGambar(el, bukaAwal, blok) {
+    if (!SK || !el) return;
+    var kini = hariIni(), S = sikHitung(kini);
+    if (!S) { el.hidden = true; return; }
+    var pos = sikPosisi(S, kini), r = sikRingkas(S, kini), t = S.t;
+    if (blok) {   // di halaman Blockout: yang penting batas blockout paket yang masih dibuka
+      var buka = kini <= t[1], nmB = buka ? S.nama : S.namaNext, tutup = buka ? t[1] : S.tutupNext;
+      r = { utama: 'Blockout ' + nmB + ' ditutup ' + labelTgl(tutup), sub: '<b>' + sikRel(tutup, kini) + '</b> · ' + (S.terbit ? 'jadwal ' + S.nama + ' sudah terbit' :
+        'jadwal ' + S.nama + (kini < S.t4plan ? ' terbit ' + labelTgl(S.t4plan) : ' sebentar lagi terbit')) };
+    }
+    var tahap = [
+      { j: 'Jadwal ' + S.namaPrev + ' terbit', d: 'Cycle sebelumnya selesai. Jadwalnya sudah bisa dicek di Cari namaku.' },
+      { j: 'Blockout ' + S.nama + ' ditutup', d: 'Batas terakhir isi Blockout date untuk jadwal ' + S.nama + '. Sesudahnya, berhalangan = Izin / tukar jadwal.' },
+      { j: 'Penyusunan jadwal ' + S.nama, d: 'Tim People mulai menyusun jadwal sesuai blockout yang masuk.' },
+      { j: 'Jadwal ' + S.nama + ' terbit', d: S.terbit ? 'Sudah bisa dicek di Cari namaku &amp; Lihat jadwal per ministry.' : 'Target terbit. Cek jadwalmu di sini mulai tanggal ini.' },
+      { j: 'Cycle berikutnya · ' + S.namaNext, d: 'Penyusunan jadwal ' + S.namaNext + ' dimulai. Blockout ' + S.namaNext + ' paling lambat ' + labelTgl(S.tutupNext) + '.' }
+    ];
+    var h = '<button type="button" class="sik-kepala" aria-expanded="false">' +
+        '<span class="sik-ikon">' + IK_SIK.kal + '</span>' +
+        '<span class="sik-tx"><span class="sik-eb">Siklus jadwal · ' + esc(S.nama) + '</span>' +
+          '<span class="sik-utama" style="display:block">' + esc(r.utama) + '</span><span class="sik-sub" style="display:block">' + r.sub + '</span></span>' +
+        '<span class="sik-chev">' + IK_SIK.chev + '</span></button>' +
+      '<div class="sik-bar"><i style="width:0"></i></div>' +
+      '<div class="sik-isi"><ol class="sik-tl">';
+    var sudah = tahap.map(function (x, j) { return j === 3 ? S.terbit : j === 4 ? S.terbit && kini >= t[j] : kini >= t[j]; });
+    var menunggu = !S.terbit && kini >= S.t4plan, iKini = menunggu ? -1 : sudah.indexOf(false);
+    tahap.forEach(function (x, j) {
+      var lewat = sudah[j], tunggu = j === 3 && menunggu;
+      var kelas = lewat ? 'lewat' : tunggu ? 'tunggu' : j === iKini ? 'kini' : 'nanti';
+      var d = tglObj(t[j]);
+      var rel = tunggu ? 'Sedang difinalkan' : lewat ? (j === 3 ? '✓ Terbit ' + sikRel(t[j], kini) : 'Selesai · ' + sikRel(t[j], kini)) : sikRel(t[j], kini);
+      var chip = '';
+      if (j === 3 && S.terbit) {
+        chip = ['Umum', 'Youth', 'Kids'].map(function (mn) {
+          return S.pub[mn] !== undefined ? '<span class="sik-chip ok">' + mn + ' ✓' + (S.pub[mn] ? ' ' + sikTglPdk(S.pub[mn]) : '') + '</span>' : '<span class="sik-chip">' + mn + ' menyusul</span>';
+        }).join('');
+      }
+      h += '<li class="' + kelas + '"><div class="sik-tgl">' + d.getDate() + ' ' + BLN3[d.getMonth()].charAt(0) + BLN3[d.getMonth()].slice(1).toLowerCase() +
+          '<small>' + HARI2[d.getDay()] + ' · ' + d.getFullYear() + (j === 3 && !S.terbit ? '<br>target' : '') + '</small></div>' +
+        '<span class="sik-node">' + IK_SIK.cek + '</span>' +
+        '<div class="sik-ket"><div class="sik-judul">' + esc(x.j) + '</div>' + (lewat && j < 3 ? '' : '<div class="sik-desk">' + x.d + '</div>') +
+          '<span class="sik-rel">' + esc(rel) + '</span>' + (chip ? '<div>' + chip + '</div>' : '') + '</div></li>';
+    });
+    h += '</ol></div>';
+    el.innerHTML = h;
+    el.hidden = false;
+    var buka = sikUser === null ? bukaAwal : sikUser;
+    el.classList.toggle('buka', !!buka);
+    el.querySelector('.sik-kepala').setAttribute('aria-expanded', buka ? 'true' : 'false');
+    el._pos = pos;
+    sikTata(el);
+  }
+  /** Jalur & isian progres diukur dari posisi titik tahap (dipanggil setelah tampil / ukuran layar berubah). */
+  function sikTata(el) {
+    if (!el || el.hidden) return;
+    requestAnimationFrame(function () {
+      var bar = el.querySelector('.sik-bar i');
+      if (bar) bar.style.width = (el._pos / 4 * 100).toFixed(1) + '%';
+      var tl = el.querySelector('.sik-tl');
+      if (!tl || !el.classList.contains('buka')) return;
+      var nodes = tl.querySelectorAll('.sik-node');
+      if (nodes.length < 5) return;
+      var t0 = tl.getBoundingClientRect().top;
+      var y = Array.prototype.map.call(nodes, function (n) { var r = n.getBoundingClientRect(); return r.top - t0 + r.height / 2; });
+      var jalur = tl.querySelector('.sik-jalur');
+      if (!jalur) {
+        jalur = document.createElement('div'); jalur.className = 'sik-jalur'; jalur.innerHTML = '<div class="sik-isian"></div>'; tl.appendChild(jalur);
+        var ujung = document.createElement('div'); ujung.className = 'sik-kepala-kini'; tl.appendChild(ujung);
+        var hi = document.createElement('div'); hi.className = 'sik-hariini'; hi.innerHTML = '<span>Hari ini</span>'; tl.appendChild(hi);
+      }
+      jalur.style.top = y[0] + 'px'; jalur.style.height = (y[4] - y[0]) + 'px';
+      var p = el._pos, a = Math.min(Math.floor(p), 3), yy = y[a] + (y[Math.min(a + 1, 4)] - y[a]) * (p - a);
+      var isian = jalur.firstChild, ujungK = tl.querySelector('.sik-kepala-kini'), hari = tl.querySelector('.sik-hariini');
+      ujungK.style.top = yy + 'px';
+      // label "Hari ini" di bawah tulisan tanggal tahap terakhir yang sudah lewat; disembunyikan kalau tidak muat sebelum tahap berikutnya
+      var tgl = tl.querySelectorAll('.sik-tgl'), bawah = Array.prototype.map.call(tgl, function (x) { return x.getBoundingClientRect().bottom - t0; });
+      var py = Math.max(yy, bawah[a] + 14);
+      hari.style.top = py + 'px';
+      hari.style.visibility = p > 0 && p < 4 && (a >= 4 || py + 12 < y[a + 1] - 14) ? 'visible' : 'hidden';
+      ujungK.style.visibility = y.some(function (n) { return Math.abs(n - yy) < 13; }) ? 'hidden' : 'visible';
+      setTimeout(function () { isian.style.height = (yy - y[0]) + 'px'; }, 30);
+    });
+  }
+  var sikEl = [$('siklus'), $('siklusBo')];
+  function sikSemua() { sikGambar(sikEl[0], !namaAktif); sikGambar(sikEl[1], false, true); }
+  sikEl.forEach(function (el) {
+    if (!el) return;
+    el.addEventListener('click', function (e) {
+      if (!e.target.closest('.sik-kepala')) return;
+      var buka = !el.classList.contains('buka');
+      el.classList.toggle('buka', buka);
+      el.querySelector('.sik-kepala').setAttribute('aria-expanded', buka ? 'true' : 'false');
+      if (el === sikEl[0]) { sikUser = buka; try { localStorage.setItem('jpccSiklus', buka ? '1' : '0'); } catch (x) {} }
+      sikTata(el);
+    });
+  });
+  window.addEventListener('resize', function () { sikEl.forEach(sikTata); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) sikSemua(); });
+  setInterval(sikSemua, 30 * 60 * 1000);   // halaman dibiarkan terbuka: garis ikut bergerak, ganti hari ikut berganti
+  sikSemua();
+  /** Kalimat target terbit untuk pesan "belum ada jadwal" (kosong kalau tidak ada data siklus). */
+  function sikTarget() {
+    if (!SK) return '';
+    var kini = hariIni(), S = sikHitung(kini);
+    if (!S || S.terbit) return '';
+    return ' Jadwal ' + S.nama + (kini < S.t4plan ? ' ditargetkan terbit ' + labelTgl(S.t4plan) + '.' : ' sedang difinalkan dan sebentar lagi terbit.');
   }
 
   /* ---------- Blockout date ---------- */
@@ -1473,7 +1713,7 @@ var PARAM = window.__PARAM__;
     geserPil();
     var masuk = SEKSI[md];
     var keluar = Object.keys(SEKSI).filter(function (k) { return k !== md && !SEKSI[k].hidden; }).map(function (k) { return SEKSI[k]; });
-    var siapkan = function () { if (md === 'jadwal') gambarJadwal(false); if (md === 'tim') gambarTim(); if (md === 'blok') siapkanBlok(); };
+    var siapkan = function () { if (md === 'jadwal') gambarJadwal(false); if (md === 'tim') gambarTim(); if (md === 'blok') siapkanBlok(); sikEl.forEach(sikTata); };
     if (langsung) { keluar.forEach(function (s) { s.hidden = true; }); masuk.hidden = false; siapkan(); simpanUrl(); return; }
     keluar.forEach(function (s) { s.classList.add('keluar'); });
     setTimeout(function () {
