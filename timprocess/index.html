@@ -47,6 +47,12 @@
     outline: none; -webkit-appearance: none; appearance: none; background: #fff; color: var(--ink); }
   .masuk input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(75, 46, 131, .12); }
   .masuk .btn { margin-top: 12px; width: 100%; }
+  .awas { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 70; width: min(520px, calc(100% - 32px));
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; background: #1F1B24; color: #fff;
+    font-size: 14px; line-height: 1.45; box-shadow: 0 10px 30px rgba(31, 27, 36, .28); }
+  .awas b { font-variant-numeric: tabular-nums; }
+  .awas svg { width: 22px; height: 22px; flex: none; color: #FBBF24; }
+  .masuk .salah.info { color: var(--muted); font-weight: 600; }
   .masuk .salah { min-height: 20px; margin-top: 10px; font-size: 13.5px; font-weight: 700; color: var(--bad); }
 
   .btn { height: 50px; padding: 0 22px; border: 0; border-radius: 14px; background: var(--brand); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer;
@@ -265,9 +271,9 @@
   <section id="vMasuk" hidden>
     <form class="masuk" id="fMasuk" autocomplete="off" novalidate>
       <span class="gembok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></span>
-      <h2>Masuk dengan PIN</h2>
-      <p>Halaman ini khusus Tim Process. Masukkan PIN dari admin JPCC Worship People.</p>
-      <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••••" aria-label="PIN" maxlength="40">
+      <h2 id="mJudul">Masuk dengan PIN</h2>
+      <p id="mKet">Halaman ini khusus Tim Process. Masukkan PIN dari admin JPCC Worship People.</p>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="••••••" aria-label="PIN" maxlength="40">
       <button type="submit" class="btn" id="bMasuk">Masuk</button>
       <div class="salah" id="salah" role="alert"></div>
     </form>
@@ -350,6 +356,7 @@
   </section>
 </div>
 <div class="toast" id="toast" role="status"></div>
+<div class="awas" id="awas" role="status" hidden></div>
 
 <script type="text/plain" id="jpcc-app">
 var DATA = window.__DATA__;
@@ -376,41 +383,80 @@ var DATA = window.__DATA__;
   }
   function salinLama(teks) { var a = document.createElement('textarea'); a.value = teks; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); } catch (x) {} a.remove(); }
 
-  /* ---------- sesi (PIN) ---------- */
-  var KUNCI = 'jpccTPsesi', TOK = null;
-  try { var sv = JSON.parse(localStorage.getItem(KUNCI) || 'null'); if (sv && sv.token && sv.habis > Date.now()) TOK = sv.token; } catch (x) {}
-  function simpanSesi(s) { TOK = s.token; try { localStorage.setItem(KUNCI, JSON.stringify(s)); } catch (x) {} }
-  function hapusSesi() { TOK = null; try { localStorage.removeItem(KUNCI); } catch (x) {} }
+  /* ---------- sesi (PIN) ----------
+   * Token sesi hanya disimpan di memori halaman: refresh / buka ulang = masukkan PIN lagi.
+   * Tidak ada aktivitas (sentuh, gulir, ketik, gerak mouse) selama KUNCI_MENIT -> halaman terkunci, PIN lagi.
+   * Saat terkunci, isian yang belum disimpan tetap ada (tidak terlihat) dan muncul lagi setelah PIN benar.
+   */
+  var KUNCI_MENIT = 2, AWAS_DETIK = 20;
+  var TOK = null, terkunci = false, aktifTerakhir = Date.now();
+  try { localStorage.removeItem('jpccTPsesi'); } catch (x) {}   // sesi lama (versi sebelumnya) dibuang
   function panggil(fn, args, ok, gagal) {
     var r = google.script.run.withSuccessHandler(ok).withFailureHandler(function (e) {
       var m = e && e.message ? e.message : String(e);
-      if (/SESI_HABIS/.test(m)) { hapusSesi(); tampilMasuk('Sesi sudah habis. Masukkan PIN lagi.'); return; }
+      if (/SESI_HABIS/.test(m)) { gagal('Sesi sudah habis. Masukkan PIN lagi, lalu ulangi.'); kunci('Sesi sudah habis. Masukkan PIN lagi untuk melanjutkan.'); return; }
       gagal(m);
     });
     r[fn].apply(r, args);
   }
   function lihat(id) { ['vMasuk', 'vMuat', 'vGagal', 'vUbah', 'vMon'].forEach(function (v) { $(v).hidden = v !== id; }); }
-  function tampilMasuk(pesan) {
+  function tampilMasuk(pesan, modeKunci) {
     $('tab').hidden = true; $('keluar').hidden = true;
     lihat('vMasuk');
+    $('mJudul').textContent = modeKunci ? 'Halaman terkunci' : 'Masuk dengan PIN';
+    $('mKet').textContent = modeKunci ? 'Masukkan PIN lagi untuk melanjutkan. Isian yang belum disimpan tetap ada.' :
+      'Halaman ini khusus Tim Process. Masukkan PIN dari admin JPCC Worship People.';
+    $('bMasuk').textContent = modeKunci ? 'Buka' : 'Masuk';
     $('salah').textContent = pesan || (DATA && DATA.pinAktif === false ? 'PIN belum diatur admin.' : '');
+    $('salah').className = 'salah' + (modeKunci ? ' info' : '');
     $('pin').value = '';
+    window.scrollTo(0, 0);
     setTimeout(function () { $('pin').focus(); }, 50);
   }
+  function kunci(pesan) {
+    if (!TOK && terkunci) return;
+    TOK = null; terkunci = true; tutupAwas();
+    tampilMasuk(pesan || 'Terkunci otomatis karena tidak ada aktivitas selama ' + KUNCI_MENIT + ' menit.', true);
+  }
+  function aktivitas() {
+    if (!TOK || terkunci) return;
+    if (Date.now() - aktifTerakhir >= KUNCI_MENIT * 60000) { kunci(); return; }   // mis. HP baru dinyalakan lagi: kunci dulu
+    aktifTerakhir = Date.now(); tutupAwas();
+  }
+  ['pointerdown', 'pointermove', 'keydown', 'input', 'wheel', 'touchstart', 'scroll'].forEach(function (ev) {
+    document.addEventListener(ev, aktivitas, { passive: true, capture: true });
+  });
+  var IKON_GEMBOK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>';
+  function tutupAwas() { if (!$('awas').hidden) $('awas').hidden = true; }
+  function cekDiam() {
+    if (!TOK || terkunci) return;
+    var sisa = KUNCI_MENIT * 60000 - (Date.now() - aktifTerakhir);
+    if (sisa <= 0) { kunci(); return; }
+    if (sisa <= AWAS_DETIK * 1000) {
+      $('awas').innerHTML = IKON_GEMBOK + '<span>Tidak ada aktivitas. Halaman terkunci dalam <b>' + Math.ceil(sisa / 1000) + ' detik</b>. Sentuh atau gulir layar untuk lanjut.</span>';
+      $('awas').hidden = false;
+    } else tutupAwas();
+  }
+  setInterval(cekDiam, 1000);
+  document.addEventListener('visibilitychange', cekDiam);          // HP dikunci / pindah aplikasi lalu kembali
+  window.addEventListener('pageshow', function (e) { if (e.persisted && TOK) kunci('Masukkan PIN lagi untuk melanjutkan.'); });
   $('fMasuk').addEventListener('submit', function (e) {
     e.preventDefault();
     var pin = $('pin').value.trim();
-    if (!pin) { $('salah').textContent = 'Masukkan PIN dulu.'; return; }
-    $('bMasuk').disabled = true; $('bMasuk').textContent = 'Memeriksa…'; $('salah').textContent = '';
+    if (!pin) { $('salah').textContent = 'Masukkan PIN dulu.'; $('salah').className = 'salah'; return; }
+    $('bMasuk').disabled = true; $('bMasuk').textContent = 'Memeriksa…'; $('salah').textContent = ''; $('salah').className = 'salah';
+    var label = terkunci ? 'Buka' : 'Masuk';
     panggil('tpLogin', [pin], function (s) {
-      $('bMasuk').disabled = false; $('bMasuk').textContent = 'Masuk';
-      simpanSesi(s); muat();
+      $('bMasuk').disabled = false; $('bMasuk').textContent = label;
+      TOK = s.token; terkunci = false; aktifTerakhir = Date.now(); $('pin').value = '';
+      if (D) { $('tab').hidden = false; $('keluar').hidden = false; setTab(tabNow); }   // buka kunci: lanjut dari posisi terakhir
+      else muat();
     }, function (m) {
-      $('bMasuk').disabled = false; $('bMasuk').textContent = 'Masuk';
+      $('bMasuk').disabled = false; $('bMasuk').textContent = label;
       $('salah').textContent = m; $('pin').select();
     });
   });
-  $('keluar').addEventListener('click', function () { hapusSesi(); D = null; tampilMasuk('Kamu sudah keluar.'); });
+  $('keluar').addEventListener('click', function () { TOK = null; location.reload(); });   // keluar = semua isian di halaman ikut hilang
 
   /* ---------- data ---------- */
   var D = null, IX = null, tabNow = 'ubah';
@@ -822,7 +868,7 @@ var DATA = window.__DATA__;
   });
 
   // mulai
-  if (TOK) muat(); else tampilMasuk();
+  tampilMasuk();
 })();
 </script>
 <script src="../assets/jpcc.js"></script>
