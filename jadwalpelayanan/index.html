@@ -1290,23 +1290,32 @@ var PARAM = window.__PARAM__;
     var t = Object.keys(p).map(function (k) { return p[k]; }).filter(String).sort();
     return t.length ? t[0] : '';
   }
+  /** Cycle yang sedang berjalan. Indeks i = bulan pertama paket yang disusun di cycle ini (tahap 2-4); paket tahap 1 = i - bulan. */
   function sikHitung(kini) {
-    var P = SK.paket || { bulan: 2, mulai: 1, buatSebelum: 2 }, ts = SK.terbitSebelum || 1, td = SK.tglTerbit || 1, tunggu = SK.tunggu || 30;
+    var P = SK.paket || { bulan: 2, mulai: 1, buatSebelum: 2 }, ts = SK.terbitSebelum || 1, td = SK.tglTerbit || 1, tunggu = SK.tunggu || 60;
     var awal = +kini.slice(0, 4) * 12 + (+kini.slice(5, 7) - 1) - 12;
+    var m0 = SK.mulai === undefined ? '2027-01' : SK.mulai;   // paket pertama yang dipublish lewat sistem ini
+    var mulai = /^\d{4}-\d{2}$/.test(m0 || '') ? +m0.slice(0, 4) * 12 + (+m0.slice(5, 7) - 1) : null;
     for (var k = 0; k < 40; k++) {
-      var i = awal + k, bln = i % 12 + 1;
+      var i = awal + k, bln = i % 12 + 1, iPrev = i - P.bulan;
       if (((bln - P.mulai) % P.bulan + P.bulan) % P.bulan) continue;
-      var pub = sikPub(i), mns = Object.keys(pub), terbit = mns.length > 0;
+      if (mulai !== null && i < mulai) continue;   // cycle paket sebelum sistem ini dipakai (jadwalnya di file lain): dianggap selesai
+      var pub = sikPub(i), terbit = Object.keys(pub).length > 0, pubPrev = sikPub(iPrev);
+      var anggapPrev = mulai !== null && iPrev < mulai, terbitPrev = anggapPrev || Object.keys(pubPrev).length > 0;   // paket di file lain = dianggap sudah terbit
       var t3 = sikTgl(i - P.buatSebelum, P.mulai), t5 = sikTgl(i + P.bulan - P.buatSebelum, P.mulai);
       if (kini >= t5 && (terbit || kini >= tambahHari(t5, tunggu))) continue;   // cycle ini sudah selesai
-      var iPrev = i - P.bulan, pubPrev = sikPub(iPrev);
-      var t1 = sikAwalTerbit(pubPrev) || sikTgl(iPrev - ts, td), t4plan = sikTgl(i - ts, td);
+      var t1plan = sikTgl(iPrev - ts, td), t1 = terbitPrev && !anggapPrev ? (sikAwalTerbit(pubPrev) || t1plan) : t1plan, t4plan = sikTgl(i - ts, td);
       var t4 = terbit ? (sikAwalTerbit(pub) || t4plan) : t4plan;
       if (terbit && t4 < t3) t4 = t3;
       return { i: i, nama: sikNama(i), namaPrev: sikNama(iPrev), namaNext: sikNama(i + P.bulan), terbit: terbit, pub: pub, t4plan: t4plan,
-        t: [t1, tambahHari(t3, -1), t3, t4, t5], tutupNext: tambahHari(t5, -1) };
+        terbitPrev: terbitPrev, anggapPrev: anggapPrev, pubPrev: pubPrev, t1plan: t1plan, t: [t1, tambahHari(t3, -1), t3, t4, t5], tutupNext: tambahHari(t5, -1),
+        judul: sikNamaPdk(iPrev, i) };
     }
     return null;
+  }
+  function sikNamaPdk(a, b) {   // "Jan–Feb → Mar–Apr 2027"
+    var x = sikNama(a), y = sikNama(b);
+    return x.slice(-4) === y.slice(-4) && x.indexOf(' ') === x.length - 5 ? x.slice(0, -5) + ' → ' + y : x + ' → ' + y;
   }
   function sikRel(t, kini) {
     var n = Math.round((tglObj(t) - tglObj(kini)) / 864e5);
@@ -1316,7 +1325,7 @@ var PARAM = window.__PARAM__;
   /** Posisi hari ini di jalur: indeks tahap + pecahan menuju tahap berikutnya (0..4). */
   function sikPosisi(S, kini) {
     var t = S.t;
-    if (kini < t[0]) return 0;
+    if (!S.terbitPrev || kini < t[0]) return 0;   // jadwal tahap 1 belum terbit: garis menunggu di titik 1
     for (var j = 0; j < 4; j++) {
       if (j === 3 && !S.terbit) return 3;                   // belum terbit: berhenti di tahap 4 (menunggu)
       if (kini < t[j + 1] || (j === 2 && !S.terbit)) {
@@ -1330,6 +1339,11 @@ var PARAM = window.__PARAM__;
   }
   function sikRingkas(S, kini) {
     var t = S.t;
+    if (!S.terbitPrev) return kini < S.t1plan
+      ? { utama: 'Jadwal ' + S.namaPrev + ' terbit ' + labelTgl(S.t1plan), sub: '<b>' + sikRel(S.t1plan, kini) + '</b> · sedang disusun Tim People' }
+      : { utama: 'Jadwal ' + S.namaPrev + ' sebentar lagi terbit', sub: 'Target ' + labelTgl(S.t1plan) + ' · <b>sedang difinalkan</b>' };
+    if (!S.terbit && !S.anggapPrev && kini < tambahHari(t[0], 7)) return { utama: 'Jadwal ' + S.namaPrev + ' sudah terbit ✓',   // seminggu pertama setelah terbit
+      sub: 'Cek jadwalmu di Cari namaku · blockout ' + S.nama + ' ditutup ' + labelTgl(t[1]) + ' · <b>' + sikRel(t[1], kini) + '</b>' };
     if (S.terbit) return { utama: 'Jadwal ' + S.nama + ' sudah terbit ✓',
       sub: 'Berikutnya: blockout ' + S.namaNext + ' ditutup ' + labelTgl(S.tutupNext) + ' · <b>' + sikRel(S.tutupNext, kini) + '</b>' };
     if (kini <= t[1]) return { utama: 'Blockout ' + S.nama + ' ditutup ' + labelTgl(t[1]),
@@ -1347,40 +1361,47 @@ var PARAM = window.__PARAM__;
     var pos = sikPosisi(S, kini), r = sikRingkas(S, kini), t = S.t;
     if (blok) {   // di halaman Blockout: yang penting batas blockout paket yang masih dibuka
       var buka = kini <= t[1], nmB = buka ? S.nama : S.namaNext, tutup = buka ? t[1] : S.tutupNext;
-      r = { utama: 'Blockout ' + nmB + ' ditutup ' + labelTgl(tutup), sub: '<b>' + sikRel(tutup, kini) + '</b> · ' + (S.terbit ? 'jadwal ' + S.nama + ' sudah terbit' :
-        'jadwal ' + S.nama + (kini < S.t4plan ? ' terbit ' + labelTgl(S.t4plan) : ' sebentar lagi terbit')) };
+      var nmT = S.terbitPrev ? S.nama : S.namaPrev, rT = S.terbitPrev ? S.t4plan : S.t1plan, sdh = S.terbitPrev ? S.terbit : false;
+      r = { utama: 'Blockout ' + nmB + ' ditutup ' + labelTgl(tutup), sub: '<b>' + sikRel(tutup, kini) + '</b> · ' + (sdh ? 'jadwal ' + nmT + ' sudah terbit' :
+        'jadwal ' + nmT + (kini < rT ? ' terbit ' + labelTgl(rT) : ' sebentar lagi terbit')) };
     }
     var tahap = [
-      { j: 'Jadwal ' + S.namaPrev + ' terbit', d: 'Cycle sebelumnya selesai. Jadwalnya sudah bisa dicek di Cari namaku.' },
+      { j: 'Jadwal ' + S.namaPrev + ' terbit', d: S.terbitPrev ? 'Awal cycle. Jadwalnya sudah bisa dicek di Cari namaku.' :
+        'Target terbit. Titik ini tercentang otomatis begitu jadwalnya dipublish.' },
       { j: 'Blockout ' + S.nama + ' ditutup', d: 'Batas terakhir isi Blockout date untuk jadwal ' + S.nama + '. Sesudahnya, berhalangan = Izin / tukar jadwal.' },
-      { j: 'Penyusunan jadwal ' + S.nama, d: 'Tim People mulai menyusun jadwal sesuai blockout yang masuk.' },
-      { j: 'Jadwal ' + S.nama + ' terbit', d: S.terbit ? 'Sudah bisa dicek di Cari namaku &amp; Lihat jadwal per ministry.' : 'Target terbit. Cek jadwalmu di sini mulai tanggal ini.' },
-      { j: 'Cycle berikutnya · ' + S.namaNext, d: 'Penyusunan jadwal ' + S.namaNext + ' dimulai. Blockout ' + S.namaNext + ' paling lambat ' + labelTgl(S.tutupNext) + '.' }
+      { j: 'Penyusunan jadwal ' + S.nama, d: 'Tim People mulai menyusun jadwal sesuai blockout yang masuk. Jadwal ' + S.namaPrev + ' mulai berjalan.' },
+      { j: 'Jadwal ' + S.nama + ' terbit', d: S.terbit ? 'Sudah bisa dicek di Cari namaku &amp; Lihat jadwal per ministry.' :
+        'Target terbit. Titik ini tercentang otomatis begitu jadwalnya dipublish.' },
+      { j: 'Cycle berikutnya', d: 'Jadwal ' + S.nama + ' mulai berjalan &amp; penyusunan ' + S.namaNext + ' dimulai. Blockout ' + S.namaNext + ' paling lambat ' + labelTgl(S.tutupNext) + '.' }
     ];
     var h = '<button type="button" class="sik-kepala" aria-expanded="false">' +
         '<span class="sik-ikon">' + IK_SIK.kal + '</span>' +
-        '<span class="sik-tx"><span class="sik-eb">Siklus jadwal · ' + esc(S.nama) + '</span>' +
+        '<span class="sik-tx"><span class="sik-eb">Cycle ' + esc(S.nama) + '</span>' +
           '<span class="sik-utama" style="display:block">' + esc(r.utama) + '</span><span class="sik-sub" style="display:block">' + r.sub + '</span></span>' +
         '<span class="sik-chev">' + IK_SIK.chev + '</span></button>' +
       '<div class="sik-bar"><i style="width:0"></i></div>' +
       '<div class="sik-isi"><ol class="sik-tl">';
-    var sudah = tahap.map(function (x, j) { return j === 3 ? S.terbit : j === 4 ? S.terbit && kini >= t[j] : kini >= t[j]; });
-    var menunggu = !S.terbit && kini >= S.t4plan, iKini = menunggu ? -1 : sudah.indexOf(false);
+    // tahap 1 & 4 (terbit) menunggu publish sungguhan; tahap 2, 3, 5 menurut tanggal
+    var sudah = [S.terbitPrev, kini >= t[1], kini >= t[2], S.terbit, S.terbit && kini >= t[4]];
+    var iKini = sudah.indexOf(false);
+    var chipMn = function (p) {
+      return ['Umum', 'Youth', 'Kids'].map(function (mn) {
+        return p[mn] !== undefined ? '<span class="sik-chip ok">' + mn + ' ✓' + (p[mn] ? ' ' + sikTglPdk(p[mn]) : '') + '</span>' : '<span class="sik-chip">' + mn + ' menyusul</span>';
+      }).join('');
+    };
     tahap.forEach(function (x, j) {
-      var lewat = sudah[j], tunggu = j === 3 && menunggu;
+      var lewat = sudah[j], terbitJ = j === 0 || j === 3, rencana = j === 0 ? S.t1plan : S.t4plan;
+      var tunggu = !lewat && terbitJ && j === iKini && kini >= rencana;
       var kelas = lewat ? 'lewat' : tunggu ? 'tunggu' : j === iKini ? 'kini' : 'nanti';
       var d = tglObj(t[j]);
-      var rel = tunggu ? 'Sedang difinalkan' : lewat ? (j === 3 ? '✓ Terbit ' + sikRel(t[j], kini) : 'Selesai · ' + sikRel(t[j], kini)) : sikRel(t[j], kini);
-      var chip = '';
-      if (j === 3 && S.terbit) {
-        chip = ['Umum', 'Youth', 'Kids'].map(function (mn) {
-          return S.pub[mn] !== undefined ? '<span class="sik-chip ok">' + mn + ' ✓' + (S.pub[mn] ? ' ' + sikTglPdk(S.pub[mn]) : '') + '</span>' : '<span class="sik-chip">' + mn + ' menyusul</span>';
-        }).join('');
-      }
+      var rel = tunggu ? 'Sedang difinalkan' : lewat ? (terbitJ ? '✓ Terbit ' + sikRel(t[j], kini) : 'Selesai · ' + sikRel(t[j], kini)) :
+        j === 4 && kini >= t[j] ? 'Menunggu jadwal ' + S.nama + ' terbit' : sikRel(t[j], kini);
+      var p = j === 0 ? S.pubPrev : S.pub, chip = '';
+      if (terbitJ && lewat && (j === 3 || (!S.anggapPrev && Object.keys(p).length < 3))) chip = chipMn(p);   // tahap 1: tampil kalau masih ada yang menyusul
       h += '<li class="' + kelas + '"><div class="sik-tgl">' + d.getDate() + ' ' + BLN3[d.getMonth()].charAt(0) + BLN3[d.getMonth()].slice(1).toLowerCase() +
-          '<small>' + HARI2[d.getDay()] + ' · ' + d.getFullYear() + (j === 3 && !S.terbit ? '<br>target' : '') + '</small></div>' +
+          '<small>' + HARI2[d.getDay()] + ' · ' + d.getFullYear() + (terbitJ && !lewat ? '<br>target' : '') + '</small></div>' +
         '<span class="sik-node">' + IK_SIK.cek + '</span>' +
-        '<div class="sik-ket"><div class="sik-judul">' + esc(x.j) + '</div>' + (lewat && j < 3 ? '' : '<div class="sik-desk">' + x.d + '</div>') +
+        '<div class="sik-ket"><div class="sik-judul">' + esc(x.j) + '</div>' + (kelas === 'kini' || kelas === 'tunggu' ? '<div class="sik-desk">' + x.d + '</div>' : '') +
           '<span class="sik-rel">' + esc(rel) + '</span>' + (chip ? '<div>' + chip + '</div>' : '') + '</div></li>';
     });
     h += '</ol></div>';
@@ -1444,8 +1465,9 @@ var PARAM = window.__PARAM__;
   function sikTarget() {
     if (!SK) return '';
     var kini = hariIni(), S = sikHitung(kini);
-    if (!S || S.terbit) return '';
-    return ' Jadwal ' + S.nama + (kini < S.t4plan ? ' ditargetkan terbit ' + labelTgl(S.t4plan) + '.' : ' sedang difinalkan dan sebentar lagi terbit.');
+    if (!S || (S.terbitPrev && S.terbit)) return '';
+    var nm = S.terbitPrev ? S.nama : S.namaPrev, rt = S.terbitPrev ? S.t4plan : S.t1plan;
+    return ' Jadwal ' + nm + (kini < rt ? ' ditargetkan terbit ' + labelTgl(rt) + '.' : ' sedang difinalkan dan sebentar lagi terbit.');
   }
 
   /* ---------- Blockout date ---------- */
