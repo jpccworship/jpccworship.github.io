@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<base target="_blank">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Feedback Mentoring · JPCC Worship</title>
+<meta name="description" content="Form feedback mentor & mentee JPCC Worship.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234B2E83'/%3E%3Cpath d='M38 14v24.5a8 8 0 1 1-4-6.9V20l-10 2.5v20a8 8 0 1 1-4-6.9V19l18-5z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/jpcc.css">
+<style>
+  :root { color-scheme: light; --ink: #1F1B24; --muted: #6B6575; --line: #E7E3EE; --bg: #F7F5FA; --soft: #F3EFF9; --brand: #4B2E83; --ok: #137333; --okbg: #E6F4EA; --bad: #A50E0E; --badbg: #FCE8E6; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  button, textarea, select { font-family: inherit; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 18px 16px 60px; }
+  .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .12em; color: var(--brand); text-transform: uppercase; }
+  .eyebrow span { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 10px; letter-spacing: .14em; }
+  h1 { font-size: 24px; line-height: 1.25; margin: 6px 0 4px; letter-spacing: -.01em; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.55; margin: 0 0 18px; }
+  .kartu { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px; margin-bottom: 14px; }
+  .info { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 6px 12px; font-size: 14px; line-height: 1.45; }
+  .info dt { color: var(--muted); font-weight: 700; } .info dd { margin: 0; font-weight: 600; }
+  .lbl { font-size: 12.5px; font-weight: 800; color: #4A4155; margin: 0 0 8px; display: block; }
+  .bln { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bln button { height: 40px; min-width: 64px; padding: 0 12px; border: 1.5px solid #CFC7DD; border-radius: 11px; background: #fff; font-size: 14px; font-weight: 800; cursor: pointer; color: var(--ink); }
+  .bln button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .bln button small { font-weight: 700; color: var(--ok); margin-left: 4px; }
+  .bln button.on small { color: #CDEFD7; }
+  .q { padding: 14px 0; border-top: 1px solid #F1EEF5; }
+  .q:first-of-type { border-top: 0; padding-top: 4px; }
+  .q p { margin: 0 0 10px; font-size: 15px; font-weight: 700; line-height: 1.45; }
+  .skala { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .skala button { height: 48px; border: 1.5px solid #CFC7DD; border-radius: 12px; background: #fff; font-size: 17px; font-weight: 800; cursor: pointer; color: var(--ink); }
+  .skala button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .ujung { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+  textarea { width: 100%; min-height: 100px; border: 1.5px solid #CFC7DD; border-radius: 12px; padding: 10px 12px; font-size: 15px; line-height: 1.5; outline: none; resize: vertical; }
+  textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(75, 46, 131, .12); }
+  .btn { width: 100%; height: 52px; border: 0; border-radius: 14px; background: var(--brand); color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 10px rgba(75, 46, 131, .25); }
+  .btn:disabled { background: #C9C3D3; box-shadow: none; }
+  .salah { color: var(--bad); font-weight: 700; font-size: 14px; min-height: 20px; margin-top: 10px; text-align: center; }
+  .selesai { text-align: center; padding: 30px 18px; }
+  .selesai .c { width: 64px; height: 64px; border-radius: 50%; background: var(--okbg); color: var(--ok); display: inline-flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; }
+  .gagal { background: var(--badbg); color: var(--bad); border-radius: 16px; padding: 18px; font-size: 15px; line-height: 1.5; text-align: center; }
+  .btn2 { height: 42px; padding: 0 16px; border: 1.5px solid #DCD3EC; border-radius: 11px; background: #fff; color: var(--brand); font-size: 14px; font-weight: 800; cursor: pointer; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div id="jpcc-muat" role="status" aria-live="polite"><div class="jm-kotak"><div class="jm-putar" aria-hidden="true"></div><div class="jm-teks">Memuat form feedback…</div><button type="button" class="jm-ulang" hidden>Coba lagi</button></div></div>
+<div class="wrap">
+  <div class="eyebrow">JPCC Worship<span>Mentoring</span></div>
+  <div id="isi"><p class="sub" style="margin-top:20px">Memuat…</p></div>
+</div>
+<script type="text/plain" id="jpcc-app">
+var DATA = window.__DATA__;
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function lp(t) { if (!t) return '–'; return +t.slice(8, 10) + ' ' + BLN[+t.slice(5, 7) - 1] + ' ' + t.slice(0, 4); }
+  function blnKe(mulai, i) { var y = +mulai.slice(0, 4), m = +mulai.slice(5, 7) - 1 + i; y += Math.floor(m / 12); m = m % 12; return BLN[m] + ' ' + String(y).slice(2); }
+  var k = new URLSearchParams(location.search).get('k') || '';
+  var X = null, S = { ke: 1, nilai: [0, 0, 0, 0] };
+  if (!k) { $('isi').innerHTML = '<div class="gagal" style="margin-top:20px">Link feedback tidak lengkap. Buka lagi link yang dikirim Tim Evaluation.</div>'; return; }
+  google.script.run.withSuccessHandler(function (x) { X = x; S.ke = x.ke; gambar(); }).withFailureHandler(function (e) {
+    $('isi').innerHTML = '<div class="gagal" style="margin-top:20px">' + esc(e && e.message ? e.message : e) + '</div>';
+  }).mmInfo(k);
+  function gambar() {
+    var mentee = X.sebagai === 'Mentee';
+    var h = '<h1>Feedback mentoring</h1><p class="sub">Halo <b>' + esc(X.nama) + '</b>, isi sebagai <b>' + esc(X.sebagai.toLowerCase()) + '</b>. Jawabanmu dibaca Tim Evaluation untuk memantau dan membantu jalannya mentoring.</p>' +
+      '<div class="kartu"><dl class="info"><dt>' + (mentee ? 'Mentor' : 'Mentee') + '</dt><dd>' + esc(X.partner) + '</dd><dt>Bidang</dt><dd>' + esc(X.bidang) + '</dd>' +
+      '<dt>Cycle</dt><dd>' + esc(X.cycle || '–') + '</dd><dt>Periode</dt><dd>' + esc(lp(X.mulai) + ' – ' + lp(X.selesai)) + '</dd></dl></div>';
+    if (X.status === 'Dihentikan') { $('isi').innerHTML = h + '<div class="gagal">Mentoring ini sudah dihentikan, feedback tidak perlu diisi lagi.</div>'; return; }
+    h += '<div class="kartu"><span class="lbl">Feedback untuk bulan ke-</span><div class="bln" id="bln">';
+    for (var i = 1; i <= X.nBulan; i++) {
+      var sudah = X.sudah.indexOf(i) >= 0;
+      h += '<button type="button" data-ke="' + i + '"' + (i === S.ke ? ' class="on"' : '') + '>' + i + ' · ' + (X.mulai ? blnKe(X.mulai, i - 1) : '') + (sudah ? '<small>✓</small>' : '') + '</button>';
+    }
+    h += '</div><p class="sub" style="margin:8px 0 0;font-size:12.5px">✓ = sudah pernah diisi (boleh diisi ulang, yang terbaru dipakai).</p></div>';
+    h += '<div class="kartu">' + X.soal.map(function (q, i) {
+      return '<div class="q"><p>' + (i + 1) + '. ' + esc(q) + '</p><div class="skala" data-q="' + i + '">' + [1, 2, 3, 4, 5].map(function (v) {
+        return '<button type="button" data-v="' + v + '"' + (S.nilai[i] === v ? ' class="on"' : '') + '>' + v + '</button>'; }).join('') + '</div><div class="ujung"><span>1 · sangat kurang</span><span>5 · sangat baik</span></div></div>';
+    }).join('') + '<div class="q"><p>Catatan <span style="font-weight:600;color:var(--muted)">(opsional)</span></p><textarea id="cat" maxlength="1500" placeholder="' +
+      esc(mentee ? 'Apa yang paling membantu? Apa yang perlu diperbaiki?' : 'Kemajuan mentee, kendala, rencana bulan depan…') + '"></textarea></div></div>' +
+      '<button type="button" class="btn" id="kirim">Kirim feedback</button><div class="salah" id="salah"></div>';
+    $('isi').innerHTML = h;
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ke]');
+    if (b) { S.ke = +b.getAttribute('data-ke'); Array.prototype.forEach.call($('bln').children, function (x) { x.classList.toggle('on', x === b); }); return; }
+    b = e.target.closest('.skala button');
+    if (b) { var q = +b.parentNode.getAttribute('data-q'); S.nilai[q] = +b.getAttribute('data-v'); Array.prototype.forEach.call(b.parentNode.children, function (x) { x.classList.toggle('on', x === b); }); return; }
+    if (e.target.closest('#kirim')) {
+      if (S.nilai.some(function (v) { return !v; })) { $('salah').textContent = 'Beri nilai 1–5 untuk semua pertanyaan dulu.'; return; }
+      $('kirim').disabled = true; $('kirim').textContent = 'Mengirim…'; $('salah').textContent = '';
+      google.script.run.withSuccessHandler(function (r) {
+        if (X.sudah.indexOf(S.ke) < 0) X.sudah.push(S.ke);
+        $('isi').innerHTML = '<div class="kartu selesai"><span class="c">✓</span><h1 style="margin-top:14px">Terima kasih!</h1><p class="sub">' + esc(r.pesan) + '</p>' +
+          '<button type="button" class="btn2" id="lagi">Isi untuk bulan lain</button></div>';
+      }).withFailureHandler(function (e2) {
+        $('kirim').disabled = false; $('kirim').textContent = 'Kirim feedback'; $('salah').textContent = e2 && e2.message ? e2.message : String(e2);
+      }).mmKirim(k, { ke: S.ke, nilai: S.nilai, cat: $('cat').value.trim() });
+      return;
+    }
+    if (e.target.closest('#lagi')) { S.nilai = [0, 0, 0, 0]; gambar(); window.scrollTo(0, 0); }
+  });
+})();
+</script>
+<script src="../assets/jpcc.js"></script>
+<script>JPCC.mulai("mentoring");</script>
+</body>
+</html>
