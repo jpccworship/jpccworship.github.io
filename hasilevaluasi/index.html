@@ -991,7 +991,7 @@ var DATA = window.__DATA__;
       VC.baru.map(function (k) { var o = IX.orang[k]; return '<button type="button" class="orang-chip" data-vc="' + esc(k) + '">' + esc(o ? o[1] : k) + '</button>'; }).join('') : '';
     if (!VC.k) {
       $('kIsi').innerHTML = '<div class="kartu"><h3>Volunteer Card</h3><p class="ket" style="margin-bottom:0">Cari nama di kotak atas, atau klik nama orang di Dashboard, Program, Dampak, atau Mentor–Mentee. ' +
-        'Isinya: skor & aspek, grafik progres dengan tanda program yang diikuti, kekuatan & yang perlu dikembangkan, catatan rekan, perjalanan (audisi → deployment), program, mentoring, dan riwayat pelayanan.</p></div>';
+        'Isinya: skor & aspek, grafik progres dengan tanda program yang diikuti, kekuatan & yang perlu dikembangkan, catatan rekan, perjalanan (audisi → deployment), program, mentoring, riwayat pelayanan, dan riwayat cuti.</p></div>';
       return;
     }
     var k = VC.k;
@@ -1080,6 +1080,22 @@ var DATA = window.__DATA__;
     h += '<div class="kartu"><h3>Jadwal pelayanan</h3><div class="jadwal2"><div><div class="eyebrow2" style="margin-bottom:4px">Terakhir</div><ul>' + ((d.lalu || []).length ? d.lalu.map(function (x) { return '<li>' + esc(lt(x[0])) + '<small>' + esc(x[1] + ' · ' + x[2]) + '</small></li>'; }).join('') : '<li class="kecil">Belum ada</li>') + '</ul></div>' +
       '<div><div class="eyebrow2" style="margin-bottom:4px">Berikutnya</div><ul>' + ((d.depan || []).length ? d.depan.map(function (x) { return '<li>' + esc(lt(x[0])) + '<small>' + esc(x[1] + ' · ' + x[2]) + '</small></li>'; }).join('') : '<li class="kecil">Belum ada</li>') + '</ul></div></div></div>';
     h += '</div>';
+    // riwayat cuti & blockout (tab Blockout Date + Riwayat Cuti di file Admin)
+    var cuti = r.cuti || [];
+    var periodeCuti = function (a, b) {
+      if (a === b) return lp(a);
+      var x = lp(a), y = lp(b);
+      return a.slice(0, 4) === b.slice(0, 4) ? x.replace(/ \d{4}$/, '') + ' – ' + y : x + ' – ' + y;
+    };
+    h += '<div class="kartu"><h3>Riwayat cuti &amp; blockout</h3><p class="ket">Dari Form Cuti Pelayanan dan Blockout date di halaman Jadwal Pelayanan. Yang dibatalkan tidak ditampilkan.</p>' +
+      (cuti.length ? '<div class="tbl-wrap"><table class="t"><thead><tr><th>Periode</th><th>Alasan &amp; keterangan</th></tr></thead><tbody>' +
+        cuti.map(function (c) {
+          var st = c[1] < kini ? 'Selesai' : c[0] > kini ? 'Akan datang' : 'Sedang cuti', kls = c[1] < kini ? 'abu' : c[0] > kini ? '' : 'oren';
+          if (/khusus/i.test(c[4] || '')) { st = c[4]; kls = 'abu'; }
+          return '<tr><td style="white-space:nowrap;vertical-align:top"><b>' + esc(periodeCuti(c[0], c[1])) + '</b><div class="kecil" style="color:var(--muted);margin:2px 0 6px">' +
+            (selisih(c[0], c[1]) + 1) + ' hari</div><span class="chip ' + kls + '">' + esc(st) + '</span></td>' +
+            '<td style="vertical-align:top"><b>' + esc(c[2] || '–') + '</b>' + (c[3] ? '<div class="kecil" style="color:var(--muted);margin-top:2px">' + esc(c[3]) + '</div>' : '') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' : '<div class="kosong">Belum ada cuti / blockout tercatat.</div>') + '</div>';
     $('kIsi').innerHTML = h;
   }
   function grafikKartu(k, d, prog) {
