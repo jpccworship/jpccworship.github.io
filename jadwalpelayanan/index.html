@@ -118,10 +118,10 @@
   .sik-tl li.tunggu .sik-rel { background: #FFF3E0; color: #9A3412; }
   .sik-chip { display: inline-block; margin: 6px 6px 0 0; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--soft); color: #4A4155; }
   .sik-chip.ok { background: #E6F4EA; color: #0B5A2A; }
-  .sik-jalur { position: absolute; z-index: 1; left: 89px; width: 4px; margin-left: -2px; border-radius: 2px; background: #E7E3EE; }
+  .sik-jalur { position: absolute; z-index: 1; left: 91px; width: 4px; margin-left: -2px; border-radius: 2px; background: #E7E3EE; }
   .sik-isian { position: absolute; left: 0; right: 0; top: 0; height: 0; border-radius: 2px; background: linear-gradient(180deg, #7A5BC2, var(--brand));
     transition: height 1s var(--ease); }
-  .sik-kepala-kini { position: absolute; z-index: 3; left: 89px; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #fff;
+  .sik-kepala-kini { position: absolute; z-index: 3; left: 91px; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #fff;
     border: 3px solid var(--brand); transition: top 1s var(--ease); }
   .sik-hariini { position: absolute; z-index: 3; left: 0; width: 70px; margin-top: -10px; text-align: right; transition: top 1s var(--ease); }
   .sik-hariini span { display: inline-block; padding: 2px 7px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 800; white-space: nowrap; }
@@ -1423,18 +1423,20 @@ var PARAM = window.__PARAM__;
       if (!tl || !el.classList.contains('buka')) return;
       var nodes = tl.querySelectorAll('.sik-node');
       if (nodes.length < 5) return;
-      var t0 = tl.getBoundingClientRect().top;
+      var tr = tl.getBoundingClientRect(), t0 = tr.top;
       var y = Array.prototype.map.call(nodes, function (n) { var r = n.getBoundingClientRect(); return r.top - t0 + r.height / 2; });
+      // garis tepat di tengah titik tahap (diukur dari titiknya, bukan angka tetap, supaya tetap lurus di semua HP & zoom)
+      var r0 = nodes[0].getBoundingClientRect(), cx = Math.round((r0.left - tr.left + r0.width / 2) * 2) / 2;
       var jalur = tl.querySelector('.sik-jalur');
       if (!jalur) {
         jalur = document.createElement('div'); jalur.className = 'sik-jalur'; jalur.innerHTML = '<div class="sik-isian"></div>'; tl.appendChild(jalur);
         var ujung = document.createElement('div'); ujung.className = 'sik-kepala-kini'; tl.appendChild(ujung);
         var hi = document.createElement('div'); hi.className = 'sik-hariini'; hi.innerHTML = '<span>Hari ini</span>'; tl.appendChild(hi);
       }
-      jalur.style.top = y[0] + 'px'; jalur.style.height = (y[4] - y[0]) + 'px';
+      jalur.style.top = y[0] + 'px'; jalur.style.height = (y[4] - y[0]) + 'px'; jalur.style.left = cx + 'px';
       var p = el._pos, a = Math.min(Math.floor(p), 3), yy = y[a] + (y[Math.min(a + 1, 4)] - y[a]) * (p - a);
       var isian = jalur.firstChild, ujungK = tl.querySelector('.sik-kepala-kini'), hari = tl.querySelector('.sik-hariini');
-      ujungK.style.top = yy + 'px';
+      ujungK.style.top = yy + 'px'; ujungK.style.left = cx + 'px';
       // label "Hari ini" di bawah tulisan tanggal tahap terakhir yang sudah lewat; disembunyikan kalau tidak muat sebelum tahap berikutnya
       var tgl = tl.querySelectorAll('.sik-tgl'), bawah = Array.prototype.map.call(tgl, function (x) { return x.getBoundingClientRect().bottom - t0; });
       var py = Math.max(yy, bawah[a] + 14);
