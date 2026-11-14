@@ -102,6 +102,32 @@
   .btn.kecil { height: 42px; padding: 0 16px; font-size: 14px; }
   .kurang { font-size: 13px; color: var(--muted); }
   .kaki { margin-top: 32px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; }
+  .chip .jml { display: inline-block; min-width: 20px; height: 20px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--soft); color: var(--brand);
+    font-size: 12px; line-height: 20px; text-align: center; }
+  .chip.on .jml { background: rgba(255, 255, 255, .22); color: #fff; }
+  .l.apr .no { background: #137333; }
+  .l.pp .no { background: #B06000; }
+  .sub { margin: -4px 0 10px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .sub b { color: var(--ink); }
+  .tambah { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 58px; padding: 10px 14px; margin: 0 0 4px;
+    border: 2px dashed #CFC7DD; border-radius: 16px; background: #fff; color: var(--muted); font-size: 15px; font-weight: 800; text-align: center; cursor: pointer;
+    transition: background .12s, border-color .12s; -webkit-tap-highlight-color: transparent; }
+  .tambah .ikon { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 21px; font-weight: 800; line-height: 1; }
+  .tambah.apr { border-color: #9FD3AE; color: #137333; }
+  .tambah.apr .ikon { background: #E6F4EA; }
+  .tambah.apr:hover { background: #F4FBF6; border-color: #137333; }
+  .tambah.pp { border-color: #F2C98F; color: #8A5300; }
+  .tambah.pp .ikon { background: #FDF0DC; }
+  .tambah.pp:hover { background: #FFFAF2; border-color: #B06000; }
+  .tambah.kunci { cursor: not-allowed; border: 2px solid #E7E3EE; color: var(--muted); font-size: 13.5px; font-weight: 700; line-height: 1.45;
+    background: repeating-linear-gradient(-45deg, #FBFAFD 0 9px, #EFEBF4 9px 18px); }
+  .tambah.kunci .ikon { width: auto; height: auto; font-size: 15px; }
+  .poin.apr { border-color: #CDE9D5; background: #F8FCF9; }
+  .poin.apr .no { background: #E6F4EA; color: #137333; }
+  .poin.pp { border-color: #F5DDBA; background: #FFFBF5; }
+  .poin.pp .no { background: #FDF0DC; color: #8A5300; }
+  .panel.apr { border-color: #9FD3AE; box-shadow: 0 10px 30px rgba(19, 115, 51, .08); }
+  .panel.pp { border-color: #F2C98F; box-shadow: 0 10px 30px rgba(176, 96, 0, .08); }
   @media (max-width: 640px) {
     .wrap { padding: 12px 14px 48px; }
     h1 { font-size: 20px; }
@@ -117,7 +143,7 @@
     <div class="eyebrow">JPCC Worship<span class="people">People</span></div>
     <h1>Masukan Ibadah</h1>
   </header>
-  <p class="intro">Terima kasih sudah ikut beribadah! Masukanmu tentang tim Praise &amp; Worship dan tim Sound membantu kami bertumbuh. Pilih ibadah yang kamu ikuti, lalu tambahkan beberapa poin. Cukup pilih dari daftar, sekitar 2 menit.</p>
+  <p class="intro">Terima kasih sudah ikut beribadah! Masukanmu untuk tim Praise &amp; Worship, Sound, dan Choir membantu kami bertumbuh. Pilih ibadah yang kamu ikuti dan tim yang mau kamu beri masukan. Mulai dari apresiasi, lalu saran pengembangan kalau ada. Cukup pilih dari daftar, sekitar 2 menit.</p>
 
   <div class="l"><span class="no">1</span>Nama kamu</div>
   <div class="kotak">
@@ -134,10 +160,18 @@
   </section>
 
   <section id="s3" hidden>
-    <div class="l"><span class="no">3</span>Poin masukan</div>
-    <div id="daftarPoin"></div>
-    <div class="panel" id="panel" hidden></div>
-    <button type="button" class="btn garis kecil" id="tambah" hidden>+ Tambah poin lain</button>
+    <div class="l"><span class="no">3</span>Masukan untuk</div>
+    <div class="chips" id="pilihTim"></div>
+    <div id="isiTim" hidden>
+      <div class="l apr"><span class="no">4</span>Apresiasi</div>
+      <p class="sub" id="subApr"></p>
+      <div id="daftarApr"></div>
+      <div id="slotApr"></div>
+      <div class="l pp"><span class="no">5</span>Saran pengembangan</div>
+      <p class="sub" id="subPp"></p>
+      <div id="daftarPp"></div>
+      <div id="slotPp"></div>
+    </div>
     <div class="baris-btn" id="barKirim" hidden>
       <button type="button" class="btn" id="kirim">Kirim masukan</button>
       <span class="kurang" id="infoKirim"></span>
@@ -267,104 +301,132 @@ var DATA = window.__DATA__;
     gambarIbadah();
     $('hasil').innerHTML = '';
     $('s3').hidden = false;
-    if (!st.poin.length && !st.draf) bukaDraf();
+    if (!st.tim && P.urut.length === 1) st.tim = P.urut[0];
     gambarPoin();
     setTimeout(function () { $('s3').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   });
 
-  /* ---------- 3. poin: Kategori -> Aspek -> Apresiasi / Perlu perbaikan -> pilihan ---------- */
-  function bukaDraf() {
-    st.draf = { kat: P.urut.length === 1 ? P.urut[0] : '', aspek: '', sifat: '', pilihan: '', catatan: '' };
+  /* ---------- 3-5. tim -> apresiasi (+) -> saran pengembangan (+, terbuka setelah ada minimal 1 apresiasi untuk tim itu) ---------- */
+  var APR = SIFAT[0], PP = SIFAT[1];
+  st.tim = '';
+  function poinTim(kat, sf) { return st.poin.filter(function (x) { return x.kat === kat && (!sf || x.sifat === sf); }); }
+  function timKurangApr() {
+    var t = [];
+    st.poin.forEach(function (x) { if (t.indexOf(x.kat) < 0 && !poinTim(x.kat, APR).length) t.push(x.kat); });
+    return t;
   }
-  function labelPoin(x) {
-    return '<span class="sf ' + (x.sifat === SIFAT[0] ? 'apr' : 'pp') + '">' + esc(x.sifat) + '</span>' + esc(x.pilihan === LAIN ? x.catatan : x.pilihan) +
-      '<small>' + esc(x.kat) + ' › ' + esc(x.aspek) + (x.pilihan === LAIN ? ' › Lain-lain' : '') + '</small>';
+  function gambarTim() {
+    $('pilihTim').innerHTML = P.urut.length ? P.urut.map(function (k) {
+      var n = poinTim(k).length;
+      return '<button type="button" class="chip' + (st.tim === k ? ' on' : '') + '" data-tim="' + esc(k) + '">' + esc(k) + (n ? '<span class="jml">' + n + '</span>' : '') + '</button>';
+    }).join('') : '<div class="pesan kosong">Pilihan masukan belum diatur. Hubungi tim People.</div>';
   }
-  function gambarPoin() {
-    $('daftarPoin').innerHTML = st.poin.map(function (x, i) {
-      return '<div class="poin"><span class="no">' + (i + 1) + '</span><span class="isi">' + labelPoin(x) + '</span>' +
-        '<button type="button" class="x" data-hapus="' + i + '" aria-label="Hapus poin">×</button></div>';
-    }).join('');
-    gambarDraf();
-    $('tambah').hidden = !!st.draf || st.poin.length >= MAKS || st.kirim;
-    $('barKirim').hidden = !st.poin.length || !!st.draf;
-    $('kirim').disabled = st.kirim || !st.poin.length;
-    $('kirim').textContent = st.kirim ? 'Mengirim…' : 'Kirim masukan (' + st.poin.length + ' poin)';
-    $('infoKirim').textContent = st.poin.length >= MAKS ? 'Maksimal ' + MAKS + ' poin.' : '';
+  function kartuPoin(x, i) {
+    return '<div class="poin ' + (x.sifat === APR ? 'apr' : 'pp') + '"><span class="no">' + (i + 1) + '</span><span class="isi">' + esc(x.pilihan === LAIN ? x.catatan : x.pilihan) +
+      '<small>' + esc(x.aspek) + (x.pilihan === LAIN ? ' · Lain-lain' : '') + '</small></span>' +
+      '<button type="button" class="x" data-hapus="' + st.poin.indexOf(x) + '" aria-label="Hapus poin">×</button></div>';
   }
-  function gambarDraf() {
-    var p = $('panel'), d = st.draf;
-    if (!d) { p.hidden = true; p.innerHTML = ''; return; }
-    var K = P.k[d.kat], A = K && d.aspek ? K.a[d.aspek] : null;
-    var h = '<h3>Poin ' + (st.poin.length + 1) + '</h3>';
-    h += '<div class="tanya">Tentang apa?</div><div class="chips">' + P.urut.map(function (k) {
-      return '<button type="button" class="chip' + (d.kat === k ? ' on' : '') + '" data-kat="' + esc(k) + '">' + esc(k) + '</button>';
+  function kotakTambah(sf) {
+    var apr = sf === APR;
+    if (!apr && !poinTim(st.tim, APR).length) {
+      return '<div class="tambah kunci" aria-disabled="true"><span class="ikon">🔒</span><span>Isi minimal 1 apresiasi dulu untuk membuka saran pengembangan</span></div>';
+    }
+    if (st.kirim) return '';
+    if (st.poin.length >= MAKS) return '<div class="tambah kunci" aria-disabled="true"><span>Maksimal ' + MAKS + ' poin dalam satu kiriman.</span></div>';
+    return '<button type="button" class="tambah ' + (apr ? 'apr' : 'pp') + '" data-tambah="' + esc(sf) + '"><span class="ikon">+</span><span>Tambah ' +
+      (apr ? 'apresiasi' : 'saran pengembangan') + '</span></button>';
+  }
+  function panelDraf() {
+    var d = st.draf, K = P.k[st.tim], A = d.aspek ? K.a[d.aspek] : null, apr = d.sifat === APR;
+    var h = '<div class="panel ' + (apr ? 'apr' : 'pp') + '" id="panel"><h3>' + (apr ? 'Apresiasi' : 'Saran pengembangan') + ' untuk ' + esc(st.tim) + '</h3>';
+    h += '<div class="tanya">Bagian mana?</div><div class="chips">' + K.urut.map(function (a) {
+      return '<button type="button" class="chip' + (d.aspek === a ? ' on' : '') + '" data-aspek="' + esc(a) + '">' + esc(a) + '</button>';
     }).join('') + '</div>';
-    if (K) {
-      h += '<div class="tanya">Bagian mana?</div><div class="chips">' + K.urut.map(function (a) {
-        return '<button type="button" class="chip' + (d.aspek === a ? ' on' : '') + '" data-aspek="' + esc(a) + '">' + esc(a) + '</button>';
-      }).join('') + '</div>';
-    }
     if (A) {
-      h += '<div class="tanya">Apresiasi atau perlu perbaikan?</div><div class="sifat">' +
-        '<button type="button" class="apr' + (d.sifat === SIFAT[0] ? ' on' : '') + '" data-sifat="' + esc(SIFAT[0]) + '">👍 ' + esc(SIFAT[0]) + '</button>' +
-        '<button type="button" class="pp' + (d.sifat === SIFAT[1] ? ' on' : '') + '" data-sifat="' + esc(SIFAT[1]) + '">🔧 ' + esc(SIFAT[1]) + '</button></div>';
-    }
-    if (A && d.sifat) {
       var ops = (A[d.sifat] || []).concat([LAIN]);
-      h += '<div class="tanya">Yang paling sesuai</div><div class="opsi">' + ops.map(function (o) {
+      h += '<div class="tanya">' + (apr ? 'Yang paling kamu apresiasi' : 'Yang paling perlu dikembangkan') + '</div><div class="opsi">' + ops.map(function (o) {
         return '<button type="button" class="' + (o === LAIN ? 'lain' : '') + (d.pilihan === o ? ' on' : '') + '" data-pilih="' + esc(o) + '">' + esc(o) + '</button>';
       }).join('') + '</div>';
       if (d.pilihan === LAIN) {
-        h += '<div class="tanya">Tulis singkat masukanmu</div><textarea id="catatan" maxlength="500" placeholder="Tulis singkat, mis. lagu penutup terlalu panjang">' + esc(d.catatan) + '</textarea>';
+        h += '<div class="tanya">Tulis singkat</div><textarea id="catatan" maxlength="500" placeholder="' +
+          (apr ? 'Tulis singkat, mis. transisi ke doa sangat menyentuh' : 'Tulis singkat, mis. lagu penutup terlalu panjang') + '">' + esc(d.catatan) + '</textarea>';
       }
     }
-    var siap = d.kat && d.aspek && d.sifat && d.pilihan && (d.pilihan !== LAIN || d.catatan.trim());
-    h += '<div class="baris-btn"><button type="button" class="btn kecil" id="simpanPoin"' + (siap ? '' : ' disabled') + '>Simpan poin</button>' +
-      (st.poin.length ? '<button type="button" class="btn garis kecil" id="batalPoin">Batal</button>' : '') +
-      '<span class="kurang" id="kurangPoin">' + (siap ? '' : !d.kat ? 'Pilih kategori.' : !d.aspek ? 'Pilih bagian.' : !d.sifat ? 'Pilih apresiasi / perlu perbaikan.' : !d.pilihan ? 'Pilih yang paling sesuai.' : 'Tulis catatan untuk Lain-lain.') + '</span></div>';
-    p.innerHTML = h;
-    p.hidden = false;
+    var siap = d.aspek && d.pilihan && (d.pilihan !== LAIN || d.catatan.trim());
+    h += '<div class="baris-btn"><button type="button" class="btn kecil" id="simpanPoin"' + (siap ? '' : ' disabled') + '>Simpan</button>' +
+      '<button type="button" class="btn garis kecil" id="batalPoin">Batal</button>' +
+      '<span class="kurang" id="kurangPoin">' + (siap ? '' : !d.aspek ? 'Pilih bagian.' : !d.pilihan ? 'Pilih yang paling sesuai.' : 'Tulis catatan untuk Lain-lain.') + '</span></div></div>';
+    return h;
   }
-  $('panel').addEventListener('click', function (e) {
-    var d = st.draf, b = e.target.closest('button');
-    if (!d || !b) return;
+  function gambarPoin() {
+    gambarTim();
+    var ada = !!st.tim && !!P.k[st.tim];
+    $('isiTim').hidden = !ada;
+    if (ada) {
+      var nApr = poinTim(st.tim, APR).length;
+      $('subApr').innerHTML = 'Mulai dari hal yang sudah baik dari <b>' + esc(st.tim) + '</b>. Minimal 1 apresiasi.';
+      $('subPp').innerHTML = nApr ? 'Hal yang bisa dikembangkan <b>' + esc(st.tim) + '</b>. Boleh dilewati.' : 'Terbuka setelah ada minimal 1 apresiasi.';
+      [[APR, 'Apr'], [PP, 'Pp']].forEach(function (z) {
+        $('daftar' + z[1]).innerHTML = poinTim(st.tim, z[0]).map(kartuPoin).join('');
+        $('slot' + z[1]).innerHTML = st.draf && st.draf.sifat === z[0] ? panelDraf() : kotakTambah(z[0]);
+      });
+    }
+    var kurang = timKurangApr();
+    $('barKirim').hidden = !st.poin.length;
+    $('kirim').disabled = st.kirim || !st.poin.length || !!st.draf || kurang.length > 0;
+    $('kirim').textContent = st.kirim ? 'Mengirim…' : 'Kirim masukan (' + st.poin.length + ' poin)';
+    $('infoKirim').textContent = st.kirim ? '' : st.draf ? 'Simpan atau batalkan poin yang sedang diisi.' :
+      kurang.length ? 'Tambahkan minimal 1 apresiasi untuk ' + kurang.join(', ') + '.' : st.poin.length >= MAKS ? 'Maksimal ' + MAKS + ' poin.' : '';
+  }
+  function simpanPoin() {
+    var d = st.draf;
+    if (!d) return;
+    d.catatan = d.pilihan === LAIN ? d.catatan.replace(/\s+/g, ' ').trim() : '';
+    var kunci = [st.tim, d.aspek, d.sifat, d.pilihan, d.catatan.toLowerCase()].join('|');
+    var dobel = st.poin.some(function (x) { return [x.kat, x.aspek, x.sifat, x.pilihan, x.catatan.toLowerCase()].join('|') === kunci; });
+    if (dobel) { $('kurangPoin').textContent = 'Poin ini sudah ada di daftar.'; return; }
+    st.poin.push({ kat: st.tim, aspek: d.aspek, sifat: d.sifat, pilihan: d.pilihan, catatan: d.catatan });
+    st.draf = null;
+    gambarPoin();
+  }
+  $('s3').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b || st.kirim) return;
+    var d = st.draf;
+    if (b.hasAttribute('data-tim')) {
+      var t = b.getAttribute('data-tim');
+      if (t !== st.tim) { st.tim = t; st.draf = null; }
+      gambarPoin();
+      return;
+    }
+    if (b.hasAttribute('data-hapus')) {
+      st.poin.splice(Number(b.getAttribute('data-hapus')), 1);
+      gambarPoin();
+      return;
+    }
+    if (b.hasAttribute('data-tambah')) {
+      var K = P.k[st.tim];
+      st.draf = { sifat: b.getAttribute('data-tambah'), aspek: K && K.urut.length === 1 ? K.urut[0] : '', pilihan: '', catatan: '' };
+      gambarPoin();
+      setTimeout(function () { if ($('panel')) $('panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 40);
+      return;
+    }
+    if (!d) return;
     if (b.id === 'simpanPoin') return simpanPoin();
     if (b.id === 'batalPoin') { st.draf = null; gambarPoin(); return; }
-    if (b.hasAttribute('data-kat')) { var k = b.getAttribute('data-kat'); if (k !== d.kat) { d.kat = k; d.aspek = ''; d.sifat = ''; d.pilihan = ''; } }
-    else if (b.hasAttribute('data-aspek')) { var a = b.getAttribute('data-aspek'); if (a !== d.aspek) { d.aspek = a; d.sifat = ''; d.pilihan = ''; } }
-    else if (b.hasAttribute('data-sifat')) { var s = b.getAttribute('data-sifat'); if (s !== d.sifat) { d.sifat = s; d.pilihan = ''; } }
+    if (b.hasAttribute('data-aspek')) { var a = b.getAttribute('data-aspek'); if (a !== d.aspek) { d.aspek = a; d.pilihan = ''; } }
     else if (b.hasAttribute('data-pilih')) { d.pilihan = b.getAttribute('data-pilih'); }
     else return;
-    gambarDraf();
+    gambarPoin();
     if (d.pilihan === LAIN && $('catatan')) $('catatan').focus();
   });
-  $('panel').addEventListener('input', function (e) {
+  $('s3').addEventListener('input', function (e) {
     if (e.target.id !== 'catatan' || !st.draf) return;
     st.draf.catatan = e.target.value;
     var siap = !!st.draf.catatan.trim();
     $('simpanPoin').disabled = !siap;
     $('kurangPoin').textContent = siap ? '' : 'Tulis catatan untuk Lain-lain.';
   });
-  function simpanPoin() {
-    var d = st.draf;
-    if (!d) return;
-    d.catatan = d.pilihan === LAIN ? d.catatan.replace(/\s+/g, ' ').trim() : '';
-    var kunci = [d.kat, d.aspek, d.sifat, d.pilihan, d.catatan.toLowerCase()].join('|');
-    var dobel = st.poin.some(function (x) { return [x.kat, x.aspek, x.sifat, x.pilihan, x.catatan.toLowerCase()].join('|') === kunci; });
-    if (dobel) { $('kurangPoin').textContent = 'Poin ini sudah ada di daftar.'; return; }
-    st.poin.push({ kat: d.kat, aspek: d.aspek, sifat: d.sifat, pilihan: d.pilihan, catatan: d.catatan });
-    st.draf = null;
-    gambarPoin();
-  }
-  $('daftarPoin').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-hapus]');
-    if (!b || st.kirim) return;
-    st.poin.splice(Number(b.getAttribute('data-hapus')), 1);
-    if (!st.poin.length && !st.draf) bukaDraf();
-    gambarPoin();
-  });
-  $('tambah').addEventListener('click', function () { bukaDraf(); gambarPoin(); $('panel').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
   /* ---------- 4. kirim ---------- */
   $('kirim').addEventListener('click', function () {
@@ -375,7 +437,7 @@ var DATA = window.__DATA__;
     g.withSuccessHandler(function (x) {
       st.kirim = false;
       var n = st.poin.length;
-      st.poin = []; st.draf = null; st.kunci = '';
+      st.poin = []; st.draf = null; st.kunci = ''; st.tim = '';
       $('s3').hidden = true;
       gambarIbadah();
       pesan('ok', '✓ <b>' + n + ' poin masukan terkirim</b> untuk ' + esc(x && x.label ? x.label : 'ibadah ini') + '. Terima kasih!<br>Mau memberi masukan untuk ibadah lain? Pilih di bawah.');
