@@ -366,6 +366,10 @@
   .ob-m.saya { align-self: flex-end; background: var(--brand); color: #fff; border-color: var(--brand); border-radius: 14px 14px 5px 14px; }
   .ob-m.saya small { color: #D9CCF5; } .ob-m.saya a { color: #fff; }
   .ob-hari { align-self: center; font-size: 11px; font-weight: 700; color: var(--muted); background: #ECE7F4; border-radius: 999px; padding: 2px 10px; margin: 4px 0; }
+  .ob-lama { align-self: center; border: 1.5px solid #D9D0EA; background: #fff; color: var(--brand); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; margin-bottom: 4px; }
+  .ob-lama:disabled { opacity: .6; cursor: default; }
+  .ob-info { align-self: center; font-size: 11px; color: var(--muted); background: #FFF8E1; border-radius: 8px; padding: 3px 10px; margin-bottom: 4px; text-align: center; }
+  .ob-k em { display: block; font-style: normal; font-size: 11.5px; font-weight: 500; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ob-form { display: flex; gap: 8px; padding: 8px; border-top: 1px solid var(--line); }
   .ob-form textarea { flex: 1; min-width: 0; resize: none; height: 42px; max-height: 120px; border: 1.5px solid #CFC7DD; border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 14.5px; outline: none; }
   .ob-form textarea:focus { border-color: var(--brand); }
@@ -2013,9 +2017,12 @@ var PART_BAGIAN = { inUmum: ['inputRingan:Umum'], inYouth: ['inputRingan:Youth']
   pic: ['pic', 'input'], yi: ['yi', 'input'], formasi: ['formasi'], atur: ['atur', 'input'], log: ['log'], akun: ['akun'], anggota: ['anggota', 'input'], db: [] };
 var DENYUT_MS = 4000, DENYUT_SEMBUNYI_MS = 20000, RT = { t: 0, jalan: false, aktif: false, gagal: 0 };
 var NOTIF = [], NOTIF_SEJAK = 0, NB = 0, CHAT = [], CHAT_SEJAK = 0, CB = {}, ONLINE = [], CH = { kanal: 'semua', buka: false, daftar: true };
+var CHAT_LAGI = {}, CHAT_AKHIR = {}, CHAT_HARI = 90, CHAT_MUAT = false, CHAT_SIAP = false;
 function mulaiRealtime() {
   RT.aktif = true; NOTIF = []; NOTIF_SEJAK = 0; NB = 0; CHAT = []; CHAT_SEJAK = 0;
-  api('scChat').then(function (r) { terimaChat(r.pesan, r.cb, true); }).catch(function () {});
+  CHAT_LAGI = {}; CHAT_AKHIR = {}; CHAT_SIAP = false;
+  // denyut baru mengambil chat setelah riwayat awal termuat (supaya pesan lama tidak dianggap pesan baru)
+  api('scChat').then(function (r) { muatChatAwal(r, true); CHAT_SIAP = true; }, function () { CHAT_SIAP = true; });
   denyut();
 }
 function hentikanRealtime() { RT.aktif = false; clearTimeout(RT.t); ONLINE = []; gambarOnline(); }
@@ -2025,12 +2032,13 @@ function denyut() {
   if (!S.akun || !TOKEN || $('masuk').style.display !== 'none') return jadwalDenyut(DENYUT_MS);
   if (RT.jalan) return;
   RT.jalan = true;
-  api('scDenyut', { hal: S.hal, mn: S.mn, notifSejak: NOTIF_SEJAK, chatSejak: CHAT_SEJAK }).then(function (r) {
+  api('scDenyut', { hal: S.hal, mn: S.mn, notifSejak: NOTIF_SEJAK, chatSejak: CHAT_SIAP ? CHAT_SEJAK : -1 }).then(function (r) {
     RT.gagal = 0;
     ONLINE = r.on || [];
     if (S.akun) S.akun.nb = r.nbW || 0;
     terimaNotif(r.notif || [], r.nb, NOTIF_SEJAK > 0);
     terimaChat(r.chat || [], r.cb, false);
+    if (r.chatUlang) api('scChat').then(function (r2) { muatChatAwal(r2, false); }).catch(function () {});
     gambarOnline();
     var v = r.v || {}, awal = !Object.keys(VER).length;
     if (awal) { VER = v; return; }
@@ -2151,7 +2159,8 @@ function terimaChat(baru, cb, awal) {
   CHAT.forEach(function (m) { ada[m[0]] = 1; });
   var masuk = baru.filter(function (m) { return !ada[m[0]]; });
   CHAT = CHAT.concat(masuk).sort(function (a, b) { return a[0] - b[0]; });
-  if (CHAT.length > 400) CHAT = CHAT.slice(-400);
+  if (CHAT.length > 6000) CHAT = CHAT.slice(-6000);
+  CHAT.forEach(function (m) { if (!CHAT_AKHIR[m[4]] || m[1] > CHAT_AKHIR[m[4]]) CHAT_AKHIR[m[4]] = m[1]; });
   baru.forEach(function (m) { if (m[0] > CHAT_SEJAK) CHAT_SEJAK = m[0]; });
   var dariLain = masuk.filter(function (m) { return m[2] !== S.akun.id; });
   if (!awal && dariLain.length && !(CH.buka && dariLain.every(function (m) { return m[4] === CH.kanal; }))) {
@@ -2167,13 +2176,53 @@ function gambarBadgeChat() {
   CHAT.forEach(function (m) { if (m[4].indexOf('dm:') === 0 && m[2] !== S.akun.id && m[1] > (Number(CB[m[4]]) || 0)) n++; });
   var b = $('obrolN'); if (b) { b.textContent = n > 99 ? '99+' : n; b.hidden = !n; }
 }
-var tandaT = 0;
+var tandaT = {};   // per percakapan: pindah percakapan tidak membatalkan penanda baca yang sebelumnya
 function tandaiChatDibaca() {
   var k = CH.kanal, akhir = 0;
   CHAT.forEach(function (m) { if (m[4] === k && m[1] > akhir) akhir = m[1]; });
   if (!akhir || (Number(CB[k]) || 0) >= akhir) return;
   CB[k] = akhir; gambarBadgeChat();
-  clearTimeout(tandaT); tandaT = setTimeout(function () { api('scChatBaca', k, akhir).catch(function () {}); }, 600);
+  clearTimeout(tandaT[k]); tandaT[k] = setTimeout(function () { delete tandaT[k]; api('scChatBaca', k, akhir).catch(function () {}); }, 600);
+}
+/* pesan tersimpan 90 hari di server: saat masuk, semua yang belum dibaca + 40 pesan terakhir tiap percakapan langsung dimuat */
+function muatChatAwal(r, sapa) {
+  CHAT_HARI = r.hari || CHAT_HARI;
+  Object.keys(r.lagi || {}).forEach(function (k) { CHAT_LAGI[k] = 1; });
+  Object.keys(r.akhir || {}).forEach(function (k) { if (!CHAT_AKHIR[k] || r.akhir[k] > CHAT_AKHIR[k]) CHAT_AKHIR[k] = r.akhir[k]; });
+  terimaChat(r.pesan || [], r.cb, true);
+  if (sapa) {
+    var n = 0, k = {};
+    CHAT.forEach(function (m) { if (m[2] !== S.akun.id && m[1] > (Number(CB[m[4]]) || 0)) { n++; k[m[4]] = 1; } });
+    if (n) roti('💬 Ada ' + n + ' pesan chat belum dibaca' + (Object.keys(k).length > 1 ? ' di ' + Object.keys(k).length + ' percakapan' : ' dari ' + namaKanal(Object.keys(k)[0])) + '. Buka Chat tim di kanan bawah.');
+  }
+}
+function muatChatLama() {
+  var k = CH.kanal, M = CHAT.filter(function (m) { return m[4] === k; });
+  if (CHAT_MUAT || !CHAT_LAGI[k]) return;
+  CHAT_MUAT = true; gambarObrol(false);
+  api('scChatRiwayat', k, M.length ? M[0][0] : 0).then(function (r) {
+    CHAT_MUAT = false;
+    if (!r.lagi) delete CHAT_LAGI[k];
+    var isi = $('obPesan'), h0 = isi ? isi.scrollHeight : 0, y0 = isi ? isi.scrollTop : 0;
+    terimaChat(r.pesan || [], null, true);
+    if (CH.kanal !== k) return;
+    gambarObrol(false);
+    isi = $('obPesan'); if (isi) isi.scrollTop = isi.scrollHeight - h0 + y0;
+  }, function (e) { CHAT_MUAT = false; gambarObrol(false); roti('✗ ' + e.message); });
+}
+function labelHariChat(w) {
+  var d = new Date(w), n = new Date(), hari = function (x) { return new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime(); };
+  var beda = Math.round((hari(n) - hari(d)) / 864e5);
+  if (beda === 0) return 'Hari ini';
+  if (beda === 1) return 'Kemarin';
+  return d.getDate() + ' ' + BLN[d.getMonth()] + (d.getFullYear() !== n.getFullYear() ? ' ' + d.getFullYear() : '');
+}
+function cuplikChat(k) {
+  var m = null;
+  for (var i = CHAT.length - 1; i >= 0; i--) if (CHAT[i][4] === k) { m = CHAT[i]; break; }
+  if (!m) return '';
+  var siapa = m[2] === S.akun.id ? 'Kamu: ' : k.indexOf('dm:') === 0 ? '' : m[3].split(' ')[0] + ': ';
+  return siapa + m[5].replace(/\s+/g, ' ').slice(0, 60);
 }
 function teksChat(t) { return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g, '<br>'); }
 function gambarObrol(gulirBawah) {
@@ -2182,18 +2231,22 @@ function gambarObrol(gulirBawah) {
   var onId = {}; ONLINE.forEach(function (o) { onId[o[0]] = o; });
   var kanal = daftarKanal().map(function (k) {
     var n = belumDibaca(k);
-    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ob-ik">' + (k === 'semua' ? '#' : k.charAt(0)) + '</span><span class="sp">' + esc(namaKanal(k)) + '</span>' + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
+    var pv = cuplikChat(k);
+    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ob-ik">' + (k === 'semua' ? '#' : k.charAt(0)) + '</span><span class="sp">' + esc(namaKanal(k)) + (pv ? '<em>' + esc(pv) + '</em>' : '') + '</span>' + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
   }).join('');
-  var orang = D.akun.filter(function (a) { return a[0] !== S.akun.id; }).sort(function (a, b) { return (onId[b[0]] ? 1 : 0) - (onId[a[0]] ? 1 : 0) || (a[1] < b[1] ? -1 : 1); }).map(function (a) {
-    var k = kanalDm(a[0]), n = belumDibaca(k), o = onId[a[0]];
-    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ava kcl" style="background:' + AVA[a[1].length % 6] + '">' + inisial(a[1]) + '<i class="ob-titik' + (o ? ' on' : '') + '"></i></span><span class="sp">' + esc(a[1]) + (o ? '<small>' + esc(NAMA_HAL[o[2]] || 'online') + (o[3] && /susun|cek/.test(o[2]) ? ' ' + esc(o[3]) : '') + '</small>' : '') + '</span>' + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
+  var akhirDm = function (a) { return CHAT_AKHIR[kanalDm(a[0])] || 0; };
+  var orang = D.akun.filter(function (a) { return a[0] !== S.akun.id; }).sort(function (a, b) { return akhirDm(b) - akhirDm(a) || (onId[b[0]] ? 1 : 0) - (onId[a[0]] ? 1 : 0) || (a[1] < b[1] ? -1 : 1); }).map(function (a) {
+    var k = kanalDm(a[0]), n = belumDibaca(k), o = onId[a[0]], pv = cuplikChat(k);
+    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ava kcl" style="background:' + AVA[a[1].length % 6] + '">' + inisial(a[1]) + '<i class="ob-titik' + (o ? ' on' : '') + '"></i></span><span class="sp">' + esc(a[1]) + (o ? '<small>' + esc(NAMA_HAL[o[2]] || 'online') + (o[3] && /susun|cek/.test(o[2]) ? ' ' + esc(o[3]) : '') + '</small>' : '') + (pv ? '<em>' + esc(pv) + '</em>' : '') + '</span>' + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
   }).join('');
   var M = CHAT.filter(function (m) { return m[4] === CH.kanal; }), hari = '';
   var pesan = M.length ? M.map(function (m) {
-    var d = new Date(m[1]), h = d.getDate() + ' ' + BLN[d.getMonth()], saya = m[2] === S.akun.id, sep = '';
+    var d = new Date(m[1]), h = labelHariChat(m[1]), saya = m[2] === S.akun.id, sep = '';
     if (h !== hari) { hari = h; sep = '<div class="ob-hari">' + h + '</div>'; }
     return sep + '<div class="ob-m' + (saya ? ' saya' : '') + '">' + (saya ? '' : '<b>' + esc(m[3]) + '</b>') + '<div>' + teksChat(m[5]) + '</div><small>' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + '</small></div>';
-  }).join('') : '<div class="kosong">Belum ada pesan di ' + esc(namaKanal(CH.kanal)) + '.' + (CH.kanal.indexOf('dm:') === 0 ? ' Pesan ini hanya terlihat oleh kalian berdua.' : '') + '</div>';
+  }).join('') : '<div class="kosong">Belum ada pesan di ' + esc(namaKanal(CH.kanal)) + '.' + (CH.kanal.indexOf('dm:') === 0 ? ' Pesan ini hanya terlihat oleh kalian berdua.' : '') + '<br>Pesan tetap terkirim walau penerimanya sedang tidak online, dan disimpan ' + CHAT_HARI + ' hari.</div>';
+  if (M.length) pesan = (CHAT_LAGI[CH.kanal] ? '<button type="button" class="ob-lama" data-ob="lama"' + (CHAT_MUAT ? ' disabled' : '') + '>' + (CHAT_MUAT ? 'Memuat…' : 'Muat pesan sebelumnya') + '</button>' :
+    '<div class="ob-info">Pesan di percakapan ini disimpan ' + CHAT_HARI + ' hari.</div>') + pesan;
   var draf = $('obTulis') ? $('obTulis').value : '', fokus = document.activeElement && document.activeElement.id === 'obTulis';
   p.innerHTML = '<div class="ob-kp"><button type="button" class="ob-balik" data-ob="daftar" aria-label="Daftar percakapan">‹</button><b>' + esc(namaKanal(CH.kanal)) + '</b><span class="kecil">' + (CH.kanal.indexOf('dm:') === 0 ? 'pesan pribadi' : CH.kanal === 'semua' ? 'semua akun Scheduling' : 'penyusun ' + CH.kanal + ' & Admin') + '</span><button type="button" class="x" data-ob="tutup" aria-label="Tutup">×</button></div>' +
     '<div class="ob-badan' + (CH.daftar ? ' lihat-daftar' : '') + '"><nav class="ob-daftar"><div class="ob-grp">Grup</div>' + kanal + '<div class="ob-grp">Pesan pribadi · ' + ONLINE.filter(function (o) { return o[0] !== S.akun.id; }).length + ' online</div>' + orang + '</nav>' +
@@ -2227,7 +2280,7 @@ function kirimChat() {
   el.addEventListener('click', function (e) {
     var b;
     if (e.target.closest('#obrolBuka')) { bukaObrol(true); return; }
-    if ((b = e.target.closest('[data-ob]'))) { if (b.getAttribute('data-ob') === 'tutup') bukaObrol(false); else { CH.daftar = true; gambarObrol(false); } return; }
+    if ((b = e.target.closest('[data-ob]'))) { var ob = b.getAttribute('data-ob'); if (ob === 'tutup') bukaObrol(false); else if (ob === 'lama') muatChatLama(); else { CH.daftar = true; gambarObrol(false); } return; }
     if ((b = e.target.closest('[data-kanal]'))) { CH.kanal = b.getAttribute('data-kanal'); CH.daftar = false; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) $('obTulis').focus(); return; }
   });
   el.addEventListener('submit', function (e) { e.preventDefault(); kirimChat(); });
