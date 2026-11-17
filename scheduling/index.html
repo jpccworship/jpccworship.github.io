@@ -292,6 +292,93 @@
   .centang input { accent-color: var(--brand); margin: 0; }
   .centang:has(input:checked) { border-color: var(--brand); background: var(--soft); color: var(--brand); }
   @media (max-width: 900px) { #atas .logo { display: none; } .simpan { padding: 0 9px; font-size: 11px; } }
+  /* lonceng notifikasi */
+  .lonceng { position: relative; width: 38px; height: 38px; border: 1.5px solid var(--line); border-radius: 999px; background: #fff; color: var(--brand); display: grid; place-items: center; cursor: pointer; flex: none; }
+  .lonceng i { position: absolute; top: -4px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #D93025; color: #fff; font-size: 10.5px; font-weight: 800; font-style: normal; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
+  .lonceng i[hidden] { display: none; }
+  #notifPanel { position: fixed; z-index: 55; top: 62px; right: 18px; width: 400px; max-width: calc(100vw - 24px); max-height: min(560px, calc(100vh - 80px)); background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 60px rgba(25, 10, 60, .25); display: none; flex-direction: column; overflow: hidden; }
+  #notifPanel.buka { display: flex; }
+  .np-k { display: flex; align-items: center; gap: 8px; padding: 12px 12px 10px 16px; border-bottom: 1px solid var(--line); }
+  .np-k b { font-size: 15px; } .np-k .kecil { flex: 1; }
+  .np-k .x, .ob-kp .x { width: 32px; height: 32px; border: 0; border-radius: 9px; background: var(--soft); font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink); }
+  .np-isi { overflow-y: auto; padding: 6px; }
+  .np-b { display: flex; gap: 10px; width: 100%; text-align: left; border: 0; background: transparent; border-radius: 12px; padding: 9px 10px; cursor: pointer; font-size: 13px; line-height: 1.45; color: var(--ink); }
+  .np-b:hover { background: var(--soft); }
+  .np-b.baru { background: #F3EEFB; }
+  .np-b .sp { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .np-b small { color: var(--muted); font-size: 11.5px; }
+  .ava.kcl { width: 26px; height: 26px; font-size: 10.5px; position: relative; }
+  .susun-on { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: -4px 0 8px; }
+  .susun-on:empty { display: none; }
+  #sisi .n.info { background: #E8F1FC; color: #0B4F8A; }
+  /* sel yang baru diubah orang lain */
+  .sel.kilat { animation: kilat 2.4s ease-out 2; }
+  @keyframes kilat { 0% { box-shadow: inset 0 0 0 2px #F29900; background: #FFF4D6; } 100% { box-shadow: inset 0 0 0 2px transparent; } }
+  /* batang geser samping: menempel di ujung bawah layar */
+  .geser { position: fixed; bottom: 0; left: 0; z-index: 30; margin: 0; height: 20px; border-radius: 0; border-top: 1px solid var(--line); background: #F1EEF6; box-shadow: 0 -4px 14px rgba(40, 20, 80, .08); visibility: hidden; }
+  #isi { padding-bottom: 92px; }
+  body.ada-geser #isi { padding-bottom: 104px; }
+  /* laci terbuka: tombol chat pindah ke kiri laci supaya tidak menutupi tombol Simpan */
+  @media (min-width: 901px) { body.laci-buka #obrol { right: 418px; } body.laci-buka .ob-panel { max-width: calc(100vw - 440px); } }
+  @media (max-width: 900px) { body.laci-buka #obrol:not(.buka) { display: none; } }
+  body.ada-geser #obrol { bottom: 32px; }
+  /* HP: kepala halaman muat satu baris (status simpan jadi titik, nama akun disembunyikan) */
+  @media (max-width: 560px) {
+    #atas { gap: 8px; padding: 8px 12px; }
+    #atas .eyebrow { display: none; } #atas h1 { font-size: 17px; }
+    .simpan { font-size: 0; gap: 0; width: 30px; padding: 0; justify-content: center; }
+    .lonceng, .bantu { width: 36px; height: 36px; padding: 0; justify-content: center; }
+    .akun { padding: 4px; } .akun .nm { display: none; }
+  }
+  .geser { scrollbar-width: auto; scrollbar-color: #A996D4 #F1EEF6; }
+  .geser::-webkit-scrollbar { height: 14px; } .geser::-webkit-scrollbar-track { background: #F1EEF6; }
+  .geser::-webkit-scrollbar-thumb { background: #A996D4; border-radius: 999px; border: 3px solid #F1EEF6; } .geser::-webkit-scrollbar-thumb:hover { background: #7C64B8; }
+  /* chat tim */
+  #obrol { position: fixed; right: 18px; bottom: 18px; z-index: 44; transition: bottom .15s ease; }
+  .ob-buka { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--brand); color: #fff; font: inherit; font-weight: 800; font-size: 14px; cursor: pointer; box-shadow: 0 10px 28px rgba(45, 24, 99, .32); }
+  .ob-buka small { font-size: 11px; font-weight: 700; background: rgba(255, 255, 255, .18); border-radius: 999px; padding: 2px 8px; }
+  .ob-buka small::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #5BE38B; margin-right: 5px; vertical-align: 1px; }
+  .ob-n { min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px; background: #D93025; color: #fff; font-size: 10.5px; font-weight: 800; font-style: normal; display: inline-grid; place-items: center; }
+  .ob-buka .ob-n { position: absolute; top: -5px; left: -4px; box-shadow: 0 0 0 2px #fff; }
+  .ob-n[hidden], .ob-buka small[hidden] { display: none; }
+  #obrol.buka .ob-buka { display: none; }
+  .ob-panel { position: absolute; right: 0; bottom: 0; width: 680px; max-width: calc(100vw - 24px); height: min(560px, calc(100vh - 90px)); background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 70px rgba(25, 10, 60, .3); display: flex; flex-direction: column; overflow: hidden; }
+  .ob-panel[hidden] { display: none; }
+  .ob-kp { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 14px; background: #2D1863; color: #fff; }
+  .ob-kp b { font-size: 15px; } .ob-kp .kecil { flex: 1; color: #D9CCF5; }
+  .ob-kp .x { background: rgba(255, 255, 255, .14); color: #fff; }
+  .ob-balik { display: none; width: 32px; height: 32px; border: 0; border-radius: 9px; background: rgba(255, 255, 255, .14); color: #fff; font-size: 20px; cursor: pointer; }
+  .ob-badan { flex: 1; min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr); }
+  .ob-daftar { overflow-y: auto; border-right: 1px solid var(--line); padding: 6px; background: #FBFAFD; }
+  .ob-grp { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 10px 8px 4px; }
+  .ob-k { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent; border-radius: 10px; padding: 7px 8px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); text-align: left; cursor: pointer; }
+  .ob-k:hover { background: var(--soft); } .ob-k.on { background: #EDE6F8; color: var(--brand); }
+  .ob-k .sp { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ob-k small { display: block; font-size: 11px; font-weight: 600; color: #1E8E3E; }
+  .ob-ik { width: 26px; height: 26px; border-radius: 8px; background: #EDE6F8; color: var(--brand); display: grid; place-items: center; font-weight: 800; font-size: 12px; flex: none; }
+  .ob-titik { position: absolute; right: -2px; bottom: -2px; width: 10px; height: 10px; border-radius: 50%; background: #C7C1D1; box-shadow: 0 0 0 2px #FBFAFD; }
+  .ob-titik.on { background: #1E8E3E; }
+  .ob-obrol { display: flex; flex-direction: column; min-height: 0; }
+  .ob-pesan { flex: 1; overflow-y: auto; padding: 12px; background: #F7F5FA; display: flex; flex-direction: column; gap: 6px; }
+  .ob-m { align-self: flex-start; max-width: 82%; background: #fff; border: 1px solid var(--line); border-radius: 14px 14px 14px 5px; padding: 7px 10px 5px; font-size: 13.5px; line-height: 1.45; overflow-wrap: anywhere; }
+  .ob-m b { display: block; font-size: 11.5px; color: var(--brand); }
+  .ob-m small { display: block; text-align: right; font-size: 10.5px; color: var(--muted); }
+  .ob-m.saya { align-self: flex-end; background: var(--brand); color: #fff; border-color: var(--brand); border-radius: 14px 14px 5px 14px; }
+  .ob-m.saya small { color: #D9CCF5; } .ob-m.saya a { color: #fff; }
+  .ob-hari { align-self: center; font-size: 11px; font-weight: 700; color: var(--muted); background: #ECE7F4; border-radius: 999px; padding: 2px 10px; margin: 4px 0; }
+  .ob-form { display: flex; gap: 8px; padding: 8px; border-top: 1px solid var(--line); }
+  .ob-form textarea { flex: 1; min-width: 0; resize: none; height: 42px; max-height: 120px; border: 1.5px solid #CFC7DD; border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 14.5px; outline: none; }
+  .ob-form textarea:focus { border-color: var(--brand); }
+  .ob-form button { width: 42px; height: 42px; flex: none; border: 0; border-radius: 12px; background: var(--brand); color: #fff; display: grid; place-items: center; cursor: pointer; }
+  @media (max-width: 700px) {
+    #obrol { right: 12px; bottom: 12px; }
+    .ob-buka span { display: none; } .ob-buka { padding: 0 14px; }
+    .ob-panel { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; height: 100dvh; border-radius: 0; }
+    .ob-badan { grid-template-columns: minmax(0, 1fr); }
+    .ob-badan .ob-daftar { display: none; } .ob-badan.lihat-daftar .ob-daftar { display: block; border: 0; } .ob-badan.lihat-daftar .ob-obrol { display: none; }
+    .ob-balik { display: grid; place-items: center; }
+    #notifPanel { right: 12px; top: 58px; }
+  }
   @media (prefers-reduced-motion: reduce) { .putar, .simpan.kirim::before { animation-duration: 2.4s; } }
 </style>
 </head>
@@ -306,6 +393,7 @@
     <div><div class="eyebrow">JPCC Worship<span>People</span></div><h1>Scheduling</h1></div>
     <span class="sp"></span>
     <button type="button" class="simpan ok" id="simpanSt" title="Semua perubahan sudah tersimpan di file Admin">Tersimpan</button>
+    <button type="button" class="lonceng" id="bLonceng" title="Notifikasi perubahan dari tim" aria-label="Notifikasi"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.500a6 6 0 0 1 12 0c0 5.500 2.200 7 2.200 7H3.800S6 15 6 9.500z"/><path d="M10 20a2.200 2.200 0 0 0 4 0"/></svg><i id="loncengN" hidden></i></button>
     <button class="bantu" id="bTur" type="button" title="Ulangi tutorial"><i>?</i><span>Tutorial</span></button>
     <div class="akun"><button type="button" class="nm" id="bAkun" title="Akun saya"><b id="aNama"></b><small id="aHak"></small></button><button type="button" id="bKunci">Kunci</button></div>
   </header>
@@ -316,6 +404,7 @@
 <aside id="laci" aria-hidden="true"></aside>
 <div id="modal"><div class="kotak" id="modalIsi"></div></div>
 <div id="roti" role="status"></div>
+<div id="notifPanel" role="dialog" aria-label="Notifikasi"></div>
 <div id="sibuk" hidden><div class="kt"><div class="putar" aria-hidden="true"></div><div id="sibukTeks"></div></div></div>
 <div id="tur" hidden><div class="tirai2"></div><div id="turLubang"></div><div id="turKartu"></div></div>
 <script type="text/plain" id="jpcc-app">
@@ -356,7 +445,8 @@ var D = { hariIni: ymd(new Date()), anggota: [], input: {}, ditarik: [], pilihan
   pic: [], picWa: [], yi: { update: '', daftar: [] }, formasi: { sv: [], mn: [], peran: [], isi: [], string: [] },
   atur: { service: [], peran: [], pola: {}, alasan: [], posCari: [], tim: [], link: [], pastor: [] }, log: [], akun: DATA.akun || [] };
 MN.forEach(function (m) { D.input[m] = { peran: [], kol: [], tanpaTgl: 0 }; });
-var TOKEN = '', SIG = '', VERSI = '0', SEQ = 0;
+var TOKEN = '', SIG = '', VER = {}, SEQ = 0;
+var ALAT = { Keys: 0, Bass: 1, Drums: 2, Guitar: 3 };   // urutan skor instrumen di data anggota
 
 var AG = {}, AGL = [];
 function muatAnggota() {
@@ -434,6 +524,16 @@ function terimaInput(mn, baru, ringan) {
     if (!c.kd) { if (o && o.kd && o.t === c.t && o.sv === c.sv && o.jenis === c.jenis && o.cat === c.cat && o.lk === c.lk) c.kd = o.kd; else kurang = true; }
     siapkanKol(mn, c);
   });
+  // sel yang diubah orang lain (bukan dari antrian sendiri) berkedip sebentar supaya terlihat
+  if (lama.length) {
+    var now = Date.now(), q0 = ANTRI[mn] || {};
+    baru.kol.forEach(function (c) {
+      var o = bySid[c.sid];
+      if (!o) return;
+      c.kilat = o.kilat || {};
+      c.n.forEach(function (v, i) { if (v !== o.n[i] && !q0[c.sid + '\u0001' + i]) c.kilat[i] = now; });
+    });
+  }
   D.input[mn] = baru;
   urutKol(mn);
   var q = ANTRI[mn] || {};
@@ -645,7 +745,7 @@ var JENIS_CEK = [
   ['lebih', 'Lebih dari 1x sebulan', 'kuning', 'Boleh, tapi pastikan memang disengaja.'],
   ['aturan', 'Di luar aturan pelayan', 'biru', 'Melebihi maks per bulan yang diminta, atau di luar ibadah yang diutamakan orang itu. Sifatnya diutamakan, bukan larangan.'],
   ['pic', 'Belum ada PIC', 'abu', 'Tanggal yang belum punya PIC sama sekali (Youth tidak dicek).'],
-  ['kosong', 'Belum terisi sesuai Formasi', 'abu', 'Peran yang menurut Formasi Tim seharusnya terisi.']
+  ['kosong', 'Belum terisi sesuai Formasi', 'abu', 'Peran yang menurut Formasi Tim seharusnya terisi. Boleh sengaja dikosongkan (mis. WL cukup satu), dan baris di luar Formasi boleh diisi; jadwal tetap bisa terbit.']
 ];
 var CEK_BERAT = /^(blok|asing|bentrok)$/;
 function statDraft(mn) {
@@ -687,10 +787,16 @@ function bedaTerbit(mn) {
 function terima(r) {
   if (!r) return;
   if (r.hariIni) D.hariIni = r.hariIni;
-  if (r.versi) VERSI = r.versi;
   if (r.sigAnggota) SIG = r.sigAnggota;
+  if (r.versi && typeof r.versi === 'object') {
+    var pv = [];
+    if (r.input) pv = pv.concat(['inUmum', 'inYouth', 'inKids']);
+    if (r.inputRingan) Object.keys(r.inputRingan).forEach(function (m) { pv.push('in' + m); });
+    ['terbit', 'blockout', 'pic', 'yi', 'formasi', 'atur', 'log', 'akun', 'anggota'].forEach(function (k) { if (r[k] || (k === 'blockout' && r.cuti)) pv.push(k); });
+    pv.forEach(function (k) { if (r.versi[k]) VER[k] = r.versi[k]; });
+  }
   if (r.anggota) { D.anggota = r.anggota; muatAnggota(); }
-  if (r.atur) { var ps = D.atur.pastor; D.atur = r.atur; D.atur.pastor = ps || []; muatSV(); muatPR(); }
+  if (r.atur) { var ps = D.atur.pastor, bk0 = D.atur.backup; D.atur = r.atur; D.atur.pastor = ps || []; if (!D.atur.backup && bk0) D.atur.backup = bk0; muatSV(); muatPR(); }
   if (r.pilihan) { D.pilihan = r.pilihan; muatPilihan(); }
   if (r.ditarik) D.ditarik = r.ditarik;
   var kurang = false;
@@ -701,7 +807,7 @@ function terima(r) {
     D.terbit = T.slot.map(function (s) { return { k: s[0], t: s[1], mn: s[2], acara: s[3], jenis: s[4], sv: s[5], camp: s[6], ct: s[7], lat: s[8], ps: s[9], cat: s[10], pub: s[11], oleh: s[12], lk: s[13], tim: [] }; });
     T.tugas.forEach(function (x) { D.terbit[x[0]].tim.push([T.peran[x[1]], T.nama[x[2]], x[3], x[4]]); });
   }
-  ['blockout', 'riwayat', 'cuti', 'aturanOrang', 'peranCuti', 'pic', 'picWa', 'yi', 'formasi', 'log', 'akun'].forEach(function (k) { if (r[k]) D[k] = r[k]; });
+  ['blockout', 'riwayat', 'cuti', 'aturanOrang', 'peranCuti', 'peranOrang', 'pic', 'picWa', 'yi', 'formasi', 'log', 'akun'].forEach(function (k) { if (r[k]) D[k] = r[k]; });
   if (r.blockout || r.cuti || r.aturanOrang) muatBL();
   if (r.atur && !r.input && !r.inputRingan) MN.forEach(urutKol);
   if (r.input || r.inputRingan || r.terbit || r.ditarik) {
@@ -792,13 +898,14 @@ var S = { akun: null, hal: 'beranda', mn: 'Umum', ym: '', tgl: '', aktif: null, 
   cari: { q: '', pos: '', kc: '', mn: 'Umum', st: 'aktif', ym: '', urut: 'jarang' }, bk: { q: '', ym: '' }, tb: { mn: 'Umum', ym: '' }, logJ: '' };
 function boleh(apa, mn) {
   var h = (S.akun && S.akun.hak) || [];
+  if (apa === 'database') return h.indexOf('admin') >= 0 && h.indexOf('database') >= 0;
   if (h.indexOf('admin') >= 0) return true;
   if (apa === 'susun') return h.indexOf(mn) >= 0;
   if (apa === 'terbit') return h.indexOf('publish') >= 0;
   if (apa === 'aturan') return MN.some(function (m) { return h.indexOf(m) >= 0; });
   return false;
 }
-function labelHak(h) { return h.indexOf('admin') >= 0 ? 'Admin · semua bagian' : h.indexOf('lihat') >= 0 && h.length === 1 ? 'Lihat saja' : (MN.some(function (x) { return h.indexOf(x) >= 0; }) ? 'Penyusun ' + h.filter(function (x) { return MN.indexOf(x) >= 0; }).join(' & ') : 'Lihat') + (h.indexOf('publish') >= 0 ? ' · boleh menerbitkan' : ''); }
+function labelHak(h) { return h.indexOf('admin') >= 0 ? (h.indexOf('database') >= 0 ? 'Admin + Database' : 'Admin · semua bagian') : h.indexOf('lihat') >= 0 && h.length === 1 ? 'Lihat saja' : (MN.some(function (x) { return h.indexOf(x) >= 0; }) ? 'Penyusun ' + h.filter(function (x) { return MN.indexOf(x) >= 0; }).join(' & ') : 'Lihat') + (h.indexOf('publish') >= 0 ? ' · boleh menerbitkan' : ''); }
 function roti(t) { var r = $('roti'); r.textContent = t; r.classList.add('buka'); clearTimeout(roti.t); roti.t = setTimeout(function () { r.classList.remove('buka'); }, /^[✗⚠]/.test(t) ? 7000 : 3800); }
 
 /* =====================================================================================================
@@ -816,21 +923,31 @@ var IK = {
   yi: '<path d="M13 3L5 13.500h6l-1 7.500 8-10.500h-6z"/>',
   atur: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>',
   peta: '<path d="M9 4.500l6 2v13l-6-2zM9 4.500L3.500 6.500v13L9 17.500M15 6.500l5.500-2v13L15 19.500"/>',
+  db: '<ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v6c0 1.700 3.400 3 7.500 3s7.500-1.300 7.500-3V6M4.500 12v6c0 1.700 3.400 3 7.500 3s7.500-1.300 7.500-3v-6"/>',
   sistem: '<rect x="5" y="10.500" width="14" height="10" rx="2.200"/><path d="M8.200 10.500V8a3.800 3.800 0 0 1 7.600 0v2.500"/>'
 };
 function ikon(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + IK[k] + '</svg>'; }
 var NAV = [['KERJAKAN'], ['beranda', 'Beranda'], ['susun', 'Susun jadwal', '1'], ['cek', 'Cek & terbit', '2'], ['terbit', 'Jadwal terbit', '3'],
   ['PELAYAN'], ['pelayan', 'Cari pelayan'], ['blockout', 'Blockout & cuti'],
-  ['DATA'], ['formasi', 'Formasi tim'], ['pic', 'PIC per campus'], ['yi', 'Youth Invasion'], ['atur', 'Pengaturan'],
+  ['DATA'], ['formasi', 'Formasi tim'], ['pic', 'PIC per campus'], ['yi', 'Youth Invasion'], ['atur', 'Pengaturan'], ['db', 'Database'],
   ['SISTEM'], ['sistem', 'Akses & sistem']];
+/* orang yang blockout / cuti perannya masih berlaku (belum dibatalkan, tanggal selesai belum lewat) */
+function orangBkAktif() {
+  var o = {};
+  D.blockout.forEach(function (b) { if (!/batal/i.test(b[7]) && b[3] >= kini()) o[kn(b[1])] = 1; });
+  D.cuti.forEach(function (b) { if (!/batal/i.test(b[8]) && b[3] >= kini()) o[kn(b[1])] = 1; });
+  return Object.keys(o);
+}
 function gambarNav() {
   var berat = cekDraft().filter(function (x) { return CEK_BERAT.test(x.j); }).length;
-  var bkBaru = D.blockout.concat(D.cuti).filter(function (b) { return /^\d{4}-\d\d-\d\d/.test(b[0]) && !/batal/i.test(b[b.length - 3]) && selisih(b[0].slice(0, 10), kini()) <= 7; }).length;
+  var bkAktif = orangBkAktif().length;
   $('sisi').innerHTML = NAV.map(function (n) {
     if (n.length === 1) return '<div class="grp">' + n[0] + '</div>';
-    var angka = n[0] === 'cek' && berat ? berat : n[0] === 'blockout' && bkBaru ? bkBaru : 0;
+    if (n[0] === 'db' && !boleh('database')) return '';
+    var angka = n[0] === 'cek' && berat ? berat : n[0] === 'blockout' && bkAktif ? bkAktif : 0;
+    var ket = n[0] === 'cek' ? berat + ' catatan yang harus dicek sebelum terbit' : bkAktif + ' orang punya blockout / cuti yang masih berlaku (tanggalnya belum lewat)';
     return '<button type="button" data-hal="' + n[0] + '" class="' + (S.hal === n[0] ? 'on' : '') + '">' + ikon(n[0]) + '<span>' + n[1] + '</span>' +
-      (angka ? '<span class="n">' + angka + '</span>' : n[2] ? '<span class="langkah">' + n[2] + '</span>' : '') + '</button>';
+      (angka ? '<span class="n' + (n[0] === 'blockout' ? ' info' : '') + '" title="' + ket + '">' + angka + '</span>' : n[2] ? '<span class="langkah">' + n[2] + '</span>' : '') + '</button>';
   }).join('');
 }
 function gambar() {
@@ -841,6 +958,7 @@ function gambar() {
   $('isi').scrollTop = iy;
   pasangGeser();
   if (S.aktif && S.hal === 'susun') gambarPemilih();
+  if (typeof gambarOnline === 'function') gambarOnline();
 }
 /* tabel jadwal: penuh ke bawah (halaman yang menggulir), hanya geser ke samping; judul kolom ikut turun saat digulir */
 function geserKepala() {
@@ -849,12 +967,23 @@ function geserKepala() {
   var d = Math.max(0, Math.min(atas - r.top, r.height - hk - 70));
   t.style.setProperty('--naik', d + 'px'); t.classList.toggle('melayang', d > 0);
 }
+/* batang geser samping menempel di ujung bawah layar selama tabel jadwal terlihat */
+function posGeser() {
+  var g = $('gridw'), s = $('geser');
+  if (!g || !s) { document.body.classList.remove('ada-geser'); return; }
+  var r = g.getBoundingClientRect(), bisa = g.scrollWidth > g.clientWidth + 2, lihat = r.top < window.innerHeight - 40 && r.bottom > 60;
+  var tampil = bisa && lihat && S.hal === 'susun';
+  s.style.visibility = tampil ? 'visible' : 'hidden';
+  document.body.classList.toggle('ada-geser', tampil);
+  if (tampil) { s.style.left = Math.max(0, r.left) + 'px'; s.style.width = Math.min(g.clientWidth, window.innerWidth - Math.max(0, r.left)) + 'px'; }
+}
 function pasangGeser() {
-  var g = $('gridw'), s = $('geser'); if (!g || !s) return;
+  var g = $('gridw'), s = $('geser'); if (!g || !s) { posGeser(); return; }
   s.firstChild.style.width = g.scrollWidth + 'px';
   s.style.visibility = g.scrollWidth > g.clientWidth + 2 ? 'visible' : 'hidden';
   s.scrollLeft = g.scrollLeft;
   s.onscroll = function () { if (Math.abs(g.scrollLeft - s.scrollLeft) > 1) g.scrollLeft = s.scrollLeft; };
+  posGeser();
   g.onscroll = function () { if (Math.abs(g.scrollLeft - s.scrollLeft) > 1) s.scrollLeft = g.scrollLeft; };
   geserKepala();
 }
@@ -929,7 +1058,7 @@ LAYAR.susun = function () {
   var cek = cekDraft(S.mn), cekTampil = cek.filter(function (x) { return K.some(function (c) { return c.id === x.kol; }); });
   var iB = B.indexOf(S.ym);
   var h = '<div class="judul"><div><h2>Susun jadwal</h2><p>' + (st.n ? 'Draft ' + S.mn + ': ' + st.n + ' service · ' + ltp(st.dari) + ' – ' + lt(st.sampai).replace(/^\w+, /, '') + ' · ' + st.isi + '/' + st.perlu + ' peran terisi' : 'Belum ada draft ' + S.mn + '.') + '</p></div><span class="sp"></span>' +
-    '<button class="btn garis" type="button" data-hal="cek">Cek & terbit ›</button></div>' + hanyaLihat('susun', S.mn);
+    '<button class="btn garis" type="button" data-hal="cek">Cek & terbit ›</button></div>' + hanyaLihat('susun', S.mn) + '<div id="susunOnline" class="susun-on"></div>';
   h += '<div class="alat">' + mnSeg(S.mn, 'data-mn') +
     '<div class="seg"><button type="button" data-bln="-1"' + (iB <= 0 ? ' disabled style="opacity:.35"' : '') + '>‹</button><button type="button" class="on" style="min-width:132px;justify-content:center">' + lbln(S.ym) + '</button><button type="button" data-bln="1"' + (iB >= B.length - 1 ? ' disabled style="opacity:.35"' : '') + '>›</button></div>' +
     '<span class="sp"></span>' +
@@ -961,8 +1090,8 @@ LAYAR.susun = function () {
     h += '<tr><td class="pr">' + esc(p[1]) + '</td>' + K.map(function (c) {
       var v = c.n[i], ps = pisah(v), akt = S.aktif && S.aktif.kol === c.id && S.aktif.i === i;
       if (!v || v === '-') { var w = !v && wajib(S.mn, c, i); return '<td><button type="button" class="sel ' + (w ? 'kosong-wajib' : 'tak') + (akt ? ' aktif' : '') + '" data-sel="' + c.id + ':' + i + '">' + (w ? '+ isi' : v === '-' ? '–' : '') + '</button></td>'; }
-      var td = tandaSel(S.mn, c, i), ubah = c.lama && c.lama[i] !== v;
-      return '<td><button type="button" class="sel' + (td.length ? ' f-' + td[0] : '') + (akt ? ' aktif' : '') + (S.sorot && kn(ps.n) === S.sorot && !akt ? ' sama' : '') + '" data-sel="' + c.id + ':' + i + '" title="' + esc(ps.n + (td.length ? ' · ' + td.map(function (x) { return NAMA_TANDA[x]; }).join(', ') : '')) + '">' +
+      var td = tandaSel(S.mn, c, i), ubah = c.lama && c.lama[i] !== v, kl = c.kilat && c.kilat[i] && Date.now() - c.kilat[i] < 6000;
+      return '<td><button type="button" class="sel' + (td.length ? ' f-' + td[0] : '') + (kl ? ' kilat' : '') + (akt ? ' aktif' : '') + (S.sorot && kn(ps.n) === S.sorot && !akt ? ' sama' : '') + '" data-sel="' + c.id + ':' + i + '" title="' + esc(ps.n + (td.length ? ' · ' + td.map(function (x) { return NAMA_TANDA[x]; }).join(', ') : '')) + '">' +
         (ps.kh ? '<i class="kh">' + esc(ps.kh) + '</i>' : '') + '<span>' + esc(ps.n) + '</span>' + (ubah ? '<i class="ub" title="Berubah dari versi terbit"></i>' : '') + '</button></td>';
     }).join('') + '</tr>';
   });
@@ -978,8 +1107,8 @@ LAYAR.susun = function () {
 };
 
 /* ---------- laci: pemilih pelayan ---------- */
-function bukaLaci(html) { var bd = $('laci').querySelector('.bd'), y = bd ? bd.scrollTop : 0; $('laci').innerHTML = html; $('laci').classList.add('buka'); $('laci').setAttribute('aria-hidden', 'false'); $('app').classList.toggle('ada-laci', !!S.aktif); if (window.innerWidth <= 900) $('tirai').classList.add('buka'); bd = $('laci').querySelector('.bd'); if (bd && bukaLaci.jaga) bd.scrollTop = y; bukaLaci.jaga = false; }
-function tutupLaci() { $('laci').classList.remove('buka'); $('app').classList.remove('ada-laci'); $('laci').setAttribute('aria-hidden', 'true'); if (!$('modal').classList.contains('buka') && !$('sisi').classList.contains('buka')) $('tirai').classList.remove('buka'); if (S.aktif) { S.aktif = null; S.sorot = ''; } }
+function bukaLaci(html) { var bd = $('laci').querySelector('.bd'), y = bd ? bd.scrollTop : 0; $('laci').innerHTML = html; $('laci').classList.add('buka'); $('laci').setAttribute('aria-hidden', 'false'); document.body.classList.add('laci-buka'); $('app').classList.toggle('ada-laci', !!S.aktif); if (window.innerWidth <= 900) $('tirai').classList.add('buka'); bd = $('laci').querySelector('.bd'); if (bd && bukaLaci.jaga) bd.scrollTop = y; bukaLaci.jaga = false; }
+function tutupLaci() { $('laci').classList.remove('buka'); document.body.classList.remove('laci-buka'); $('app').classList.remove('ada-laci'); $('laci').setAttribute('aria-hidden', 'true'); if (!$('modal').classList.contains('buka') && !$('sisi').classList.contains('buka')) $('tirai').classList.remove('buka'); if (S.aktif) { S.aktif = null; S.sorot = ''; } }
 var PM = { tab: 'saran', q: '' };
 function bukaPemilih(kolId, i) {
   S.aktif = { kol: kolId, i: i }; PM = { tab: 'saran', q: '' };
@@ -1268,10 +1397,10 @@ function modalAturanNama() {
 /* ---------- Blockout & cuti ---------- */
 LAYAR.blockout = function () {
   var F = S.bk, q = kn(F.q), tab = S.bkTab, bisa = boleh('aturan'), P = paketDraft();
-  var aktif = D.blockout.filter(function (b) { return !/batal/i.test(b[7]); });
+  var aktif = D.blockout.filter(function (b) { return !/batal/i.test(b[7]) && b[3] >= kini(); }), nAktif = orangBkAktif().length;
   var h = '<div class="lebar"><div class="judul"><div><h2>Blockout & cuti</h2><p>Blockout & cuti peran diisi pelayan lewat halaman Jadwal Pelayanan, atau tim People di sini. Yang blockout tidak dipilih isi otomatis, tidak muncul di pilihan nama, dan ditandai merah kalau tetap dijadwalkan.</p></div><span class="sp"></span>' +
     '<button type="button" class="btn" data-aksi="bkTambah"' + (bisa ? '' : ' disabled') + '>+ Tambah blockout / cuti peran</button></div>' + hanyaLihat('aturan');
-  h += '<div class="kolom3" style="margin-bottom:12px">' + [['Blockout aktif', aktif.length], ['Tidak bisa di ' + lblnp(P[0]), unik(aktif.filter(function (b) { return b[2] <= P[0] + '-31' && b[3] >= P[0] + '-01'; }).map(function (b) { return b[1]; })).length + ' orang'], ['Tidak bisa di ' + lblnp(P[1]), unik(aktif.filter(function (b) { return b[2] <= P[1] + '-31' && b[3] >= P[1] + '-01'; }).map(function (b) { return b[1]; })).length + ' orang']].map(function (x) {
+  h += '<div class="kolom3" style="margin-bottom:12px">' + [['Blockout / cuti aktif', nAktif + ' orang'], ['Tidak bisa di ' + lblnp(P[0]), unik(aktif.filter(function (b) { return b[2] <= P[0] + '-31' && b[3] >= P[0] + '-01'; }).map(function (b) { return b[1]; })).length + ' orang'], ['Tidak bisa di ' + lblnp(P[1]), unik(aktif.filter(function (b) { return b[2] <= P[1] + '-31' && b[3] >= P[1] + '-01'; }).map(function (b) { return b[1]; })).length + ' orang']].map(function (x) {
     return '<div class="kartu" style="margin:0"><div class="kecil" style="font-weight:800;text-transform:uppercase;letter-spacing:.06em">' + x[0] + '</div><div style="font-size:24px;font-weight:800;margin-top:4px">' + x[1] + '</div></div>'; }).join('') + '</div>';
   h += '<div class="tab2">' + [['aktif', 'Blockout date', D.blockout.length], ['cuti', 'Cuti peran', D.cuti.length], ['riwayat', 'Riwayat cuti', D.riwayat.length], ['aturan', 'Aturan pelayan', D.aturanOrang.length]].map(function (x) {
     return '<button type="button" data-bktab="' + x[0] + '" class="' + (tab === x[0] ? 'on' : '') + '">' + x[1] + ' · ' + x[2] + '</button>'; }).join('') + '</div>';
@@ -1294,10 +1423,10 @@ LAYAR.blockout = function () {
   var bl = unik(asal.map(function (b) { return b[2].slice(0, 7); }).concat(asal.map(function (b) { return b[3].slice(0, 7); }))).sort();
   h += '<div class="alat"><input class="isian" type="search" data-bk="q" placeholder="Cari nama…" value="' + esc(F.q) + '" style="width:220px"><select class="isian" data-bk="ym"><option value="">Semua bulan</option>' + bl.map(function (b) { return '<option value="' + b + '"' + (F.ym === b ? ' selected' : '') + '>Kena ' + lblnp(b) + '</option>'; }).join('') + '</select><span class="kecil">' + L.length + ' baris</span></div>';
   h += '<div class="tw"><table class="t"><thead><tr><th>Nama</th><th>Periode</th><th>Hari</th>' + (cuti ? '<th>Cuti sebagai</th>' : '') + '<th>Alasan</th><th>Posisi · campus</th><th>Dikirim</th><th>Status</th><th></th></tr></thead><tbody>' + (L.length ? L.map(function (x) {
-    var b = x.b, a = AG[kn(b[1])], st = b[iSt], alasan = cuti ? b[6] : b[5], desk = cuti ? b[7] : b[6], cat = cuti ? b[9] : b[8];
+    var b = x.b, a = AG[kn(b[1])], st = !/batal/i.test(b[iSt]) && !riw && b[3] < kini() ? 'Selesai' : b[iSt], alasan = cuti ? b[6] : b[5], desk = cuti ? b[7] : b[6], cat = cuti ? b[9] : b[8];
     return '<tr><td><b>' + esc(b[1]) + '</b></td><td style="white-space:nowrap">' + ltp(b[2]) + ' – ' + lt(b[3]).replace(/^\w+, /, '') + '</td><td>' + b[4] + '</td>' + (cuti ? '<td>' + String(b[5]).split(',').map(function (p) { return '<span class="chip ungu">' + esc(p.trim()) + '</span>'; }).join(' ') + '</td>' : '') +
       '<td><b style="font-weight:700">' + esc(alasan) + '</b><div class="kecil">' + esc(desk) + (cat ? ' · admin: ' + esc(cat) : '') + '</div></td><td>' + (a ? esc(a.pos.join(', ')) + '<div class="kecil">' + (a.kampL.join(' · ') || '–') + ' · ' + (a.aktL.join(' · ') || '–') + '</div>' : '–') + '</td><td class="kecil" style="white-space:nowrap">' + esc(lw(b[0])) + '</td>' +
-      '<td><span class="chip ' + (st === 'Aktif' ? 'bad' : /batal/i.test(st) ? 'abu' : 'ok') + '">' + esc(st) + '</span></td><td>' + (!riw && bisa ? '<button type="button" class="btn garis kcl" data-bkstatus="' + (cuti ? 'cuti' : 'blockout') + ':' + x.i + '">' + (/batal/i.test(st) ? 'Aktifkan lagi' : 'Batalkan') + '</button>' : '') + '</td></tr>';
+      '<td><span class="chip ' + (st === 'Aktif' ? 'bad' : /batal/i.test(st) ? 'abu' : 'ok') + '" title="' + (st === 'Aktif' ? 'Masih berlaku: tanggal selesainya belum lewat' : st === 'Selesai' ? 'Tanggalnya sudah lewat; pindah ke Riwayat cuti malam ini' : '') + '">' + esc(st) + '</span></td><td>' + (!riw && bisa ? '<button type="button" class="btn garis kcl" data-bkstatus="' + (cuti ? 'cuti' : 'blockout') + ':' + x.i + '">' + (/batal/i.test(st) ? 'Aktifkan lagi' : 'Batalkan') + '</button>' : '') + '</td></tr>';
   }).join('') : '<tr><td colspan="' + (cuti ? 9 : 8) + '"><div class="kosong">' + (cuti ? 'Belum ada cuti peran. Contoh: gitaris yang juga MD mengajukan cuti MD saja, jadi tetap dijadwalkan sebagai gitaris.' : 'Tidak ada data.') + '</div></td></tr>') + '</tbody></table></div>';
   return h + '<p class="kecil" style="margin-top:8px">Blockout & cuti peran yang tanggal selesainya sudah lewat otomatis pindah ke Riwayat cuti setiap hari, dan tampil di Volunteer Card halaman Hasil Evaluasi.</p></div>';
 };
@@ -1306,7 +1435,7 @@ function modalBlockout() {
     '<div class="penuh"><label class="lbl">Nama</label><input class="isian" id="bkNama" list="dlNama" placeholder="Ketik lalu pilih"><datalist id="dlNama">' + AGL.filter(function (a) { return a.aktif; }).map(function (a) { return '<option value="' + esc(a.n) + '">'; }).join('') + '</datalist></div>' +
     '<div><label class="lbl">Mulai</label><input class="isian" id="bkT1" type="date"></div><div><label class="lbl">Selesai</label><input class="isian" id="bkT2" type="date"></div>' +
     '<div class="penuh"><label class="lbl">Berlaku untuk</label><select class="isian" id="bkJenis"><option value="semua">Semua pelayanan (blockout)</option><option value="peran">Peran tertentu saja (cuti peran)</option></select>' +
-    '<div id="bkPeranWrap" hidden style="margin-top:8px"><div class="kecil" style="margin-bottom:6px">Pilih peran yang dicutikan. Di peran lain orangnya tetap bisa dijadwalkan.</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + D.peranCuti.map(function (p) { return '<label class="centang"><input type="checkbox" name="bkPeran" value="' + esc(p) + '"><span>' + esc(p) + '</span></label>'; }).join('') + '</div></div></div>' +
+    '<div id="bkPeranWrap" hidden style="margin-top:8px"><div class="kecil" id="bkPeranKet" style="margin-bottom:6px">Pilih nama dulu supaya yang muncul hanya perannya.</div><div id="bkPeranList" style="display:flex;flex-wrap:wrap;gap:6px"></div></div></div>' +
     '<div class="penuh"><label class="lbl">Alasan</label><select class="isian" id="bkAlasan">' + D.atur.alasan.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('') + '</select></div>' +
     '<div class="penuh"><label class="lbl">Deskripsi</label><textarea class="isian" id="bkDesk" rows="2"></textarea></div></div>' +
     '<div class="aksi"><button type="button" class="btn garis" data-tutup="modal">Batal</button><button type="button" class="btn" data-ok="bk">Simpan</button></div>');
@@ -1425,7 +1554,7 @@ LAYAR.atur = function () {
 };
 
 /* ---------- Akses & sistem ---------- */
-var HAK = [['admin', 'Admin', 'Semua bagian, termasuk data, akun, dan menerbitkan'], ['Umum', 'Susun Umum', 'Mengisi jadwal Umum'], ['Youth', 'Susun Youth', 'Mengisi jadwal Youth'], ['Kids', 'Susun Kids', 'Mengisi jadwal Kids'], ['publish', 'Boleh menerbitkan', 'Menerbitkan & menarik jadwal terbit'], ['lihat', 'Lihat saja', 'Hanya melihat, tidak bisa mengubah']];
+var HAK = [['admin', 'Admin', 'Semua bagian, termasuk data, akun, dan menerbitkan'], ['database', 'Database', 'Bersama Admin: melihat & mengubah Database anggota. Hanya bisa diberikan oleh akun Admin + Database'], ['Umum', 'Susun Umum', 'Mengisi jadwal Umum'], ['Youth', 'Susun Youth', 'Mengisi jadwal Youth'], ['Kids', 'Susun Kids', 'Mengisi jadwal Kids'], ['publish', 'Boleh menerbitkan', 'Menerbitkan & menarik jadwal terbit'], ['lihat', 'Lihat saja', 'Hanya melihat, tidak bisa mengubah']];
 LAYAR.sistem = function () {
   var admin = boleh('data');
   var h = '<div class="lebar"><div class="judul"><div><h2>Akses & sistem</h2><p>Siapa boleh mengerjakan apa, dan pekerjaan otomatis di belakang layar.</p></div></div>' +
@@ -1434,7 +1563,7 @@ LAYAR.sistem = function () {
     h += hanyaLihat('data') + '<div class="kolom2"><div class="kartu"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><h3 style="margin:0">Akun · ' + D.akun.length + '</h3><span style="flex:1"></span><button type="button" class="btn kcl" data-aksi="akunTambah"' + (admin ? '' : ' disabled') + '>+ Tambah akun</button></div>' +
       '<div class="tw" style="border:0"><table class="t"><thead><tr><th>Nama</th>' + (admin ? '<th>Hak akses</th><th></th>' : '') + '</tr></thead><tbody>' + D.akun.map(function (a, i) {
         return '<tr><td><b>' + esc(a[1]) + '</b>' + (a[0] === S.akun.id ? ' <span class="chip abu" style="height:18px;font-size:10px">kamu</span>' : '') + (a[3] ? ' <span class="chip warn" style="height:18px;font-size:10px" title="Masih memakai PIN sementara">belum buat PIN</span>' : '') + '</td>' +
-          (admin ? '<td>' + (a[2] || []).map(function (x) { var d = HAK.filter(function (q) { return q[0] === x; })[0]; return '<span class="chip ' + (x === 'admin' ? 'ungu' : MN.indexOf(x) >= 0 ? x : x === 'lihat' ? 'abu' : 'ok') + '">' + (d ? d[1] : x) + '</span>'; }).join(' ') + '</td>' +
+          (admin ? '<td>' + (a[2] || []).map(function (x) { var d = HAK.filter(function (q) { return q[0] === x; })[0]; return '<span class="chip ' + (x === 'admin' ? 'ungu' : x === 'database' ? 'biru' : MN.indexOf(x) >= 0 ? x : x === 'lihat' ? 'abu' : 'ok') + '">' + (d ? d[1] : x) + '</span>'; }).join(' ') + '</td>' +
           '<td style="white-space:nowrap;text-align:right"><button type="button" class="btn garis kcl" data-akun="' + i + '">Ubah</button> <button type="button" class="btn garis kcl" data-pin="' + i + '">Reset PIN</button></td>' : '') + '</tr>';
       }).join('') + '</tbody></table></div></div>' +
       '<div class="kartu"><h3>Arti hak akses</h3><p class="ket">Semua akun bisa melihat semua bagian; yang dibatasi hanya yang bisa diubah. Penyusun (Umum / Youth / Kids) juga bisa mengisi blockout, cuti peran, dan aturan pelayan.</p><ul class="daftar">' + HAK.map(function (x) { return '<li><span class="sp"><b>' + x[1] + '</b><small>' + x[2] + '</small></span></li>'; }).join('') + '</ul>' +
@@ -1457,7 +1586,7 @@ function modalAkun(i) {
   var a = i >= 0 ? D.akun[i] : ['', '', ['Umum']];
   bukaModal('<button type="button" class="x" data-tutup="modal">×</button><h3>' + (i >= 0 ? 'Ubah akun' : 'Tambah akun') + '</h3><p class="ket">Hak akses bisa lebih dari satu (mis. Susun Umum + Susun Youth + Boleh menerbitkan).</p>' +
     '<label class="lbl">Nama</label><input class="isian" id="akNama" style="width:100%" maxlength="60" value="' + esc(a[1]) + '">' + (i < 0 ? '<p class="kecil" style="margin-top:6px">PIN sementara dibuat otomatis setelah disimpan. Orangnya diminta membuat PIN sendiri saat pertama masuk.</p>' : '') +
-    '<span class="lbl" style="margin-top:12px">Hak akses</span>' + HAK.map(function (x) { return '<label style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid #F1EEF5"><input type="checkbox" name="akHak" value="' + x[0] + '"' + ((a[2] || []).indexOf(x[0]) >= 0 ? ' checked' : '') + ' style="margin-top:3px"><span><b style="display:block">' + x[1] + '</b><span class="kecil">' + x[2] + '</span></span></label>'; }).join('') +
+    '<span class="lbl" style="margin-top:12px">Hak akses</span>' + HAK.filter(function (x) { return x[0] !== 'database' || boleh('database'); }).map(function (x) { return '<label style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid #F1EEF5"><input type="checkbox" name="akHak" value="' + x[0] + '"' + ((a[2] || []).indexOf(x[0]) >= 0 ? ' checked' : '') + ' style="margin-top:3px"><span><b style="display:block">' + x[1] + '</b><span class="kecil">' + x[2] + '</span></span></label>'; }).join('') +
     '<div class="aksi">' + (i >= 0 && a[0] !== S.akun.id ? '<button type="button" class="btn bahaya" data-ok="akunHapus" data-id="' + i + '" style="margin-right:auto">Cabut akses</button>' : '') + '<button type="button" class="btn garis" data-tutup="modal">Batal</button><button type="button" class="btn" data-ok="akun" data-id="' + i + '">Simpan</button></div>');
 }
 
@@ -1575,7 +1704,7 @@ document.addEventListener('click', function (e) {
     if (a === 'buat') modalBuat(S.mn);
     if (a === 'se') modalSE();
     if (a === 'oto') kerja('Mengisi nama otomatis sesuai Formasi Tim…', function () { return api('scIsiOtomatis', S.mn, S.ym, S.tgl || '', KL()); });
-    if (a === 'terbit') { if (!$('tbTarget').selectedOptions[0] || val('tbTarget').indexOf('|') < 0) return roti('✗ Pilih dulu yang mau diterbitkan.'); var tg = val('tbTarget').split('|'); TUNDA = { mn: tg[0], ym: tg[1] }; konfirmasi('Terbitkan jadwal?', 'Yang terbit: <b>' + esc($('tbTarget').selectedOptions[0].textContent) + '</b>. Halaman Jadwal Pelayanan langsung berubah dan volunteer bisa melihatnya.', 'Ya, terbitkan', 'terbit', 'hijau'); }
+    if (a === 'terbit') { if (!$('tbTarget').selectedOptions[0] || val('tbTarget').indexOf('|') < 0) return roti('✗ Pilih dulu yang mau diterbitkan.'); var tg = val('tbTarget').split('|'); TUNDA = { mn: tg[0], ym: tg[1] }; modalTerbit(tg[0], tg[1], $('tbTarget').selectedOptions[0].textContent); }
     if (a === 'bkTambah') modalBlockout();
     if (a === 'aturanTambah') modalAturanNama();
     if (a === 'picTambah') { var nm = val('pcNama'), dp = { aksi: 'tambah', mn: val('pcMn'), kc: val('pcKc'), nama: nm }; if (!AG[kn(nm)]) roti('✗ Pilih nama dari Database.'); else kerja('Menambah PIC…', function () { return api('scPic', dp, KL()); }); }
@@ -1644,10 +1773,12 @@ document.addEventListener('input', function (e) {
   if (t.id === 'pmQ') { PM.q = t.value; if (PM.q && PM.tab === 'saran') PM.tab = 'layak'; gambarPemilih(); fokusLagi('#pmQ'); return; }
   if (t.getAttribute('data-cari') === 'q') { S.cari.q = t.value; gambar(); fokusLagi('[data-cari="q"]'); return; }
   if (t.getAttribute('data-bk') === 'q') { S.bk.q = t.value; gambar(); fokusLagi('[data-bk="q"]'); return; }
+  if (t.id === 'bkNama') { isiPeranBk(); return; }
 });
 document.addEventListener('change', function (e) {
   var t = e.target, v;
-  if (t.id === 'bkJenis') { $('bkPeranWrap').hidden = t.value !== 'peran'; return; }
+  if (t.id === 'bkJenis') { $('bkPeranWrap').hidden = t.value !== 'peran'; isiPeranBk(); return; }
+  if (t.id === 'bkNama') { isiPeranBk(); return; }
   if ((v = t.getAttribute('data-cari')) && v !== 'q') { S.cari[v] = t.value; gambar(); return; }
   if ((v = t.getAttribute('data-bk')) && v !== 'q') { S.bk[v] = t.value; gambar(); return; }
   if ((v = t.getAttribute('data-te'))) { var q = v.split(':'), T = TE[q[0]], lama = T.baris[+q[1]][+q[2]]; if (String(lama) === t.value) return; T.baris[+q[1]][+q[2]] = typeof lama === 'number' && t.value !== '' && !isNaN(+t.value) ? +t.value : t.value; simpanTE(q[0], +q[1], +q[2]); return; }
@@ -1658,7 +1789,7 @@ document.addEventListener('focusout', function () { if (gambarAman.tunda) setTim
 document.addEventListener('keydown', function (e) {
   if (!$('tur').hidden) { if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); turAksi('lanjut'); } else if (e.key === 'ArrowLeft') turAksi('kembali'); else if (e.key === 'Escape') turAksi('lewati'); return; }
   if (e.key === 'Enter' && (e.target.id === 'gPin1' || e.target.id === 'gPin2')) { simpanPinBaru(); return; }
-  if (e.key === 'Escape' && !kerja.jalan) { if ($('modal').classList.contains('buka')) tutupModal(); else if ($('laci').classList.contains('buka')) { tutupLaci(); gambar(); } }
+  if (e.key === 'Escape' && !kerja.jalan) { $('notifPanel').classList.remove('buka'); if ($('modal').classList.contains('buka')) tutupModal(); else if ($('laci').classList.contains('buka')) { tutupLaci(); gambar(); } }
   if (e.key === 'Enter' && e.target.id === 'mPin') masuk();
   if (e.key === 'Enter' && e.target.id === 'pmQ') { var b = document.querySelector('#pmList .calon'); if (b) { e.preventDefault(); b.click(); } }
 });
@@ -1722,7 +1853,7 @@ function masuk() {
       S.akun.hak = p.hak; $('aHak').textContent = labelHak(p.hak);
       $('masuk').style.display = 'none'; aktifTerakhir = Date.now();
       if (adaAntrian()) kirimAntrian();
-      cekVersi(true);
+      RT.aktif = true; denyut();
       return;
     }
     S.calon = p;
@@ -1758,7 +1889,7 @@ function muatData(pinBaru) {
   gambarMasuk('muat');
   var lama = setTimeout(function () { var p = $('mKotak').querySelector('p'); if (p) p.textContent = 'Masih memuat data jadwal, sebentar lagi…'; }, 8000);
   api('scData').then(function (r) {
-    clearTimeout(lama); terima(r); masukApp();
+    clearTimeout(lama); VER = {}; terima(r); masukApp(); mulaiRealtime();
     if (pinBaru) roti('✓ PIN baru tersimpan. Pakai PIN ini setiap masuk.');
   }, function (e) { clearTimeout(lama); TOKEN = ''; gambarMasuk('masuk', 'Data belum bisa dimuat: ' + e.message); });
 }
@@ -1773,9 +1904,10 @@ function masukApp() {
   gambar();
   if (!a.tur) setTimeout(turMulai, 450);
 }
-function kunciLayar(pesan) { if (!S.akun) return; if (!$('tur').hidden) turSelesai(false); TOKEN = ''; gambarMasuk('kunci', pesan); }
+function kunciLayar(pesan) { if (!S.akun) return; if (!$('tur').hidden) turSelesai(false); TOKEN = ''; hentikanRealtime(); bukaObrol(false); gambarMasuk('kunci', pesan); }
 function sesiHabis() { if (S.akun && $('masuk').style.display === 'none') kunciLayar('Sesi berakhir. Masukkan PIN lagi untuk melanjutkan. Pekerjaanmu tetap ada.'); }
 function keluar() {
+  hentikanRealtime(); bukaObrol(false); $('notifPanel').classList.remove('buka'); DB = null;
   TOKEN = ''; S.akun = null; ANTRI = {}; $('app').hidden = true; tutupModal(); tutupLaci();
   gambarMasuk('masuk');   // token hanya dipegang di memori halaman, jadi cukup dibuang
 }
@@ -1795,22 +1927,10 @@ function modalGantiPin() {
 var KUNCI_MENIT = 15, aktifTerakhir = Date.now();
 ['pointerdown', 'keydown', 'scroll', 'touchstart', 'mousemove'].forEach(function (ev) { window.addEventListener(ev, function () { aktifTerakhir = Date.now(); }, { passive: true, capture: true }); });
 setInterval(function () { if (S.akun && $('masuk').style.display === 'none' && !kerja.jalan && Date.now() - aktifTerakhir > KUNCI_MENIT * 60000) kunciLayar('Terkunci otomatis setelah ' + KUNCI_MENIT + ' menit tanpa aktivitas. Pekerjaanmu tetap ada.'); }, 15000);
-$('isi').addEventListener('scroll', function () { if (!geserKepala.t) geserKepala.t = requestAnimationFrame(function () { geserKepala.t = 0; geserKepala(); }); }, { passive: true });
+$('isi').addEventListener('scroll', function () { if (!geserKepala.t) geserKepala.t = requestAnimationFrame(function () { geserKepala.t = 0; geserKepala(); posGeser(); }); }, { passive: true });
 window.addEventListener('resize', function () { pasangGeser(); if (!$('tur').hidden) turTampil(true); });
 
-/* perubahan dari tempat lain (spreadsheet, halaman Process, blockout dari volunteer, penyusun lain): dicek berkala */
-var CEK_DETIK = 45, cekTerakhir = 0;
-function cekVersi(paksa) {
-  if (!S.akun || !TOKEN || $('masuk').style.display !== 'none' || kerja.jalan || adaAntrian() || KIRIM || cekVersi.jalan) return;
-  if (!paksa && (document.hidden || Date.now() - cekTerakhir < CEK_DETIK * 1000 - 500)) return;
-  cekTerakhir = Date.now(); cekVersi.jalan = true;
-  api('scVersi').then(function (r) {
-    if (r.v === VERSI || kerja.jalan || adaAntrian() || KIRIM) return;
-    return muatUlang(SEMUA_BAGIAN).then(function () { gambarAman(); });
-  }).catch(function () {}).then(function () { cekVersi.jalan = false; });
-}
-setInterval(function () { cekVersi(false); }, CEK_DETIK * 1000);
-document.addEventListener('visibilitychange', function () { if (!document.hidden && Date.now() - cekTerakhir > 10000) cekVersi(true); });
+/* perubahan dari tempat lain: lihat bagian REAL-TIME (denyut tiap 4 detik) */
 
 /* ---------- tutorial (tur 15 langkah) ---------- */
 function siapSusun() {
@@ -1885,8 +2005,349 @@ function turLetak(els) {
   else { x = tengah; y = vh - kh - 14; }
   K.style.left = x + 'px'; K.style.top = y + 'px';
 }
+
+/* =====================================================================================================
+ * REAL-TIME: denyut tiap 4 detik (versi data, online, notifikasi, chat). Yang berubah langsung dimuat & digambar ulang.
+ * ===================================================================================================== */
+var PART_BAGIAN = { inUmum: ['inputRingan:Umum'], inYouth: ['inputRingan:Youth'], inKids: ['inputRingan:Kids'], terbit: ['terbit'], blockout: ['blockout'],
+  pic: ['pic', 'input'], yi: ['yi', 'input'], formasi: ['formasi'], atur: ['atur', 'input'], log: ['log'], akun: ['akun'], anggota: ['anggota', 'input'], db: [] };
+var DENYUT_MS = 4000, DENYUT_SEMBUNYI_MS = 20000, RT = { t: 0, jalan: false, aktif: false, gagal: 0 };
+var NOTIF = [], NOTIF_SEJAK = 0, NB = 0, CHAT = [], CHAT_SEJAK = 0, CB = {}, ONLINE = [], CH = { kanal: 'semua', buka: false, daftar: true };
+function mulaiRealtime() {
+  RT.aktif = true; NOTIF = []; NOTIF_SEJAK = 0; NB = 0; CHAT = []; CHAT_SEJAK = 0;
+  api('scChat').then(function (r) { terimaChat(r.pesan, r.cb, true); }).catch(function () {});
+  denyut();
+}
+function hentikanRealtime() { RT.aktif = false; clearTimeout(RT.t); ONLINE = []; gambarOnline(); }
+function jadwalDenyut(ms) { clearTimeout(RT.t); if (RT.aktif) RT.t = setTimeout(denyut, ms); }
+function denyut() {
+  if (!RT.aktif) return;
+  if (!S.akun || !TOKEN || $('masuk').style.display !== 'none') return jadwalDenyut(DENYUT_MS);
+  if (RT.jalan) return;
+  RT.jalan = true;
+  api('scDenyut', { hal: S.hal, mn: S.mn, notifSejak: NOTIF_SEJAK, chatSejak: CHAT_SEJAK }).then(function (r) {
+    RT.gagal = 0;
+    ONLINE = r.on || [];
+    if (S.akun) S.akun.nb = r.nbW || 0;
+    terimaNotif(r.notif || [], r.nb, NOTIF_SEJAK > 0);
+    terimaChat(r.chat || [], r.cb, false);
+    gambarOnline();
+    var v = r.v || {}, awal = !Object.keys(VER).length;
+    if (awal) { VER = v; return; }
+    var berubah = Object.keys(v).filter(function (k) { return VER[k] !== undefined && v[k] !== VER[k] || (VER[k] === undefined && v[k] !== '0'); });
+    if (!berubah.length) return;
+    if (berubah.indexOf('db') >= 0) {
+      // perubahan Database dari orang lain (simpanan sendiri sudah memperbarui DBV)
+      if (!kerja.jalan) { VER.db = v.db; if (S.hal === 'db' && v.db !== DBV) muatDb(true); }
+      berubah = berubah.filter(function (k) { return k !== 'db'; });
+    }
+    // sedang menyimpan / memproses: tunggu denyut berikutnya supaya isianmu tidak tertimpa
+    if (!berubah.length || kerja.jalan || KIRIM || adaAntrian()) return;
+    var bagian = [];
+    berubah.forEach(function (k) { (PART_BAGIAN[k] || []).forEach(function (b) { if (bagian.indexOf(b) < 0) bagian.push(b); }); });
+    if (bagian.indexOf('input') >= 0) bagian = bagian.filter(function (b) { return b.indexOf('inputRingan:') !== 0; });
+    if (!bagian.length) { berubah.forEach(function (k) { VER[k] = v[k]; }); return; }
+    return muatUlang(bagian).then(function () {
+      berubah.forEach(function (k) { if (!VER[k] || VER[k] < v[k]) VER[k] = v[k]; });
+      gambarAman();
+      setTimeout(gambarKilatSelesai, 6200);
+    });
+  }).catch(function (e) { RT.gagal++; }).then(function () {
+    RT.jalan = false;
+    jadwalDenyut(document.hidden ? DENYUT_SEMBUNYI_MS : RT.gagal > 2 ? 10000 : DENYUT_MS);
+  });
+}
+function gambarKilatSelesai() { if (S.hal === 'susun' && document.querySelector('#isi .sel.kilat')) gambarAman(); }
+document.addEventListener('visibilitychange', function () { if (!document.hidden && RT.aktif && !RT.jalan) denyut(); });
+window.addEventListener('focus', function () { if (RT.aktif && !RT.jalan) denyut(); });
+
+/* ---------- siapa yang online ---------- */
+var NAMA_HAL = { beranda: 'Beranda', susun: 'Susun', cek: 'Cek & terbit', terbit: 'Jadwal terbit', pelayan: 'Cari pelayan', blockout: 'Blockout & cuti', formasi: 'Formasi', pic: 'PIC', yi: 'Youth Invasion', atur: 'Pengaturan', sistem: 'Akses & sistem', db: 'Database' };
+function onlineLain() { return ONLINE.filter(function (o) { return S.akun && o[0] !== S.akun.id; }); }
+function gambarOnline() {
+  var b = $('obrolOn');
+  if (b) { var n = ONLINE.length; b.textContent = n ? n + ' online' : ''; b.hidden = !n; }
+  var e = $('susunOnline');
+  if (e) {
+    var sama = onlineLain().filter(function (o) { return o[2] === 'susun' && o[3] === S.mn; });
+    e.innerHTML = sama.length ? '<span class="kecil">Juga membuka ' + esc(S.mn) + ':</span> ' + sama.map(function (o) { return '<span class="ava kcl" title="' + esc(o[1]) + '" style="background:' + AVA[o[1].length % 6] + '">' + inisial(o[1]) + '</span>'; }).join('') : '';
+  }
+  var sig = ONLINE.map(function (o) { return o.join('/'); }).join(',');
+  if (CH.buka && sig !== gambarOnline.sig) gambarObrol(false);
+  gambarOnline.sig = sig;
+}
+
+/* ---------- notifikasi (lonceng) ---------- */
+var JENIS_NOTIF = { isi: 'mengisi jadwal', info: 'info service', hapus: 'hapus kolom', buat: 'buat jadwal', otomatis: 'isi otomatis', special: 'special event', terbit: 'terbit', tarik: 'edit terbit',
+  blockout: 'blockout', aturan: 'aturan pelayan', data: 'data', akun: 'akun', database: 'database', process: 'Process', proses: 'spreadsheet' };
+function terimaNotif(baru, nb, toast) {
+  var pakai = {};
+  NOTIF.forEach(function (e, i) { pakai[e[8] + '|' + e[1]] = i; });
+  baru.forEach(function (e) {
+    var k = e[8] + '|' + e[1];
+    if (k in pakai) NOTIF[pakai[k]] = e; else { pakai[k] = NOTIF.length; NOTIF.push(e); }
+    if (e[0] > NOTIF_SEJAK) NOTIF_SEJAK = e[0];
+  });
+  NOTIF.sort(function (a, b) { return a[0] - b[0]; });
+  if (NOTIF.length > 80) NOTIF = NOTIF.slice(-80);
+  if (typeof nb === 'number') NB = nb;
+  var bd = $('loncengN');
+  if (bd) { bd.textContent = NB > 99 ? '99+' : NB; bd.hidden = !NB; }
+  if (toast && baru.length && !$('notifPanel').classList.contains('buka')) {
+    var e = baru[baru.length - 1];
+    roti('🔔 ' + e[2] + ': ' + e[5].slice(0, 110));
+  }
+  if ($('notifPanel').classList.contains('buka')) gambarNotif();
+}
+function lalu(w) {
+  var d = Math.max(0, Math.round((Date.now() - w) / 1000));
+  if (d < 60) return 'baru saja';
+  if (d < 3600) return Math.floor(d / 60) + ' mnt lalu';
+  if (d < 86400) return Math.floor(d / 3600) + ' jam lalu';
+  var t = new Date(w); return t.getDate() + ' ' + BLN[t.getMonth()] + ' ' + ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2);
+}
+function gambarNotif() {
+  var L = NOTIF.slice().reverse(), nb = Number(S.akun && S.akun.nb) || 0;
+  $('notifPanel').innerHTML = '<div class="np-k"><b>Notifikasi</b><span class="kecil">Perubahan oleh tim ' + (boleh('data') ? '(semua bagian)' : 'di bagianmu') + '</span><button type="button" class="x" data-tutup="notif" aria-label="Tutup">×</button></div>' +
+    '<div class="np-isi">' + (L.length ? L.map(function (e) {
+      return '<button type="button" class="np-b' + (e[0] > nb ? ' baru' : '') + '" data-notif="' + e[8] + '|' + esc(e[1]) + '"><span class="ava" style="background:' + AVA[e[2].length % 6] + '">' + inisial(e[2]) + '</span><span class="sp"><span><b>' + esc(e[2]) + '</b> ' + esc(e[5]) + (e[7] > 1 ? ' <span class="kecil">(' + e[7] + ' perubahan)</span>' : '') + '</span>' +
+        '<small>' + lalu(e[0]) + ' · ' + esc(JENIS_NOTIF[e[4]] || e[4]) + (e[3] && e[3].length ? ' · ' + e[3].map(esc).join(', ') : '') + '</small></span></button>';
+    }).join('') : '<div class="kosong">Belum ada perubahan dari anggota tim lain.</div>') + '</div>';
+}
+function bukaNotif() {
+  var p = $('notifPanel');
+  if (p.classList.contains('buka')) { p.classList.remove('buka'); return; }
+  gambarNotif(); p.classList.add('buka');
+  api('scNotif').then(function (r) { terimaNotif(r.notif || [], undefined, false); gambarNotif(); }).catch(function () {});
+  var akhir = NOTIF.length ? NOTIF[NOTIF.length - 1][0] : Date.now();
+  if (NB) api('scNotifBaca', akhir).then(function (r) { NB = 0; S.akun.nb = r.nb; terimaNotif([], 0, false); }).catch(function () {});
+}
+function bukaTautan(l) {
+  l = l || {};
+  if (l.mn && MN.indexOf(l.mn) >= 0) S.mn = l.mn;
+  if (l.hal === 'susun') { S.ym = l.ym || statDraft(S.mn).bulan[0] || S.ym; S.tgl = l.t || ''; }
+  if (l.hal === 'terbit' && l.mn) { S.tb.mn = l.mn; S.tbTab = 'jadwal'; }
+  buka(l.hal && LAYAR[l.hal] ? l.hal : 'beranda');
+}
+
+/* ---------- chat tim ---------- */
+function kanalDm(id) { return 'dm:' + [S.akun.id, id].sort().join('|'); }
+function namaKanal(k) {
+  if (k === 'semua') return 'Semua tim';
+  if (MN.indexOf(k) >= 0) return 'Penyusun ' + k;
+  var m = /^dm:([a-z0-9]+)\|([a-z0-9]+)$/.exec(k), lain = m ? (m[1] === S.akun.id ? m[2] : m[1]) : '';
+  var a = D.akun.filter(function (x) { return x[0] === lain; })[0];
+  return a ? a[1] : 'Pesan pribadi';
+}
+function daftarKanal() {
+  var h = S.akun.hak, out = ['semua'];
+  MN.forEach(function (m) { if (h.indexOf('admin') >= 0 || h.indexOf(m) >= 0) out.push(m); });
+  return out;
+}
+function belumDibaca(k) { var w = Number(CB[k]) || 0; return CHAT.filter(function (m) { return m[4] === k && m[2] !== S.akun.id && m[1] > w; }).length; }
+function terimaChat(baru, cb, awal) {
+  if (cb) Object.keys(cb).forEach(function (k) { if (!CB[k] || cb[k] > CB[k]) CB[k] = cb[k]; });
+  var ada = {};
+  CHAT.forEach(function (m) { ada[m[0]] = 1; });
+  var masuk = baru.filter(function (m) { return !ada[m[0]]; });
+  CHAT = CHAT.concat(masuk).sort(function (a, b) { return a[0] - b[0]; });
+  if (CHAT.length > 400) CHAT = CHAT.slice(-400);
+  baru.forEach(function (m) { if (m[0] > CHAT_SEJAK) CHAT_SEJAK = m[0]; });
+  var dariLain = masuk.filter(function (m) { return m[2] !== S.akun.id; });
+  if (!awal && dariLain.length && !(CH.buka && dariLain.every(function (m) { return m[4] === CH.kanal; }))) {
+    var m = dariLain[dariLain.length - 1];
+    roti('💬 ' + m[3] + (m[4].indexOf('dm:') === 0 ? '' : ' · ' + namaKanal(m[4])) + ': ' + m[5].slice(0, 90));
+  }
+  if (CH.buka && (masuk.length || awal)) { tandaiChatDibaca(); gambarObrol(masuk.some(function (m) { return m[4] === CH.kanal; })); }
+  gambarBadgeChat();
+}
+function gambarBadgeChat() {
+  var n = 0;
+  daftarKanal().forEach(function (k) { n += belumDibaca(k); });
+  CHAT.forEach(function (m) { if (m[4].indexOf('dm:') === 0 && m[2] !== S.akun.id && m[1] > (Number(CB[m[4]]) || 0)) n++; });
+  var b = $('obrolN'); if (b) { b.textContent = n > 99 ? '99+' : n; b.hidden = !n; }
+}
+var tandaT = 0;
+function tandaiChatDibaca() {
+  var k = CH.kanal, akhir = 0;
+  CHAT.forEach(function (m) { if (m[4] === k && m[1] > akhir) akhir = m[1]; });
+  if (!akhir || (Number(CB[k]) || 0) >= akhir) return;
+  CB[k] = akhir; gambarBadgeChat();
+  clearTimeout(tandaT); tandaT = setTimeout(function () { api('scChatBaca', k, akhir).catch(function () {}); }, 600);
+}
+function teksChat(t) { return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g, '<br>'); }
+function gambarObrol(gulirBawah) {
+  var p = $('obrolPanel'); if (!p || !S.akun) return;
+  var isi = $('obPesan'), dekatBawah = !isi || isi.scrollHeight - isi.scrollTop - isi.clientHeight < 80, y = isi ? isi.scrollTop : 0;
+  var onId = {}; ONLINE.forEach(function (o) { onId[o[0]] = o; });
+  var kanal = daftarKanal().map(function (k) {
+    var n = belumDibaca(k);
+    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ob-ik">' + (k === 'semua' ? '#' : k.charAt(0)) + '</span><span class="sp">' + esc(namaKanal(k)) + '</span>' + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
+  }).join('');
+  var orang = D.akun.filter(function (a) { return a[0] !== S.akun.id; }).sort(function (a, b) { return (onId[b[0]] ? 1 : 0) - (onId[a[0]] ? 1 : 0) || (a[1] < b[1] ? -1 : 1); }).map(function (a) {
+    var k = kanalDm(a[0]), n = belumDibaca(k), o = onId[a[0]];
+    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ava kcl" style="background:' + AVA[a[1].length % 6] + '">' + inisial(a[1]) + '<i class="ob-titik' + (o ? ' on' : '') + '"></i></span><span class="sp">' + esc(a[1]) + (o ? '<small>' + esc(NAMA_HAL[o[2]] || 'online') + (o[3] && /susun|cek/.test(o[2]) ? ' ' + esc(o[3]) : '') + '</small>' : '') + '</span>' + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
+  }).join('');
+  var M = CHAT.filter(function (m) { return m[4] === CH.kanal; }), hari = '';
+  var pesan = M.length ? M.map(function (m) {
+    var d = new Date(m[1]), h = d.getDate() + ' ' + BLN[d.getMonth()], saya = m[2] === S.akun.id, sep = '';
+    if (h !== hari) { hari = h; sep = '<div class="ob-hari">' + h + '</div>'; }
+    return sep + '<div class="ob-m' + (saya ? ' saya' : '') + '">' + (saya ? '' : '<b>' + esc(m[3]) + '</b>') + '<div>' + teksChat(m[5]) + '</div><small>' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + '</small></div>';
+  }).join('') : '<div class="kosong">Belum ada pesan di ' + esc(namaKanal(CH.kanal)) + '.' + (CH.kanal.indexOf('dm:') === 0 ? ' Pesan ini hanya terlihat oleh kalian berdua.' : '') + '</div>';
+  var draf = $('obTulis') ? $('obTulis').value : '', fokus = document.activeElement && document.activeElement.id === 'obTulis';
+  p.innerHTML = '<div class="ob-kp"><button type="button" class="ob-balik" data-ob="daftar" aria-label="Daftar percakapan">‹</button><b>' + esc(namaKanal(CH.kanal)) + '</b><span class="kecil">' + (CH.kanal.indexOf('dm:') === 0 ? 'pesan pribadi' : CH.kanal === 'semua' ? 'semua akun Scheduling' : 'penyusun ' + CH.kanal + ' & Admin') + '</span><button type="button" class="x" data-ob="tutup" aria-label="Tutup">×</button></div>' +
+    '<div class="ob-badan' + (CH.daftar ? ' lihat-daftar' : '') + '"><nav class="ob-daftar"><div class="ob-grp">Grup</div>' + kanal + '<div class="ob-grp">Pesan pribadi · ' + ONLINE.filter(function (o) { return o[0] !== S.akun.id; }).length + ' online</div>' + orang + '</nav>' +
+    '<section class="ob-obrol"><div class="ob-pesan" id="obPesan">' + pesan + '</div><form class="ob-form" id="obForm"><textarea id="obTulis" rows="1" maxlength="1000" placeholder="Tulis pesan ke ' + esc(namaKanal(CH.kanal)) + '…"></textarea><button type="submit" aria-label="Kirim"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg></button></form></section></div>';
+  var t = $('obTulis'); t.value = draf; if (fokus) { t.focus(); t.setSelectionRange(draf.length, draf.length); }
+  isi = $('obPesan');
+  isi.scrollTop = gulirBawah || dekatBawah ? isi.scrollHeight : y;
+}
+function bukaObrol(ya) {
+  CH.buka = ya;
+  $('obrolPanel').hidden = !ya; $('obrol').classList.toggle('buka', ya);
+  if (ya) { CH.daftar = window.innerWidth <= 700 ? CH.daftar : false; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) setTimeout(function () { var t = $('obTulis'); if (t) t.focus(); }, 50); }
+}
+function kirimChat() {
+  var t = $('obTulis'), teks = t.value.trim(), k = CH.kanal;
+  if (!teks) return;
+  t.value = '';
+  var sementara = [Date.now() * 1000 + 999, Date.now(), S.akun.id, S.akun.nama, k, teks, 1];
+  CHAT.push(sementara); gambarObrol(true);
+  api('scChatKirim', k, teks).then(function (r) {
+    CHAT = CHAT.filter(function (m) { return m !== sementara; });
+    terimaChat([r.pesan], null, true); CB[k] = r.pesan[1]; gambarObrol(true);
+  }, function (e) { CHAT = CHAT.filter(function (m) { return m !== sementara; }); t.value = teks; gambarObrol(true); roti('✗ Pesan belum terkirim: ' + e.message); });
+}
+(function () {
+  var el = document.createElement('div');
+  el.id = 'obrol';
+  el.innerHTML = '<button type="button" class="ob-buka" id="obrolBuka" aria-label="Chat tim"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 3C6.900 3 3 6.600 3 11c0 2.300 1.100 4.400 2.900 5.900L5 21l4.200-2c.900.200 1.800.300 2.800.300 5.100 0 9-3.600 9-8.100S17.100 3 12 3z"/></svg><span>Chat tim</span><i class="ob-n" id="obrolN" hidden></i><small id="obrolOn" hidden></small></button>' +
+    '<section class="ob-panel" id="obrolPanel" role="dialog" aria-label="Chat tim" hidden></section>';
+  document.body.appendChild(el);
+  el.addEventListener('click', function (e) {
+    var b;
+    if (e.target.closest('#obrolBuka')) { bukaObrol(true); return; }
+    if ((b = e.target.closest('[data-ob]'))) { if (b.getAttribute('data-ob') === 'tutup') bukaObrol(false); else { CH.daftar = true; gambarObrol(false); } return; }
+    if ((b = e.target.closest('[data-kanal]'))) { CH.kanal = b.getAttribute('data-kanal'); CH.daftar = false; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) $('obTulis').focus(); return; }
+  });
+  el.addEventListener('submit', function (e) { e.preventDefault(); kirimChat(); });
+  el.addEventListener('keydown', function (e) { if (e.target.id === 'obTulis' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); kirimChat(); } if (e.key === 'Escape') bukaObrol(false); });
+})();
+
+/* ---------- Database (khusus Admin + Database) ---------- */
+var DB = null, DBF = { q: '', st: 'aktif', mn: '', kc: '', pos: '' }, DBV = '';
+var DBK = { nama: 1, lain: 2, p1: 3, p2: 4, p3: 5, wl: 6, ur: 7, tk: 8, sh: 9, umum: 10, youth: 11, kids: 12, role: 13, form: 14, tglForm: 15, home: 16, sebagai: 17, keys: 18, bass: 19, drum: 20, gitar: 21, skor: 22, aktif: 24, suara: 25, wlmn: 26, va: 27, m1: 28 };
+function muatDb(diam) {
+  if (!boleh('database')) return Promise.resolve();
+  if (!diam && !DB) $('isi').innerHTML = '<div class="kartu"><div class="kosong">Memuat Database…</div></div>';
+  return api('scDbData').then(function (r) { DB = r; DBV = r.v; if (S.hal === 'db') gambarAman(); if (diam && $('laci').classList.contains('buka') && DBE.baris) roti('ℹ Database baru saja diubah orang lain. Data di layar sudah diperbarui.'); },
+    function (e) { if (S.hal === 'db') $('isi').innerHTML = '<div class="kartu"><div class="pesan bad">' + esc(e.message) + '</div></div>'; });
+}
+function dbAktif(r) { return !/inactive|resigned/i.test(r[DBK.role]); }
+LAYAR.db = function () {
+  if (!boleh('database')) return '<div class="kartu"><div class="kosong">Bagian ini hanya untuk akun Admin + Database.</div></div>';
+  if (!DB) { setTimeout(function () { muatDb(false); }, 0); return '<div class="kartu"><div class="kosong">Memuat Database…</div></div>'; }
+  var F = DBF, q = kn(F.q), pos = (DB.pilihan.pos || []);
+  var L = DB.baris.filter(function (r) {
+    if (F.st === 'aktif' && !dbAktif(r)) return false; if (F.st === 'non' && dbAktif(r)) return false;
+    if (q && kn(r[1]).indexOf(q) < 0) return false;
+    if (F.mn && r[{ Umum: 10, Youth: 11, Kids: 12 }[F.mn]] !== 'Yes') return false;
+    if (F.kc && r[{ UR: 7, TK: 8, SH: 9 }[F.kc]] !== 'Yes') return false;
+    if (F.pos && [r[3], r[4], r[5]].indexOf(F.pos) < 0) return false;
+    return true;
+  });
+  var sel = function (id, isi, v) { return '<select class="isian" data-dbf="' + id + '">' + isi.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (o[0] === v ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>'; };
+  var yn = function (r, k) { return r[k] === 'Yes' ? '✓' : r[k] === 'No' ? '–' : ''; };
+  var h = '<div class="judul"><div><h2>Database</h2><p>Tab Database di file Database (Mapping 2026). Perubahan di sini langsung tersimpan di sana dan dipakai pilihan nama, isi otomatis, dan halaman lain. Kolom rumus (status form, skor) hanya dibaca.</p></div><span class="sp"></span><button type="button" class="btn" data-dbbaru="1">+ Anggota baru</button></div>';
+  h += '<div class="alat"><input class="isian" type="search" data-dbf="q" placeholder="Cari nama…" value="' + esc(F.q) + '" style="width:200px">' +
+    sel('st', [['aktif', 'Aktif saja'], ['', 'Semua status'], ['non', 'Inactive / resigned']], F.st) + sel('mn', [['', 'Semua ministry'], ['Umum', 'Umum'], ['Youth', 'Youth'], ['Kids', 'Kids']], F.mn) +
+    sel('kc', [['', 'Semua campus'], ['TK', 'TK'], ['UR', 'UR'], ['SH', 'SH']], F.kc) + sel('pos', [['', 'Semua posisi']].concat(pos.map(function (p) { return [p, p]; })), F.pos) + '<span class="kecil">' + L.length + ' orang</span></div>';
+  h += '<div class="tw" style="max-height:calc(100vh - 250px)"><table class="t"><thead><tr><th>Nama</th><th>Posisi</th><th>WL/MD</th><th>UR</th><th>TK</th><th>SH</th><th>Umum</th><th>Youth</th><th>Kids</th><th>Role</th><th>Form</th><th>Suara</th><th>Skor</th></tr></thead><tbody>' + L.slice(0, 400).map(function (r) {
+    return '<tr class="klik" data-db="' + r[0] + '"><td><b>' + esc(r[1]) + '</b></td><td>' + esc([r[3], r[4], r[5]].filter(String).join(', ') + (r[2] ? ' · ' + r[2] : '')) + '</td><td>' + (r[6] === 'Yes' ? '<span class="chip ungu" style="height:18px;font-size:10px">WL/MD' + (r[26] && r[26] !== 'Semua ministry' ? ' · ' + esc(r[26]) : '') + '</span>' : '') + '</td>' +
+      '<td>' + yn(r, 7) + '</td><td>' + yn(r, 8) + '</td><td>' + yn(r, 9) + '</td><td>' + yn(r, 10) + '</td><td>' + yn(r, 11) + '</td><td>' + yn(r, 12) + '</td><td>' + esc(r[13]) + '</td><td class="kecil">' + esc(r[14]) + '</td><td>' + esc(r[25]) + '</td><td>' + esc(r[22]) + '</td></tr>';
+  }).join('') + '</tbody></table></div>' + (L.length > 400 ? '<p class="kecil" style="margin-top:6px">Menampilkan 400 pertama. Persempit dengan filter.</p>' : '');
+  return h;
+};
+var DBE = { baris: 0, asal: null };
+function laciDb(baris) {
+  var r = baris ? DB.baris.filter(function (x) { return x[0] === baris; })[0] : null;
+  if (baris && !r) { roti('✗ Baris itu sudah berubah. Database dimuat ulang.'); muatDb(true); return; }
+  DBE = { baris: baris || 0, asal: r || [0].concat(new Array(28).fill('')) };
+  var v = DBE.asal, P = DB.pilihan;
+  var pil = function (k, daftar, kosong) { return '<select class="isian" data-dbk="' + k + '" style="width:100%">' + (kosong ? '<option value="">' + kosong + '</option>' : '') + (daftar || []).concat(v[k] && (daftar || []).indexOf(v[k]) < 0 ? [v[k]] : []).map(function (o) { return '<option' + (o === v[k] ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select>'; };
+  var ynB = function (k, lbl) { return '<label class="centang"><input type="checkbox" data-dbyn="' + k + '"' + (v[k] === 'Yes' ? ' checked' : '') + '><span>' + lbl + '</span></label>'; };
+  var baca = function (lbl, x) { return x !== '' && x !== undefined ? '<dt style="color:var(--muted)">' + lbl + '</dt><dd style="margin:0;font-weight:600">' + esc(x) + '</dd>' : ''; };
+  bukaLaci('<div class="kp"><button type="button" class="x" data-tutup="laci">×</button><small>' + (baris ? 'Database · baris ' + baris : 'Anggota baru') + '</small><h3>' + esc(v[1] || 'Anggota baru') + '</h3></div><div class="bd">' +
+    '<label class="lbl">Nama</label><input class="isian" data-dbk="1" style="width:100%" maxlength="120" value="' + esc(v[1]) + '">' + (baris ? '<p class="kecil" style="margin-top:4px">Mengganti nama tidak mengubah nama di jadwal yang sudah ada.</p>' : '') +
+    '<div class="bidang" style="margin-top:10px"><div><label class="lbl">Posisi 1</label>' + pil(3, P.pos, '–') + '</div><div><label class="lbl">Posisi 2</label>' + pil(4, P.pos, '–') + '</div><div><label class="lbl">Posisi 3</label>' + pil(5, P.pos, '–') + '</div>' +
+    '<div><label class="lbl">Posisi lainnya</label><input class="isian" data-dbk="2" style="width:100%" value="' + esc(v[2]) + '"></div>' +
+    '<div><label class="lbl">Role</label>' + pil(13, P.role, '–') + '</div><div><label class="lbl">Jenis suara</label>' + pil(25, P.suara, '–') + '</div>' +
+    '<div><label class="lbl">WL/MD di ministry</label>' + pil(26, P.wlmn, '–') + '</div><div><label class="lbl">Campus khusus minggu 1</label>' + pil(28, P.m1, '–') + '</div></div>' +
+    '<span class="lbl" style="margin-top:12px">WL / MD & Vocal arranger</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + ynB(6, 'WL / MD') + '<label class="centang"><input type="checkbox" data-dbva="27"' + (v[27] === true ? ' checked' : '') + '><span>Vocal arranger</span></label></div>' +
+    '<span class="lbl" style="margin-top:12px">Campus</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + ynB(7, 'UpperRoom') + ynB(8, 'The Kasablanka') + ynB(9, 'Sutera Hall') + '</div>' +
+    '<span class="lbl" style="margin-top:12px">Active at</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + ynB(10, 'Umum (Main service)') + ynB(11, 'Youth') + ynB(12, 'Kids') + '</div>' +
+    (baris ? '<span class="lbl" style="margin-top:14px">Dari form & evaluasi (hanya baca)</span><dl style="display:grid;grid-template-columns:140px minmax(0,1fr);gap:6px 10px;margin:0;font-size:13px">' + baca('Status form', v[14]) + baca('Tanggal isi form', String(v[15]).replace(/^(\d{4}-\d\d-\d\d)T(\d\d:\d\d).*$/, '$1 $2')) + baca('Home-base', v[16]) + baca('Melayani sebagai', v[17]) +
+      baca('Skor Keys / Bass / Drum / Gitar', [v[18], v[19], v[20], v[21]].map(function (x) { return x === '' ? '–' : x; }).join(' / ')) + baca('Skor akhir', v[22]) + baca('Aktif', v[24]) + '</dl>' : '') +
+    '</div><div class="kk"><span class="kecil" id="dbKet"></span><button type="button" class="btn" data-dbsimpan="1" style="margin-left:auto">Simpan ke Database</button></div>');
+  $('app').classList.add('ada-laci');   // tabel bergeser, tidak tertutup laci
+}
+function simpanDb() {
+  var v = DBE.asal, ubah = {}, nilai = function (k, x) { if (String(x) !== String(v[k] === true ? true : v[k] === false ? false : v[k])) ubah[k] = [v[k], x]; };
+  Array.prototype.forEach.call(document.querySelectorAll('#laci [data-dbk]'), function (e) { nilai(+e.getAttribute('data-dbk'), e.value.trim()); });
+  Array.prototype.forEach.call(document.querySelectorAll('#laci [data-dbyn]'), function (e) {
+    var k = +e.getAttribute('data-dbyn'), x = e.checked ? 'Yes' : 'No';
+    if (x !== v[k] && !(v[k] === '' && !e.checked)) ubah[k] = [v[k], x];   // sel kosong yang tidak dicentang dibiarkan kosong
+  });
+  var va = document.querySelector('#laci [data-dbva]'); if (va && va.checked !== (v[27] === true)) ubah[27] = [v[27], va.checked];
+  if (!Object.keys(ubah).length) { roti('Tidak ada yang diubah.'); return; }
+  if (!DBE.baris && !ubah[1]) { roti('✗ Isi nama dulu.'); return; }
+  // isi jawaban Database dibungkus supaya tidak tertukar dengan data jadwal (sama-sama punya "pilihan")
+  kerja('Menyimpan ke Database…', function () { return api('scDbSimpan', { baris: DBE.baris, nama: v[1], ubah: ubah }).then(function (r) { return { pesan: r.pesan, db: r }; }); },
+    function (r) { DB = r.db; DBV = DB.v; VER.db = DB.v; tutupLaci(); return muatUlang(['anggota', 'input']); });
+}
+document.addEventListener('click', function (e) {
+  var b;
+  if ((b = e.target.closest('#bLonceng'))) { bukaNotif(); return; }
+  if ((b = e.target.closest('[data-tutup="notif"]'))) { $('notifPanel').classList.remove('buka'); return; }
+  if ((b = e.target.closest('[data-notif]'))) {
+    var k = b.getAttribute('data-notif'), ev = NOTIF.filter(function (x) { return x[8] + '|' + x[1] === k; })[0];
+    $('notifPanel').classList.remove('buka');
+    if (ev) bukaTautan(ev[6]);
+    return;
+  }
+  if ($('notifPanel').classList.contains('buka') && !e.target.closest('#notifPanel')) $('notifPanel').classList.remove('buka');
+  if ((b = e.target.closest('[data-db]'))) { laciDb(+b.getAttribute('data-db')); return; }
+  if ((b = e.target.closest('[data-dbbaru]'))) { laciDb(0); return; }
+  if ((b = e.target.closest('[data-dbsimpan]'))) { simpanDb(); return; }
+});
+document.addEventListener('input', function (e) { if (e.target.getAttribute('data-dbf') === 'q') { DBF.q = e.target.value; gambar(); var el = document.querySelector('[data-dbf="q"]'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); } });
+document.addEventListener('change', function (e) { var v = e.target.getAttribute('data-dbf'); if (v && v !== 'q') { DBF[v] = e.target.value; gambar(); } });
+
+/* ---------- terbitkan: persetujuan kalau masih ada catatan ---------- */
+function modalTerbit(mn, ym, label) {
+  var C2 = cekDraft(mn || undefined).filter(function (x) { var o = kolById(x.kol); return o && (!ym || o.c.t.slice(0, 7) === ym); });
+  var grup = JENIS_CEK.map(function (j) { return [j, C2.filter(function (x) { return x.j === j[0]; }).length]; }).filter(function (x) { return x[1]; });
+  var perlu = grup.length > 0;
+  bukaModal('<h3>Terbitkan jadwal?</h3><p class="ket">Yang terbit: <b>' + esc(label) + '</b>. Halaman Jadwal Pelayanan langsung berubah dan volunteer bisa melihatnya.</p>' +
+    (perlu ? '<div class="pesan warn" style="margin-bottom:10px"><b>Masih ada catatan di draft ini:</b><ul style="margin:6px 0 0;padding-left:18px">' + grup.map(function (x) { return '<li>' + x[1] + ' · ' + esc(x[0][1]) + '</li>'; }).join('') + '</ul>' +
+      '<div style="margin-top:6px">Ini tidak menghalangi terbit. Contohnya peran yang sengaja dikosongkan (mis. WL cukup satu orang) atau tambahan di luar Formasi Tim boleh tetap diterbitkan.</div></div>' +
+      '<label class="centang" style="border-radius:12px;padding:10px 12px;align-items:flex-start"><input type="checkbox" id="tbSetuju" style="margin-top:2px"><span>Saya sudah melihat catatan ini dan tetap mau menerbitkan dengan kondisi tersebut.</span></label>' :
+      '<div class="pesan ok">✓ Tidak ada catatan. Draft siap diterbitkan.</div>') +
+    '<div class="aksi"><button type="button" class="btn garis" data-tutup="modal">Batal</button><button type="button" class="btn hijau" data-ok="terbit" id="tbYa"' + (perlu ? ' disabled' : '') + '>Ya, terbitkan</button></div>');
+}
+document.addEventListener('change', function (e) { if (e.target.id === 'tbSetuju') $('tbYa').disabled = !e.target.checked; });
+
+/* ---------- cuti peran: hanya peran orang itu ---------- */
+function isiPeranBk() {
+  var w = $('bkPeranList'); if (!w) return;
+  var k = kn(val('bkNama')), a = AG[k], daftar = a && D.peranOrang && D.peranOrang[k] && D.peranOrang[k].length ? D.peranOrang[k] : null, centang = {};
+  Array.prototype.forEach.call(w.querySelectorAll('input:checked'), function (x) { centang[x.value] = 1; });
+  $('bkPeranKet').textContent = !a ? 'Pilih nama dulu supaya yang muncul hanya perannya.' : daftar ? 'Peran ' + a.n + ' menurut Database. Di peran lain orangnya tetap bisa dijadwalkan.' : 'Posisi ' + a.n + ' di Database belum cocok dengan peran mana pun, jadi semua peran ditampilkan.';
+  w.innerHTML = (a ? daftar || D.peranCuti : []).map(function (p) { return '<label class="centang"><input type="checkbox" name="bkPeran" value="' + esc(p) + '"' + (centang[p] ? ' checked' : '') + '><span>' + esc(p) + '</span></label>'; }).join('');
+}
+
 gambarMasuk('masuk');
-window.__uji = { S: S, D: function () { return D; }, cekDraft: cekDraft, statDraft: statDraft, kunci: kunciLayar, tuntaskan: tuntaskan, antri: adaAntrian, cekVersi: cekVersi, token: function () { return TOKEN; } };
+window.__uji = { S: S, D: function () { return D; }, cekDraft: cekDraft, statDraft: statDraft, kunci: kunciLayar, tuntaskan: tuntaskan, antri: adaAntrian, cekVersi: function () { return denyut(); }, rt: function () { return { VER: VER, NOTIF: NOTIF, NB: NB, CHAT: CHAT, ONLINE: ONLINE }; }, token: function () { return TOKEN; } };
 })();
 </script>
 <script src="../assets/jpcc.js"></script>

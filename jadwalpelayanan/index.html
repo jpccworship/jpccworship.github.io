@@ -484,6 +484,7 @@
   .bo-peran label { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid #DCD3EC; border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 600; cursor: pointer; background: #fff; }
   .bo-peran label input { accent-color: var(--brand); margin: 0; }
   .bo-peran label:has(input:checked) { border-color: var(--brand); background: #F3EFF9; color: var(--brand); }
+  .bo-peran-ket { width: 100%; font-size: 13px; color: var(--muted); margin-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -1538,7 +1539,7 @@ var PARAM = window.__PARAM__;
 
   /* ---------- Blockout date ---------- */
   var BO = DATA.bo || { anggota: [], alasan: [] };
-  var boDaftar = BO.anggota.map(function (a) { return { n: a[0], k: norm(a[0]), pos: a[1], kamp: a[2], min: a[3] }; });
+  var boDaftar = BO.anggota.map(function (a) { return { n: a[0], k: norm(a[0]), pos: a[1], kamp: a[2], min: a[3], peran: a[4] || [] }; });
   var boByNorm = {};
   boDaftar.forEach(function (d) { boByNorm[d.k] = d; });
   // blockout per paket publish (mis. Jan-Feb disusun mulai 1 Nov -> blockout Jan-Feb tutup 31 Okt); sebelum boMin abu-abu
@@ -1610,12 +1611,12 @@ var PARAM = window.__PARAM__;
         boGambarSudah(); gambarKal();
       }).withFailureHandler(function () { if (bo.o === d) $('boSudah').textContent = ''; }).blockoutSaya(d.n);
     }
-    gambarKal(); boCek();
+    gambarKal(); boIsiPeran(); boCek();
   }
   function boLepasNama() {
     bo.o = null; bo.sudah = [];
     $('boInfo').hidden = true;
-    gambarKal(); boCek();
+    gambarKal(); boIsiPeran(); boCek();
   }
   function boGambarSudah() {
     var el = $('boSudah');
@@ -1719,7 +1720,14 @@ var PARAM = window.__PARAM__;
 
   // berlaku untuk: semua pelayanan / peran tertentu (cuti peran)
   var boPeranEl = $('boPeran');
-  boPeranEl.innerHTML = (BO.peran || []).map(function (p) { return '<label><input type="checkbox" value="' + esc(p) + '"><span>' + esc(p) + '</span></label>'; }).join('');
+  // yang muncul hanya peran orang itu menurut Database (posisi, WL/MD, Vocal arranger, daftar PIC)
+  function boIsiPeran() {
+    var d = bo.o, semua = BO.peran || [], idx = d && d.peran && d.peran.length ? d.peran : null;
+    var daftar = idx ? idx.map(function (i) { return semua[i]; }).filter(Boolean) : semua;
+    boPeranEl.innerHTML = '<div class="bo-peran-ket">' + (!d ? 'Pilih namamu dulu supaya yang muncul hanya peranmu.' : idx ? 'Peran ' + esc(d.n) + ' menurut Database:' : 'Posisi ' + esc(d.n) + ' di Database belum cocok dengan peran mana pun, jadi semua peran ditampilkan:') + '</div>' +
+      daftar.map(function (p) { return '<label><input type="checkbox" value="' + esc(p) + '"><span>' + esc(p) + '</span></label>'; }).join('');
+  }
+  boIsiPeran();
   if (!(BO.peran || []).length) document.querySelector('#boJenis input[value="peran"]').closest('label').hidden = true;
   function boJenis() { var r = document.querySelector('input[name="boJenis"]:checked'); return r ? r.value : 'semua'; }
   function boPeranDipilih() { return Array.prototype.filter.call(boPeranEl.querySelectorAll('input'), function (x) { return x.checked; }).map(function (x) { return x.value; }); }
