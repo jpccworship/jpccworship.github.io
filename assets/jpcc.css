@@ -11,3 +11,9 @@
   font-weight: 800; cursor: pointer; }
 @keyframes jm-putar { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #jpcc-muat .jm-putar { animation-duration: 2.4s; } }
+/* logo JPCC Worship di kepala halaman */
+.jw-kop { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.jw-kop .jw-teks { min-width: 0; }
+.jw-logo { width: 44px; height: 44px; flex: none; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(31, 27, 36, .12), 0 3px 10px rgba(40, 20, 80, .10); }
+@media (max-width: 600px) { .jw-logo { width: 38px; height: 38px; } .jw-kop { gap: 10px; } }
+#jpcc-muat .jm-kotak::before { content: ''; width: 64px; height: 64px; border-radius: 50%; background: #fff url("logo-192.png") center / cover no-repeat; box-shadow: 0 0 0 1px rgba(31, 27, 36, .10), 0 8px 24px rgba(40, 20, 80, .14); }
