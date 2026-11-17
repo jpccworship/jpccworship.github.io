@@ -373,6 +373,24 @@
   .ob-form { display: flex; gap: 8px; padding: 8px; border-top: 1px solid var(--line); }
   .ob-form textarea { flex: 1; min-width: 0; resize: none; height: 42px; max-height: 120px; border: 1.5px solid #CFC7DD; border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 14.5px; outline: none; }
   .ob-form textarea:focus { border-color: var(--brand); }
+  /* @mention */
+  .ob-pesanw { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .ob-pesanw > .ob-pesan { flex: 1; min-height: 0; position: relative; }
+  .ob-m .sebut { font-weight: 700; color: #1F6FD1; }
+  .ob-m .sebut.saya { background: #FFF1B8; color: #7A4B00; border-radius: 4px; padding: 0 2px; }
+  .ob-m.saya .sebut { color: #FFE7A3; } .ob-m.saya .sebut.saya { color: #7A4B00; }
+  .ob-m.disebut { background: #FFFBEA; border-color: #F2C94C; box-shadow: 0 0 0 1px #F2C94C; }
+  .ob-m.kedip { animation: kilat 1.2s ease-out 2; }
+  .ob-at { min-width: 19px; height: 19px; padding: 0 4px; border-radius: 999px; background: #1E8E3E; color: #fff; font-style: normal; font-weight: 800; font-size: 11px; display: inline-grid; place-items: center; margin-right: 3px; flex: none; }
+  .ob-at[hidden] { display: none; }
+  .ob-buka .ob-at { position: absolute; top: -5px; left: 17px; box-shadow: 0 0 0 2px #fff; margin: 0; }
+  .ob-lompat { position: absolute; right: 14px; bottom: 12px; z-index: 2; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: #fff; color: #1E8E3E; font: inherit; font-weight: 800; font-size: 20px; box-shadow: 0 6px 18px rgba(25, 10, 60, .2); cursor: pointer; }
+  .ob-lompat i { position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; padding: 0 4px; border-radius: 999px; background: #1E8E3E; color: #fff; font-size: 10.5px; font-style: normal; display: grid; place-items: center; }
+  .ob-ac { position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 3; max-height: 250px; overflow-y: auto; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 34px rgba(25, 10, 60, .22); padding: 4px; }
+  .ob-ac-i { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; padding: 7px 8px; border-radius: 10px; text-align: left; font: inherit; color: var(--ink); cursor: pointer; }
+  .ob-ac-i.on, .ob-ac-i:hover { background: #F1EEF6; }
+  .ob-ac-i b { display: block; font-size: 13.5px; } .ob-ac-i small { display: block; font-size: 11.5px; color: var(--muted); } .ob-ac-i small.on { color: #1E8E3E; font-weight: 700; }
+  .ob-ac-ik { width: 26px; height: 26px; border-radius: 50%; background: #EDE6F8; color: var(--brand); display: grid; place-items: center; font-weight: 800; flex: none; }
   /* emoji */
   .ob-emo { width: 42px; height: 42px; flex: none; border: 0; border-radius: 12px; background: transparent; color: #6B6475; display: grid; place-items: center; cursor: pointer; }
   .ob-emo:hover, .ob-emo.on { background: #EDE6F8; color: var(--brand); }
@@ -464,7 +482,7 @@ function kini() { return D.hariIni; }
 var DATA = window.DATA || window.__DATA__ || {};
 var D = { hariIni: ymd(new Date()), anggota: [], input: {}, ditarik: [], pilihan: { keys: [], lists: [] }, terbit: [], blockout: [], riwayat: [], cuti: [], aturanOrang: [], peranCuti: [],
   pic: [], picWa: [], yi: { update: '', daftar: [] }, formasi: { sv: [], mn: [], peran: [], isi: [], string: [] },
-  atur: { service: [], peran: [], pola: {}, alasan: [], posCari: [], tim: [], link: [], pastor: [] }, log: [], akun: DATA.akun || [] };
+  atur: { service: [], peran: [], pola: {}, alasan: [], posCari: [], tim: [], link: [], pastor: [] }, log: [], akun: DATA.akun || [], akunKanal: {} };
 MN.forEach(function (m) { D.input[m] = { peran: [], kol: [], tanpaTgl: 0 }; });
 var TOKEN = '', SIG = '', VER = {}, SEQ = 0;
 var ALAT = { Keys: 0, Bass: 1, Drums: 2, Guitar: 3 };   // urutan skor instrumen di data anggota
@@ -828,7 +846,7 @@ function terima(r) {
     D.terbit = T.slot.map(function (s) { return { k: s[0], t: s[1], mn: s[2], acara: s[3], jenis: s[4], sv: s[5], camp: s[6], ct: s[7], lat: s[8], ps: s[9], cat: s[10], pub: s[11], oleh: s[12], lk: s[13], tim: [] }; });
     T.tugas.forEach(function (x) { D.terbit[x[0]].tim.push([T.peran[x[1]], T.nama[x[2]], x[3], x[4]]); });
   }
-  ['blockout', 'riwayat', 'cuti', 'aturanOrang', 'peranCuti', 'peranOrang', 'pic', 'picWa', 'yi', 'formasi', 'log', 'akun'].forEach(function (k) { if (r[k]) D[k] = r[k]; });
+  ['blockout', 'riwayat', 'cuti', 'aturanOrang', 'peranCuti', 'peranOrang', 'pic', 'picWa', 'yi', 'formasi', 'log', 'akun', 'akunKanal'].forEach(function (k) { if (r[k]) D[k] = r[k]; });
   if (r.blockout || r.cuti || r.aturanOrang) muatBL();
   if (r.atur && !r.input && !r.inputRingan) MN.forEach(urutKol);
   if (r.input || r.inputRingan || r.terbit || r.ditarik) {
@@ -2180,11 +2198,18 @@ function terimaChat(baru, cb, awal) {
   CHAT.forEach(function (m) { if (!CHAT_AKHIR[m[4]] || m[1] > CHAT_AKHIR[m[4]]) CHAT_AKHIR[m[4]] = m[1]; });
   baru.forEach(function (m) { if (m[0] > CHAT_SEJAK) CHAT_SEJAK = m[0]; });
   var dariLain = masuk.filter(function (m) { return m[2] !== S.akun.id; });
-  if (!awal && dariLain.length && !(CH.buka && dariLain.every(function (m) { return m[4] === CH.kanal; }))) {
-    var m = dariLain[dariLain.length - 1];
-    roti('💬 ' + m[3] + (m[4].indexOf('dm:') === 0 ? '' : ' · ' + namaKanal(m[4])) + ': ' + m[5].slice(0, 90));
+  var isi = $('obPesan'), dekatBawah = !isi || isi.scrollHeight - isi.scrollTop - isi.clientHeight < 80;
+  if (!awal && dariLain.length) {
+    var sebut = dariLain.filter(function (m) { return sebutSaya(m) && !(CH.buka && m[4] === CH.kanal && dekatBawah); });
+    if (sebut.length) { var ms = sebut[sebut.length - 1]; roti('@ ' + ms[3] + ' menyebutmu di ' + namaKanal(ms[4]) + ': ' + ms[5].slice(0, 90)); }
+    else if (!(CH.buka && dariLain.every(function (m) { return m[4] === CH.kanal; }))) {
+      var m = dariLain[dariLain.length - 1];
+      roti('💬 ' + m[3] + (m[4].indexOf('dm:') === 0 ? '' : ' · ' + namaKanal(m[4])) + ': ' + m[5].slice(0, 90));
+    }
+    // sedang membaca pesan lama di percakapan ini: sebutan baru masuk ke tombol @
+    if (CH.buka && !dekatBawah) dariLain.forEach(function (m) { if (m[4] === CH.kanal && sebutSaya(m) && CH.sebut.indexOf(m[0]) < 0) CH.sebut.push(m[0]); });
   }
-  if (CH.buka && (masuk.length || awal)) { tandaiChatDibaca(); gambarObrol(masuk.some(function (m) { return m[4] === CH.kanal; })); }
+  if (CH.buka && (masuk.length || awal)) { tandaiChatDibaca(); gambarObrol(masuk.some(function (m) { return m[4] === CH.kanal && m[2] === S.akun.id; })); }
   gambarBadgeChat();
 }
 function gambarBadgeChat() {
@@ -2192,6 +2217,7 @@ function gambarBadgeChat() {
   daftarKanal().forEach(function (k) { n += belumDibaca(k); });
   CHAT.forEach(function (m) { if (m[4].indexOf('dm:') === 0 && m[2] !== S.akun.id && m[1] > (Number(CB[m[4]]) || 0)) n++; });
   var b = $('obrolN'); if (b) { b.textContent = n > 99 ? '99+' : n; b.hidden = !n; }
+  var at = $('obrolAt'); if (at) at.hidden = !CHAT.some(function (m) { return sebutSaya(m) && m[1] > (Number(CB[m[4]]) || 0); });
 }
 var tandaT = {};   // per percakapan: pindah percakapan tidak membatalkan penanda baca yang sebelumnya
 function tandaiChatDibaca() {
@@ -2240,6 +2266,113 @@ function cuplikChat(k) {
   if (!m) return '';
   var siapa = m[2] === S.akun.id ? 'Kamu: ' : k.indexOf('dm:') === 0 ? '' : m[3].split(' ')[0] + ': ';
   return siapa + m[5].replace(/\s+/g, ' ').slice(0, 60);
+}
+/* ---------- @mention (seperti WhatsApp) ---------- */
+CH.sebut = []; CH.sebutDraf = {}; CH.ac = null;
+function sebutSaya(m) { return !!S.akun && m[2] !== S.akun.id && Array.isArray(m[6]) && (m[6].indexOf(S.akun.id) >= 0 || m[6].indexOf('semua') >= 0); }
+function sebutBelum(k) { var w = Number(CB[k]) || 0; return CHAT.filter(function (m) { return m[4] === k && m[1] > w && sebutSaya(m); }).length; }
+function namaAkun(id) { var a = D.akun.filter(function (x) { return x[0] === id; })[0]; return a ? a[1] : ''; }
+/* anggota percakapan (tanpa diri sendiri): Semua tim = semua akun; grup ministry = Admin + penyusun ministry itu */
+function anggotaKanal(k) {
+  return D.akun.filter(function (a) {
+    if (a[0] === S.akun.id) return false;
+    if (k === 'semua') return true;
+    var kn = (D.akunKanal || {})[a[0]];
+    return !kn || kn.indexOf(k) >= 0;
+  });
+}
+function hitungSebut() { var w = Number(CB[CH.kanal]) || 0; CH.sebut = CHAT.filter(function (m) { return m[4] === CH.kanal && m[1] > w && sebutSaya(m); }).map(function (m) { return m[0]; }); }
+/* buang dari tombol @ yang pesannya sudah terlihat di layar */
+function pangkasSebut() {
+  var isi = $('obPesan'); if (!isi || !CH.sebut.length) { gambarTombolSebut(); return; }
+  var r = isi.getBoundingClientRect();
+  CH.sebut = CH.sebut.filter(function (id) {
+    var el = isi.querySelector('[data-mid="' + id + '"]'); if (!el) return false;
+    var e = el.getBoundingClientRect();
+    return !(e.bottom > r.top + 6 && e.top < r.bottom - 6);
+  });
+  gambarTombolSebut();
+}
+function gambarTombolSebut() {
+  var w = $('obPesanW'); if (!w) return;
+  var b = $('obLompat'), n = CH.sebut.length;
+  if (!n) { if (b) b.remove(); return; }
+  if (!b) { b = document.createElement('button'); b.type = 'button'; b.id = 'obLompat'; b.className = 'ob-lompat'; b.setAttribute('data-ob', 'sebut'); b.title = 'Lompat ke pesan yang menyebutmu'; b.setAttribute('aria-label', b.title); w.appendChild(b); }
+  b.innerHTML = '@<i>' + n + '</i>';
+}
+function lompatSebut() {
+  var isi = $('obPesan'), id = CH.sebut.shift(); if (!isi || !id) { gambarTombolSebut(); return; }
+  var el = isi.querySelector('[data-mid="' + id + '"]');
+  if (el) {
+    isi.scrollTop = Math.max(0, el.offsetTop - isi.clientHeight / 3);
+    el.classList.remove('kedip'); void el.offsetWidth; el.classList.add('kedip');
+    setTimeout(function () { el.classList.remove('kedip'); }, 2600);
+  }
+  gambarTombolSebut();
+}
+/* teks pesan: tautan, baris baru, dan @Nama yang di-mention diberi warna (yang menyebutmu disorot) */
+function teksChatSebut(t, men) {
+  var h = esc(t), ganti = [];
+  (Array.isArray(men) ? men : []).map(function (id) { return [id, id === 'semua' ? 'semua' : namaAkun(id)]; }).filter(function (x) { return x[1]; })
+    .sort(function (a, b) { return b[1].length - a[1].length; }).forEach(function (x) {
+      var cari = esc('@' + x[1]); if (h.indexOf(cari) < 0) return;
+      var saya = x[0] === 'semua' || (S.akun && x[0] === S.akun.id);
+      h = h.split(cari).join('\u0001' + ganti.length + '\u0002');
+      ganti.push('<span class="sebut' + (saya ? ' saya' : '') + '">' + cari + '</span>');
+    });
+  h = h.replace(/(https?:\/\/[^\s<\u0001]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g, '<br>');
+  return h.replace(/\u0001(\d+)\u0002/g, function (_, i) { return ganti[+i]; });
+}
+/* daftar saran saat mengetik @ */
+function cariAc() {
+  var t = $('obTulis'), lama = CH.ac;
+  CH.ac = null;
+  if (t && CH.kanal.indexOf('dm:') !== 0 && t.selectionStart === t.selectionEnd) {
+    var pos = t.selectionStart, m = /(^|\s)@([^\s@]{0,30})$/.exec(t.value.slice(0, pos));
+    if (m) {
+      var q = m[2].toLowerCase(), onId = {};
+      ONLINE.forEach(function (o) { onId[o[0]] = 1; });
+      var cocok = function (n) { n = n.toLowerCase(); return !q || n.indexOf(q) === 0 || n.split(/\s+/).some(function (w) { return w.indexOf(q) === 0; }); };
+      var daftar = anggotaKanal(CH.kanal).filter(function (a) { return cocok(a[1]); })
+        .sort(function (a, b) { return (onId[b[0]] ? 1 : 0) - (onId[a[0]] ? 1 : 0) || (a[1] < b[1] ? -1 : 1); }).slice(0, 8)
+        .map(function (a) { return { id: a[0], n: a[1], on: !!onId[a[0]] }; });
+      if (!q || 'semua'.indexOf(q) === 0 || 'all'.indexOf(q) === 0) daftar.unshift({ id: 'semua', n: 'semua' });
+      if (daftar.length) CH.ac = { mulai: pos - m[2].length - 1, akhir: pos, q: q, daftar: daftar, pilih: lama && lama.q === q ? Math.min(lama.pilih, daftar.length - 1) : 0 };
+    }
+  }
+  gambarAc();
+}
+function htmlAc() {
+  return CH.ac.daftar.map(function (x, i) {
+    return '<button type="button" class="ob-ac-i' + (i === CH.ac.pilih ? ' on' : '') + '" data-ac="' + i + '">' +
+      (x.id === 'semua' ? '<span class="ob-ac-ik">@</span><span><b>semua</b><small>Sebut semua anggota ' + esc(namaKanal(CH.kanal)) + '</small></span>' :
+        '<span class="ava kcl" style="background:' + AVA[x.n.length % 6] + '">' + inisial(x.n) + '</span><span><b>' + esc(x.n) + '</b>' + (x.on ? '<small class="on">online</small>' : '') + '</span>') + '</button>';
+  }).join('');
+}
+function gambarAc() {
+  var el = $('obAc'), w = $('obPesanW');
+  if (!CH.ac) { if (el) el.remove(); return; }
+  if (!w) return;
+  if (!el) { el = document.createElement('div'); el.id = 'obAc'; el.className = 'ob-ac'; el.setAttribute('role', 'listbox'); w.appendChild(el); }
+  el.innerHTML = htmlAc();
+  var on = el.querySelector('.on'); if (on && on.scrollIntoView) on.scrollIntoView({ block: 'nearest' });
+}
+function pilihAc(i) {
+  var t = $('obTulis'), x = CH.ac && CH.ac.daftar[i]; if (!t || !x) return;
+  var sisip = '@' + x.n + ' ';
+  t.value = t.value.slice(0, CH.ac.mulai) + sisip + t.value.slice(CH.ac.akhir);
+  CH.pos = CH.ac.mulai + sisip.length;
+  CH.sebutDraf[x.id] = x.n;
+  CH.ac = null; gambarAc();
+  t.focus(); t.setSelectionRange(CH.pos, CH.pos);
+}
+/* siapa yang di-mention di pesan yang akan dikirim (yang dipilih dari daftar, atau "@Nama lengkap" yang diketik sendiri) */
+function sebutDiTeks(teks, k) {
+  if (k.indexOf('dm:') === 0) return [];
+  var out = [];
+  if (/(^|\s)@semua(?![\w])/i.test(teks)) out.push('semua');
+  anggotaKanal(k).forEach(function (a) { if (teks.indexOf('@' + a[1]) >= 0) out.push(a[0]); });
+  return out;
 }
 function teksChat(t) { return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g, '<br>'); }
 /* ---------- emoji di chat (seperti WhatsApp): pemilih per kategori + "Terakhir dipakai"; pesan yang isinya 1–3 emoji tampil besar ---------- */
@@ -2305,8 +2438,8 @@ function gambarObrol(gulirBawah) {
   var onId = {}; ONLINE.forEach(function (o) { onId[o[0]] = o; });
   var kanal = daftarKanal().map(function (k) {
     var n = belumDibaca(k);
-    var pv = cuplikChat(k);
-    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ob-ik">' + (k === 'semua' ? '#' : k.charAt(0)) + '</span><span class="sp">' + esc(namaKanal(k)) + (pv ? '<em>' + esc(pv) + '</em>' : '') + '</span>' + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
+    var pv = cuplikChat(k), at = sebutBelum(k);
+    return '<button type="button" class="ob-k' + (CH.kanal === k ? ' on' : '') + '" data-kanal="' + k + '"><span class="ob-ik">' + (k === 'semua' ? '#' : k.charAt(0)) + '</span><span class="sp">' + esc(namaKanal(k)) + (pv ? '<em>' + esc(pv) + '</em>' : '') + '</span>' + (at ? '<i class="ob-at" title="Ada yang menyebutmu">@</i>' : '') + (n ? '<i class="ob-n">' + n + '</i>' : '') + '</button>';
   }).join('');
   var akhirDm = function (a) { return CHAT_AKHIR[kanalDm(a[0])] || 0; };
   var orang = D.akun.filter(function (a) { return a[0] !== S.akun.id; }).sort(function (a, b) { return akhirDm(b) - akhirDm(a) || (onId[b[0]] ? 1 : 0) - (onId[a[0]] ? 1 : 0) || (a[1] < b[1] ? -1 : 1); }).map(function (a) {
@@ -2317,14 +2450,14 @@ function gambarObrol(gulirBawah) {
   var pesan = M.length ? M.map(function (m) {
     var d = new Date(m[1]), h = labelHariChat(m[1]), saya = m[2] === S.akun.id, sep = '';
     if (h !== hari) { hari = h; sep = '<div class="ob-hari">' + h + '</div>'; }
-    return sep + '<div class="ob-m' + (saya ? ' saya' : '') + (hanyaEmoji(m[5]) ? ' emo' : '') + '">' + (saya ? '' : '<b>' + esc(m[3]) + '</b>') + '<div class="tx">' + teksChat(m[5]) + '</div><small>' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + '</small></div>';
+    return sep + '<div class="ob-m' + (saya ? ' saya' : '') + (hanyaEmoji(m[5]) ? ' emo' : '') + (sebutSaya(m) ? ' disebut' : '') + '" data-mid="' + m[0] + '">' + (saya ? '' : '<b>' + esc(m[3]) + '</b>') + '<div class="tx">' + teksChatSebut(m[5], m[6]) + '</div><small>' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + '</small></div>';
   }).join('') : '<div class="kosong">Belum ada pesan di ' + esc(namaKanal(CH.kanal)) + '.' + (CH.kanal.indexOf('dm:') === 0 ? ' Pesan ini hanya terlihat oleh kalian berdua.' : '') + '<br>Pesan tetap terkirim walau penerimanya sedang tidak online, dan disimpan ' + CHAT_HARI + ' hari.</div>';
   if (M.length) pesan = (CHAT_LAGI[CH.kanal] ? '<button type="button" class="ob-lama" data-ob="lama"' + (CHAT_MUAT ? ' disabled' : '') + '>' + (CHAT_MUAT ? 'Memuat…' : 'Muat pesan sebelumnya') + '</button>' :
     '<div class="ob-info">Pesan di percakapan ini disimpan ' + CHAT_HARI + ' hari.</div>') + pesan;
   var draf = $('obTulis') ? $('obTulis').value : '', fokus = document.activeElement && document.activeElement.id === 'obTulis';
   p.innerHTML = '<div class="ob-kp"><button type="button" class="ob-balik" data-ob="daftar" aria-label="Daftar percakapan">‹</button><b>' + esc(namaKanal(CH.kanal)) + '</b><span class="kecil">' + (CH.kanal.indexOf('dm:') === 0 ? 'pesan pribadi' : CH.kanal === 'semua' ? 'semua akun Scheduling' : 'penyusun ' + CH.kanal + ' & Admin') + '</span><button type="button" class="x" data-ob="tutup" aria-label="Tutup">×</button></div>' +
     '<div class="ob-badan' + (CH.daftar ? ' lihat-daftar' : '') + '"><nav class="ob-daftar"><div class="ob-grp">Grup</div>' + kanal + '<div class="ob-grp">Pesan pribadi · ' + ONLINE.filter(function (o) { return o[0] !== S.akun.id; }).length + ' online</div>' + orang + '</nav>' +
-    '<section class="ob-obrol"><div class="ob-pesan" id="obPesan">' + pesan + '</div>' + (CH.emoji ? '<div class="ob-emoji" id="obEmoji">' + htmlEmoji() + '</div>' : '') +
+    '<section class="ob-obrol"><div class="ob-pesanw" id="obPesanW"><div class="ob-pesan" id="obPesan">' + pesan + '</div></div>' + (CH.emoji ? '<div class="ob-emoji" id="obEmoji">' + htmlEmoji() + '</div>' : '') +
     '<form class="ob-form" id="obForm"><button type="button" class="ob-emo' + (CH.emoji ? ' on' : '') + '" data-ob="emoji" aria-label="Emoji" title="Emoji" aria-pressed="' + (CH.emoji ? 'true' : 'false') + '">' +
     '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.2c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg></button><textarea id="obTulis" rows="1" maxlength="1000" placeholder="Tulis pesan ke ' + esc(namaKanal(CH.kanal)) + '…"></textarea><button type="submit" aria-label="Kirim"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg></button></form></section></div>';
   var t = $('obTulis'); t.value = draf;
@@ -2332,20 +2465,25 @@ function gambarObrol(gulirBawah) {
   if (CH.emoji) pasangGulirEmoji();
   isi = $('obPesan');
   isi.scrollTop = gulirBawah || dekatBawah ? isi.scrollHeight : y;
+  isi.onscroll = function () { if (CH.sebut.length) pangkasSebut(); };
+  pangkasSebut();
+  if (CH.ac) gambarAc();
 }
 function bukaObrol(ya) {
   CH.buka = ya;
   if (!ya) CH.emoji = false;
   $('obrolPanel').hidden = !ya; $('obrol').classList.toggle('buka', ya);
-  if (ya) { CH.daftar = window.innerWidth <= 700 ? CH.daftar : false; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) setTimeout(function () { var t = $('obTulis'); if (t) t.focus(); }, 50); }
+  if (!ya) CH.ac = null;
+  if (ya) { CH.daftar = window.innerWidth <= 700 ? CH.daftar : false; hitungSebut(); gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) setTimeout(function () { var t = $('obTulis'); if (t) t.focus(); }, 50); }
 }
 function kirimChat() {
   var t = $('obTulis'), teks = t.value.trim(), k = CH.kanal;
   if (!teks) return;
-  t.value = ''; CH.pos = 0;
-  var sementara = [Date.now() * 1000 + 999, Date.now(), S.akun.id, S.akun.nama, k, teks, 1];
+  t.value = ''; CH.pos = 0; CH.ac = null; CH.sebutDraf = {};
+  var men = sebutDiTeks(teks, k);
+  var sementara = [Date.now() * 1000 + 999, Date.now(), S.akun.id, S.akun.nama, k, teks, men];
   CHAT.push(sementara); gambarObrol(true);
-  api('scChatKirim', k, teks).then(function (r) {
+  api('scChatKirim', k, teks, men).then(function (r) {
     CHAT = CHAT.filter(function (m) { return m !== sementara; });
     terimaChat([r.pesan], null, true); CB[k] = r.pesan[1]; gambarObrol(true);
   }, function (e) { CHAT = CHAT.filter(function (m) { return m !== sementara; }); t.value = teks; gambarObrol(true); roti('✗ Pesan belum terkirim: ' + e.message); });
@@ -2353,25 +2491,37 @@ function kirimChat() {
 (function () {
   var el = document.createElement('div');
   el.id = 'obrol';
-  el.innerHTML = '<button type="button" class="ob-buka" id="obrolBuka" aria-label="Chat tim"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 3C6.900 3 3 6.600 3 11c0 2.300 1.100 4.400 2.900 5.900L5 21l4.200-2c.900.200 1.800.300 2.800.300 5.100 0 9-3.600 9-8.100S17.100 3 12 3z"/></svg><span>Chat tim</span><i class="ob-n" id="obrolN" hidden></i><small id="obrolOn" hidden></small></button>' +
+  el.innerHTML = '<button type="button" class="ob-buka" id="obrolBuka" aria-label="Chat tim"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 3C6.900 3 3 6.600 3 11c0 2.300 1.100 4.400 2.900 5.900L5 21l4.200-2c.900.200 1.800.300 2.800.300 5.100 0 9-3.600 9-8.100S17.100 3 12 3z"/></svg><span>Chat tim</span><i class="ob-n" id="obrolN" hidden></i><i class="ob-at" id="obrolAt" hidden title="Ada yang menyebutmu">@</i><small id="obrolOn" hidden></small></button>' +
     '<section class="ob-panel" id="obrolPanel" role="dialog" aria-label="Chat tim" hidden></section>';
   document.body.appendChild(el);
   el.addEventListener('click', function (e) {
     var b;
     if (e.target.closest('#obrolBuka')) { bukaObrol(true); return; }
+    if ((b = e.target.closest('[data-ac]'))) { pilihAc(+b.getAttribute('data-ac')); return; }
+    if ((b = e.target.closest('[data-ob="sebut"]'))) { lompatSebut(); return; }
     if ((b = e.target.closest('[data-emo]'))) { sisipEmoji(b.getAttribute('data-emo')); return; }
     if ((b = e.target.closest('[data-emot]'))) { var gr = $('emoGrp' + b.getAttribute('data-emot')), w = $('obEmoIsi'); if (gr && w) w.scrollTop = gr.offsetTop; return; }
     if ((b = e.target.closest('[data-ob]'))) { var ob = b.getAttribute('data-ob'); if (ob === 'tutup') bukaObrol(false); else if (ob === 'lama') muatChatLama(); else if (ob === 'emoji') bukaEmoji(!CH.emoji); else { CH.daftar = true; gambarObrol(false); } return; }
-    if ((b = e.target.closest('[data-kanal]'))) { CH.kanal = b.getAttribute('data-kanal'); CH.daftar = false; CH.emoji = false; CH.pos = undefined; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) $('obTulis').focus(); return; }
+    if ((b = e.target.closest('[data-kanal]'))) { var kb = b.getAttribute('data-kanal'), ganti = kb !== CH.kanal; CH.kanal = kb; CH.daftar = false; if (ganti) { CH.emoji = false; CH.pos = undefined; CH.ac = null; hitungSebut(); } gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) $('obTulis').focus(); return; }
   });
   el.addEventListener('submit', function (e) { e.preventDefault(); kirimChat(); });
   el.addEventListener('keydown', function (e) {
+    if (e.target.id === 'obTulis' && CH.ac) {
+      var n = CH.ac.daftar.length;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); CH.ac.pilih = (CH.ac.pilih + (e.key === 'ArrowDown' ? 1 : n - 1)) % n; gambarAc(); return; }
+      if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); pilihAc(CH.ac.pilih); return; }
+      if (e.key === 'Escape') { e.preventDefault(); CH.ac = null; gambarAc(); return; }
+    }
     if (e.target.id === 'obTulis' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); kirimChat(); }
     if (e.key === 'Escape') { if (CH.emoji) bukaEmoji(false); else bukaObrol(false); }
   });
   // tombol emoji tidak mengambil fokus dari kotak tulis (kursor tetap di tempatnya)
-  el.addEventListener('mousedown', function (e) { if (!SENTUH && e.target.closest('[data-emo], [data-emot], [data-ob="emoji"]')) e.preventDefault(); });
-  var catatPos = function (e) { if (e.target.id === 'obTulis') CH.pos = e.target.selectionStart; };
+  el.addEventListener('mousedown', function (e) { if (e.target.closest('[data-ac]') || (!SENTUH && e.target.closest('[data-emo], [data-emot], [data-ob="emoji"]'))) e.preventDefault(); });
+  var catatPos = function (e) {
+    if (e.target.id !== 'obTulis') return;
+    CH.pos = e.target.selectionStart;
+    if (e.type === 'input' || e.type === 'mouseup' || (e.type === 'keyup' && !/^(ArrowUp|ArrowDown|Enter|Tab|Escape|Shift)$/.test(e.key))) cariAc();
+  };
   ['input', 'keyup', 'mouseup', 'select'].forEach(function (n) { el.addEventListener(n, catatPos); });
   // di HP: mengetuk kotak tulis menutup panel emoji (keyboard kembali), seperti WhatsApp
   el.addEventListener('focusin', function (e) {
