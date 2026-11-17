@@ -1531,7 +1531,7 @@ LAYAR.pic = function () {
       return '<div><div class="kecil" style="font-weight:800;margin-bottom:6px">' + kc + ' · ' + K.length + '</div>' + (K.map(function (x) {
         var ada = AG[kn(x.p[2])];
         return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-top:1px solid #F1EEF5"><span style="flex:1;min-width:0;font-weight:600;font-size:13px;' + (x.p[3] !== 'Aktif' ? 'color:#A9A3B4;text-decoration:line-through' : '') + '">' + esc(x.p[2]) + (ada ? '' : ' <span class="chip bad" style="height:18px;font-size:10px">cek nama</span>') + '</span>' +
-          (bisa ? '<button type="button" class="btn garis kcl" style="height:26px;padding:0 8px;font-size:11px" data-pictog="' + x.i + '">' + (x.p[3] === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan') + '</button>' : '') + '</div>';
+          (bisa ? '<button type="button" class="btn garis kcl" style="height:26px;padding:0 8px;font-size:11px" data-pictog="' + x.i + '">' + (x.p[3] === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan') + '</button><button type="button" class="btn garis kcl" style="height:26px;padding:0 8px;font-size:11px;color:#B3261E" data-pichapus="' + x.i + '" title="Hapus dari daftar PIC" aria-label="Hapus ' + esc(x.p[2]) + ' dari daftar PIC">Hapus</button>' : '') + '</div>';
       }).join('') || '<div class="kecil">–</div>') + '</div>';
     }).join('') + '</div>' : '<div class="kosong" style="padding:12px">Belum ada daftar PIC ' + m + '. Service ' + m + ' tidak diisi PIC otomatis.</div>') + '</div>';
   });
@@ -1717,6 +1717,13 @@ document.addEventListener('click', function (e) {
   if ((b = t.closest('[data-bkstatus]'))) { var bs = b.getAttribute('data-bkstatus').split(':'); modalBkStatus(bs[0], +bs[1]); return; }
   if ((b = t.closest('[data-tehapus]'))) { var h = b.getAttribute('data-tehapus').split(':'), T = TE[h[0]]; T.baris.splice(+h[1], 1); gambar(); simpanTE(h[0], -1, -1); return; }
   if ((b = t.closest('[data-tetambah]'))) { var idT = b.getAttribute('data-tetambah'), T2 = TE[idT], n = T2.baris[0] ? T2.baris[0].length : (idT === 'yi' ? 4 : idT === 'tim' ? 6 : idT === 'string' ? 2 : 1), baru = []; for (var z = 0; z < n; z++) baru.push(''); if (idT === 'string') baru[1] = 'Violin'; T2.baris.push(baru); if (idT === 'alasan') D.atur.alasan = T2.baris.map(function (x) { return x[0]; }); gambar(); var inp = document.querySelector('[data-te="' + idT + ':' + (T2.baris.length - 1) + ':0"]'); if (inp) inp.focus(); return; }
+  if ((b = t.closest('[data-pichapus]'))) {
+    var ph = D.pic[+b.getAttribute('data-pichapus')];
+    bukaModal('<h3>Hapus PIC?</h3><p class="ket"><b>' + esc(ph[2]) + '</b> dihapus dari daftar PIC <b>' + esc(ph[0]) + ' ' + esc(ph[1]) + '</b> (tab PIC per Campus). Namanya tidak lagi muncul di pilihan PIC dan tidak dipilih isi otomatis. PIC yang sudah terisi di jadwal tidak ikut berubah.</p>' +
+      '<p class="ket kecil">Kalau hanya sementara (mis. cuti), lebih baik pakai <b>Nonaktifkan</b> supaya bisa diaktifkan lagi.</p>' +
+      '<div class="aksi"><button type="button" class="btn garis" data-tutup="modal">Batal</button><button type="button" class="btn bahaya" data-ok="pichapus" data-id="' + b.getAttribute('data-pichapus') + '">Hapus</button></div>');
+    return;
+  }
   if ((b = t.closest('[data-pictog]'))) { var p = D.pic[+b.getAttribute('data-pictog')]; kerja('Menyimpan…', function () { return api('scPic', { aksi: 'status', baris: p[4], nama: p[2], status: p[3] === 'Aktif' ? 'Nonaktif' : 'Aktif' }, KL()); }); return; }
   if ((b = t.closest('[data-aturtab]'))) { S.aturTab = b.getAttribute('data-aturtab'); gambar(); return; }
   if ((b = t.closest('[data-sistab]'))) { S.sisTab = b.getAttribute('data-sistab'); gambar(); return; }
@@ -1790,6 +1797,7 @@ document.addEventListener('click', function (e) {
     }
     if (k === 'akunHapus') { var ah = D.akun[id]; tutupModal(); kerja('Mencabut akses…', function () { return api('scAkunHapus', ah[0]); }, function () { roti('Akses ' + ah[1] + ' dicabut'); }); }
     if (k === 'resetpin') { tutupModal(); kerja('Mereset PIN…', function () { return api('scResetPin', TUNDA.id); }, function (r) { tampilPin('PIN direset', r.nama, r.pin); }); }
+    if (k === 'pichapus') { var pd = D.pic[id]; tutupModal(); kerja('Menghapus…', function () { return api('scPic', { aksi: 'hapus', baris: pd[4], nama: pd[2] }, KL()); }); return; }
     if (k === 'gantipin') {
       var p0 = $('gpLama').value, p1 = $('gpBaru').value, gal = cekPinBaru(p1, $('gpUlang').value, p0);
       if (gal) { $('gpSalah').textContent = gal; return; }
