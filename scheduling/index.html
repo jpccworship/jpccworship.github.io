@@ -373,6 +373,23 @@
   .ob-form { display: flex; gap: 8px; padding: 8px; border-top: 1px solid var(--line); }
   .ob-form textarea { flex: 1; min-width: 0; resize: none; height: 42px; max-height: 120px; border: 1.5px solid #CFC7DD; border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 14.5px; outline: none; }
   .ob-form textarea:focus { border-color: var(--brand); }
+  /* emoji */
+  .ob-emo { width: 42px; height: 42px; flex: none; border: 0; border-radius: 12px; background: transparent; color: #6B6475; display: grid; place-items: center; cursor: pointer; }
+  .ob-emo:hover, .ob-emo.on { background: #EDE6F8; color: var(--brand); }
+  .ob-emoji { height: 260px; flex: none; display: flex; flex-direction: column; border-top: 1px solid var(--line); background: #fff; }
+  .emo-tab { display: flex; gap: 2px; padding: 6px 8px 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+  .emo-tab button { flex: 1; min-width: 34px; height: 32px; border: 0; border-radius: 8px; background: transparent; font-size: 18px; cursor: pointer; filter: grayscale(.7); opacity: .7; }
+  .emo-tab button:hover { opacity: 1; }
+  .emo-tab button.on { background: #EDE6F8; filter: none; opacity: 1; box-shadow: inset 0 -2px 0 var(--brand); }
+  .emo-isi { flex: 1; overflow-y: auto; padding: 0 8px 8px; position: relative; }
+  .emo-grp b { display: block; position: sticky; top: 0; background: #fff; font-size: 11px; font-weight: 800; color: var(--muted); padding: 8px 2px 4px; z-index: 1; }
+  .emo-kisi { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); }
+  .emo-kisi button { height: 38px; border: 0; background: transparent; border-radius: 8px; font-size: 24px; line-height: 1; cursor: pointer; padding: 0; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+  .emo-kisi button:hover { background: #F1EEF6; }
+  .ob-m.emo, .ob-m.saya.emo { background: transparent; border-color: transparent; color: var(--ink); padding: 0 2px; }
+  .ob-m.emo .tx { font-size: 38px; line-height: 1.15; }
+  .ob-m.saya.emo small { color: var(--muted); }
+  @media (max-width: 700px) { .ob-emoji { height: min(300px, 42vh); } }
   .ob-form button { width: 42px; height: 42px; flex: none; border: 0; border-radius: 12px; background: var(--brand); color: #fff; display: grid; place-items: center; cursor: pointer; }
   @media (max-width: 700px) {
     #obrol { right: 12px; bottom: 12px; }
@@ -2225,6 +2242,63 @@ function cuplikChat(k) {
   return siapa + m[5].replace(/\s+/g, ' ').slice(0, 60);
 }
 function teksChat(t) { return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g, '<br>'); }
+/* ---------- emoji di chat (seperti WhatsApp): pemilih per kategori + "Terakhir dipakai"; pesan yang isinya 1–3 emoji tampil besar ---------- */
+var EMOJI = [
+  ['😀', 'Senyum & wajah', '😀 😃 😄 😁 😆 😅 😂 🤣 ☺️ 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🤗 🤔 🤭 🤫 🤥 😶 😐 😑 😬 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠 😈 👻 💀 🤡 💩 🙈 🙉 🙊'],
+  ['👋', 'Tangan & orang', '👋 🤚 🖐️ ✋ 🖖 👌 🤏 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 ☝️ 👍 👎 ✊ 👊 🤛 🤜 👏 🙌 👐 🤲 🤝 🙏 ✍️ 💪 👀 🧠 👶 🧒 👦 👧 🧑 👨 👩 🧓 👴 👵 🙋 🙆 🙅 🤷 🤦 🙇 💁 👨‍🎤 👩‍🎤 👨‍🏫 👩‍🏫 👨‍💻 👩‍💻 👨‍🍳 👩‍🍳 🕺 💃 👯 👪'],
+  ['❤️', 'Hati & sukacita', '❤️ 🧡 💛 💚 💙 💜 🤎 🖤 🤍 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟 ✝️ ⛪ 🕊️ 🙏 ✨ 🔥 💯 ⭐ 🌟 💫 ⚡ 🎉 🎊 🎁 🎂 🎈 🥂 🍾'],
+  ['🎵', 'Musik & kegiatan', '🎵 🎶 🎤 🎧 🎼 🎹 🥁 🎷 🎺 🎸 🪕 🎻 🎙️ 📯 🔔 🎬 🎭 🎨 🎯 🎮 🎲 ⚽ 🏀 🏐 🏸 🏓 🎾 🏊 🚴 🏃 🧘 🏆 🥇 🥈 🥉 🏅'],
+  ['🐶', 'Hewan & alam', '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🐔 🐧 🐦 🐤 🦆 🦉 🦋 🐝 🐞 🐢 🐍 🐙 🐬 🐳 🐠 🌸 🌷 🌹 🌺 🌻 🌼 🌱 🌿 🍀 🍁 🌳 🌴 🌵 ☀️ 🌤️ ⛅ 🌧️ ⛈️ 🌈 🌙 ❄️ 🌊'],
+  ['🍔', 'Makanan & minuman', '🍎 🍊 🍋 🍌 🍉 🍇 🍓 🥭 🍍 🥥 🥑 🌶️ 🌽 🍞 🥐 🧀 🍳 🍗 🍖 🍔 🍟 🍕 🌭 🥪 🌮 🍜 🍝 🍛 🍣 🍱 🥟 🍚 🍙 🍦 🍩 🍪 🍰 🍫 🍬 ☕ 🍵 🥤 🧃 🍹'],
+  ['🏠', 'Tempat & benda', '🚗 🚕 🚌 🏍️ 🚲 ✈️ 🚆 🏠 🏢 ⛪ 🏥 🏫 📱 💻 ⌚ 📷 💡 📌 📎 ✏️ 📝 📅 📆 🗓️ ⏰ ⏳ 📢 📣 💬 💭 📖 📚 🎟️ 🔑 🧾 💰 🛒 🎒 👕 👔 👗 👟'],
+  ['✅', 'Simbol', '✅ ☑️ ✔️ ❌ ❎ ⭕ ❗ ❓ ‼️ ⁉️ ⚠️ 🚫 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🔺 🔻 ➡️ ⬅️ ⬆️ ⬇️ 🔁 🔄 ➕ ➖ ✖️ 🆗 🆕 🆙 🔝 🔜 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟']
+].map(function (k) { return [k[0], k[1], k[2].split(' ').filter(String)]; });
+var EMO_KUNCI = 'scEmojiBaru', EMO_BARU = (function () { try { var v = JSON.parse(localStorage.getItem(EMO_KUNCI) || '[]'); return Array.isArray(v) ? v.slice(0, 24) : []; } catch (x) { return []; } })();
+var SENTUH = (function () { try { return window.matchMedia('(pointer: coarse)').matches; } catch (x) { return false; } })();
+function htmlEmoji() {
+  var grup = (EMO_BARU.length ? [['🕘', 'Terakhir dipakai', EMO_BARU]] : []).concat(EMOJI);
+  return '<div class="emo-tab" role="tablist">' + grup.map(function (g, i) { return '<button type="button" data-emot="' + i + '" title="' + g[1] + '" aria-label="' + g[1] + '"' + (i === (CH.emoTab || 0) ? ' class="on"' : '') + '>' + g[0] + '</button>'; }).join('') + '</div>' +
+    '<div class="emo-isi" id="obEmoIsi">' + grup.map(function (g, i) {
+      return '<div class="emo-grp" id="emoGrp' + i + '"><b>' + g[1] + '</b><div class="emo-kisi">' + g[2].map(function (x) { return '<button type="button" data-emo="' + x + '">' + x + '</button>'; }).join('') + '</div></div>';
+    }).join('') + '</div>';
+}
+function pasangGulirEmoji() {
+  var w = $('obEmoIsi'); if (!w) return;
+  w.scrollTop = CH.emoY || 0;
+  w.onscroll = function () {
+    CH.emoY = w.scrollTop;
+    var grp = w.querySelectorAll('.emo-grp'), on = 0;
+    for (var i = 0; i < grp.length; i++) if (grp[i].offsetTop <= w.scrollTop + 8) on = i;   // .emo-isi position:relative = offsetParent
+    if (on !== CH.emoTab) { CH.emoTab = on; Array.prototype.forEach.call(document.querySelectorAll('#obrolPanel [data-emot]'), function (b, j) { b.classList.toggle('on', j === on); }); }
+  };
+}
+function bukaEmoji(ya) {
+  CH.emoji = ya;
+  if (ya && SENTUH && $('obTulis')) $('obTulis').blur();   // di HP: panel emoji menggantikan keyboard, seperti WhatsApp
+  var isi = $('obPesan'), bawah = !isi || isi.scrollHeight - isi.scrollTop - isi.clientHeight < 80;
+  gambarObrol(bawah);
+  if (ya && !SENTUH) { var t = $('obTulis'); if (t) { t.focus(); var p = Math.min(CH.pos === undefined ? t.value.length : CH.pos, t.value.length); t.setSelectionRange(p, p); } }
+}
+function sisipEmoji(x) {
+  var t = $('obTulis'); if (!t) return;
+  var a = document.activeElement === t ? t.selectionStart : (CH.pos === undefined ? t.value.length : Math.min(CH.pos, t.value.length));
+  var b = document.activeElement === t ? t.selectionEnd : a;
+  if (t.value.length - (b - a) + x.length > 1000) return;
+  t.value = t.value.slice(0, a) + x + t.value.slice(b);
+  CH.pos = a + x.length;
+  if (!SENTUH) t.focus();
+  try { t.setSelectionRange(CH.pos, CH.pos); } catch (e) {}
+  EMO_BARU = [x].concat(EMO_BARU.filter(function (y) { return y !== x; })).slice(0, 24);
+  try { localStorage.setItem(EMO_KUNCI, JSON.stringify(EMO_BARU)); } catch (e) {}
+}
+/* pesan yang hanya berisi 1–3 emoji: tampil besar tanpa gelembung tebal */
+var RE_EMO = (function () { try { return new RegExp('^(?:\\p{Extended_Pictographic}|\\p{Emoji_Component}|\\u200d|\\ufe0f|\\u20e3|\\s)+$', 'u'); } catch (x) { return null; } })();
+var RE_EMO1 = (function () { try { return new RegExp('\\p{Extended_Pictographic}', 'gu'); } catch (x) { return null; } })();
+function hanyaEmoji(t) {
+  if (!RE_EMO || !RE_EMO1 || !t || /^[\d#*\s]+$/.test(t) || !RE_EMO.test(t)) return false;
+  var n = (t.match(RE_EMO1) || []).length;
+  return n >= 1 && n <= 3;
+}
 function gambarObrol(gulirBawah) {
   var p = $('obrolPanel'); if (!p || !S.akun) return;
   var isi = $('obPesan'), dekatBawah = !isi || isi.scrollHeight - isi.scrollTop - isi.clientHeight < 80, y = isi ? isi.scrollTop : 0;
@@ -2243,27 +2317,32 @@ function gambarObrol(gulirBawah) {
   var pesan = M.length ? M.map(function (m) {
     var d = new Date(m[1]), h = labelHariChat(m[1]), saya = m[2] === S.akun.id, sep = '';
     if (h !== hari) { hari = h; sep = '<div class="ob-hari">' + h + '</div>'; }
-    return sep + '<div class="ob-m' + (saya ? ' saya' : '') + '">' + (saya ? '' : '<b>' + esc(m[3]) + '</b>') + '<div>' + teksChat(m[5]) + '</div><small>' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + '</small></div>';
+    return sep + '<div class="ob-m' + (saya ? ' saya' : '') + (hanyaEmoji(m[5]) ? ' emo' : '') + '">' + (saya ? '' : '<b>' + esc(m[3]) + '</b>') + '<div class="tx">' + teksChat(m[5]) + '</div><small>' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + '</small></div>';
   }).join('') : '<div class="kosong">Belum ada pesan di ' + esc(namaKanal(CH.kanal)) + '.' + (CH.kanal.indexOf('dm:') === 0 ? ' Pesan ini hanya terlihat oleh kalian berdua.' : '') + '<br>Pesan tetap terkirim walau penerimanya sedang tidak online, dan disimpan ' + CHAT_HARI + ' hari.</div>';
   if (M.length) pesan = (CHAT_LAGI[CH.kanal] ? '<button type="button" class="ob-lama" data-ob="lama"' + (CHAT_MUAT ? ' disabled' : '') + '>' + (CHAT_MUAT ? 'Memuat…' : 'Muat pesan sebelumnya') + '</button>' :
     '<div class="ob-info">Pesan di percakapan ini disimpan ' + CHAT_HARI + ' hari.</div>') + pesan;
   var draf = $('obTulis') ? $('obTulis').value : '', fokus = document.activeElement && document.activeElement.id === 'obTulis';
   p.innerHTML = '<div class="ob-kp"><button type="button" class="ob-balik" data-ob="daftar" aria-label="Daftar percakapan">‹</button><b>' + esc(namaKanal(CH.kanal)) + '</b><span class="kecil">' + (CH.kanal.indexOf('dm:') === 0 ? 'pesan pribadi' : CH.kanal === 'semua' ? 'semua akun Scheduling' : 'penyusun ' + CH.kanal + ' & Admin') + '</span><button type="button" class="x" data-ob="tutup" aria-label="Tutup">×</button></div>' +
     '<div class="ob-badan' + (CH.daftar ? ' lihat-daftar' : '') + '"><nav class="ob-daftar"><div class="ob-grp">Grup</div>' + kanal + '<div class="ob-grp">Pesan pribadi · ' + ONLINE.filter(function (o) { return o[0] !== S.akun.id; }).length + ' online</div>' + orang + '</nav>' +
-    '<section class="ob-obrol"><div class="ob-pesan" id="obPesan">' + pesan + '</div><form class="ob-form" id="obForm"><textarea id="obTulis" rows="1" maxlength="1000" placeholder="Tulis pesan ke ' + esc(namaKanal(CH.kanal)) + '…"></textarea><button type="submit" aria-label="Kirim"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg></button></form></section></div>';
-  var t = $('obTulis'); t.value = draf; if (fokus) { t.focus(); t.setSelectionRange(draf.length, draf.length); }
+    '<section class="ob-obrol"><div class="ob-pesan" id="obPesan">' + pesan + '</div>' + (CH.emoji ? '<div class="ob-emoji" id="obEmoji">' + htmlEmoji() + '</div>' : '') +
+    '<form class="ob-form" id="obForm"><button type="button" class="ob-emo' + (CH.emoji ? ' on' : '') + '" data-ob="emoji" aria-label="Emoji" title="Emoji" aria-pressed="' + (CH.emoji ? 'true' : 'false') + '">' +
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.2c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg></button><textarea id="obTulis" rows="1" maxlength="1000" placeholder="Tulis pesan ke ' + esc(namaKanal(CH.kanal)) + '…"></textarea><button type="submit" aria-label="Kirim"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg></button></form></section></div>';
+  var t = $('obTulis'); t.value = draf;
+  if (fokus) { var pos = Math.min(CH.pos === undefined ? draf.length : CH.pos, draf.length); t.focus(); t.setSelectionRange(pos, pos); }
+  if (CH.emoji) pasangGulirEmoji();
   isi = $('obPesan');
   isi.scrollTop = gulirBawah || dekatBawah ? isi.scrollHeight : y;
 }
 function bukaObrol(ya) {
   CH.buka = ya;
+  if (!ya) CH.emoji = false;
   $('obrolPanel').hidden = !ya; $('obrol').classList.toggle('buka', ya);
   if (ya) { CH.daftar = window.innerWidth <= 700 ? CH.daftar : false; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) setTimeout(function () { var t = $('obTulis'); if (t) t.focus(); }, 50); }
 }
 function kirimChat() {
   var t = $('obTulis'), teks = t.value.trim(), k = CH.kanal;
   if (!teks) return;
-  t.value = '';
+  t.value = ''; CH.pos = 0;
   var sementara = [Date.now() * 1000 + 999, Date.now(), S.akun.id, S.akun.nama, k, teks, 1];
   CHAT.push(sementara); gambarObrol(true);
   api('scChatKirim', k, teks).then(function (r) {
@@ -2280,11 +2359,27 @@ function kirimChat() {
   el.addEventListener('click', function (e) {
     var b;
     if (e.target.closest('#obrolBuka')) { bukaObrol(true); return; }
-    if ((b = e.target.closest('[data-ob]'))) { var ob = b.getAttribute('data-ob'); if (ob === 'tutup') bukaObrol(false); else if (ob === 'lama') muatChatLama(); else { CH.daftar = true; gambarObrol(false); } return; }
-    if ((b = e.target.closest('[data-kanal]'))) { CH.kanal = b.getAttribute('data-kanal'); CH.daftar = false; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) $('obTulis').focus(); return; }
+    if ((b = e.target.closest('[data-emo]'))) { sisipEmoji(b.getAttribute('data-emo')); return; }
+    if ((b = e.target.closest('[data-emot]'))) { var gr = $('emoGrp' + b.getAttribute('data-emot')), w = $('obEmoIsi'); if (gr && w) w.scrollTop = gr.offsetTop; return; }
+    if ((b = e.target.closest('[data-ob]'))) { var ob = b.getAttribute('data-ob'); if (ob === 'tutup') bukaObrol(false); else if (ob === 'lama') muatChatLama(); else if (ob === 'emoji') bukaEmoji(!CH.emoji); else { CH.daftar = true; gambarObrol(false); } return; }
+    if ((b = e.target.closest('[data-kanal]'))) { CH.kanal = b.getAttribute('data-kanal'); CH.daftar = false; CH.emoji = false; CH.pos = undefined; gambarObrol(true); tandaiChatDibaca(); if (window.innerWidth > 700) $('obTulis').focus(); return; }
   });
   el.addEventListener('submit', function (e) { e.preventDefault(); kirimChat(); });
-  el.addEventListener('keydown', function (e) { if (e.target.id === 'obTulis' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); kirimChat(); } if (e.key === 'Escape') bukaObrol(false); });
+  el.addEventListener('keydown', function (e) {
+    if (e.target.id === 'obTulis' && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); kirimChat(); }
+    if (e.key === 'Escape') { if (CH.emoji) bukaEmoji(false); else bukaObrol(false); }
+  });
+  // tombol emoji tidak mengambil fokus dari kotak tulis (kursor tetap di tempatnya)
+  el.addEventListener('mousedown', function (e) { if (!SENTUH && e.target.closest('[data-emo], [data-emot], [data-ob="emoji"]')) e.preventDefault(); });
+  var catatPos = function (e) { if (e.target.id === 'obTulis') CH.pos = e.target.selectionStart; };
+  ['input', 'keyup', 'mouseup', 'select'].forEach(function (n) { el.addEventListener(n, catatPos); });
+  // di HP: mengetuk kotak tulis menutup panel emoji (keyboard kembali), seperti WhatsApp
+  el.addEventListener('focusin', function (e) {
+    if (e.target.id !== 'obTulis' || !SENTUH || !CH.emoji) return;
+    CH.emoji = false;
+    var p = $('obEmoji'); if (p) p.remove();
+    var b = el.querySelector('[data-ob="emoji"]'); if (b) { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }
+  });
 })();
 
 /* ---------- Database (khusus Admin + Database) ---------- */
