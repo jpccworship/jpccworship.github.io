@@ -761,6 +761,8 @@ function cekDraft(mnSaja) {
         if (peranPIC(label)) punyaPic[dk] = 1;
         var p = pisah(v), k = kn(p.n), choir = label === 'Choir', ym = c.t.slice(0, 7), a = AT[k];
         if (!AG[k] && !choir) tambah('asing', mn, c.id, i, p.n + ' · ' + label + ' · ' + lbl);
+        // di luar daftar pilihan sel ini: tidak aktif di ministry ini / bukan campus-nya / posisi tidak cocok / (Youth Invasion) tidak ada di tab Youth Invasion
+        if (AG[k] && c.jenis !== 'Special event' && !peranPIC(label) && !choir && c.kd && c.kd[i] >= 0 && PL[c.kd[i]] && !layakSel(AG[k], c, i)) tambah('luar', mn, c.id, i, p.n + ' · ' + label + ' · ' + lbl + ' · daftar: ' + ketDaftar(c, i));
         var bo = blokPada(k, c.t, mn), cp = cutiPada(k, c.t, label, mn);
         if (bo) tambah('blok', mn, c.id, i, p.n + ' blockout ' + ltp(bo[2]) + '–' + ltp(bo[3]) + (bkIbadah(bo) ? ' (hanya ' + bkIbadah(bo) + ')' : '') + ' · ' + label + ' · ' + lbl);
         else if (cp) tambah('blok', mn, c.id, i, p.n + ' cuti sebagai ' + cp.per.join(', ') + ' ' + ltp(cp.a) + '–' + ltp(cp.b) + (cp.ib ? ' (hanya ' + cp.ib + ')' : '') + ' · ' + label + ' · ' + lbl);
@@ -779,6 +781,16 @@ function cekDraft(mnSaja) {
         if (a && c.jenis !== 'Special event' && luarIbadah(k, mn, c.sv)) tambah('aturan', mn, c.id, i, p.n + ' · ' + lbl + ' · di luar ibadah yang diutamakan (' + a.ibadah.filter(function (x) { return mnSv(x) === mn; }).join(', ') + ')');
       });
       if (kosong) tambah('kosong', mn, c.id, iKosong, kosong + ' peran belum terisi · ' + lbl);
+      if (mn === 'Kids' && ccKol(c)) {   // Kids Christ Crew: WL wajib Volunteer, musisi maks 1 yang bukan Volunteer
+        var muda = [], iMuda = -1;
+        c.n.forEach(function (v, i) {
+          if (!v || v === '-') return;
+          var lb = P[i][1], a2 = AG[kn(pisah(v).n)]; if (!a2 || relawanA(a2)) return;
+          if (lb === 'Worship leader') tambah('cc', mn, c.id, i, a2.n + ' (' + (a2.role || 'role kosong') + ') sebagai Worship leader · ' + lbl);
+          if (musikLabel(lb) && muda.indexOf(a2.k) < 0) { muda.push(a2.k); if (iMuda < 0) iMuda = i; }
+        });
+        if (muda.length > 1) tambah('cc', mn, c.id, iMuda, muda.length + ' musisi bukan Volunteer (maks 1): ' + muda.map(function (k) { return AG[k].n + ' (' + (AG[k].role || '–') + ')'; }).join(', ') + ' · ' + lbl);
+      }
     });
   });
   Object.keys(tglDraft).forEach(function (dk) {   // belum ada PIC: per ministry & tanggal (Youth tidak dicek)
@@ -789,10 +801,16 @@ function cekDraft(mnSaja) {
   });
   return out;
 }
+/* Kids Christ Crew (CC): WL wajib Volunteer; Singer boleh Young Volunteer; musisi maks 1 yang bukan Volunteer (Young Volunteer / Trainee) */
+function ccKol(c) { return /christ\s*crew/i.test(c.acara || '') || /(^|\s)CC(\s|$)/.test(c.sv || ''); }
+function relawanA(a) { var r = String(a.role || ''); return /volunteer/i.test(r) && !/young/i.test(r); }
+function musikLabel(lb) { return /^(Music director|Keys|Guitar|Bass|Drums|Violin|Saxophone|Perkusi|Percussion)/i.test(lb); }
 var JENIS_CEK = [
   ['blok', 'Terjadwal saat blockout / cuti peran', 'bad', 'Orangnya sudah mengisi blockout di tanggal itu, atau sedang cuti untuk peran itu. Ganti, atau batalkan blockout-nya kalau sudah tidak berlaku.'],
   ['bentrok', 'Bentrok di tanggal yang sama', 'warn', 'Satu orang di dua service pada tanggal yang sama (beda campus, atau nomor ibadahnya tumpang tindih).'],
   ['asing', 'Nama tidak ada di Database', 'bad', 'Cek ejaan atau daftarkan dulu di Database. Nama ini tidak bisa dievaluasi dan tidak muncul di pencarian.'],
+  ['luar', 'Di luar daftar pilihan', 'bad', 'Nama ini tidak ada di daftar pilihan sel itu: tidak aktif di ministry ini, bukan campus-nya, posisinya tidak cocok, atau (kolom Youth Invasion) tidak ada di tab Youth Invasion. Ganti, kecuali memang disengaja.'],
+  ['cc', 'Aturan Christ Crew (Kids)', 'bad', 'Kids CC: Worship leader wajib Volunteer; musisi paling banyak 1 yang bukan Volunteer (Young Volunteer / Trainee). Singer boleh Young Volunteer, bebas jumlahnya.'],
   ['kode', 'Kode service tidak dikenal', 'abu', 'Service harus sama dengan daftar di Pengaturan supaya campus, call time & pilihan namanya terbaca. Special event di luar campus boleh diabaikan.'],
   ['turut', 'Berturut-turut', 'ungu', 'Melayani lagi dalam 7 hari di ministry yang sama (PIC tidak dihitung).'],
   ['lebih', 'Lebih dari 1x sebulan', 'kuning', 'Boleh, tapi pastikan memang disengaja.'],
