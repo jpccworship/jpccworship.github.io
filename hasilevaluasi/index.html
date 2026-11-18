@@ -109,6 +109,12 @@
   .muat { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 60px 0; color: var(--muted); font-size: 14px; }
   .muat i { width: 22px; height: 22px; border-radius: 50%; border: 3px solid #E2DBEE; border-top-color: var(--brand); animation: putar 0.9s linear infinite; }
   @keyframes putar { to { transform: rotate(360deg); } }
+  /* layar tunggu: kalau belum selesai setelah beberapa detik, muncul Amsal 16:32a */
+  .ayat { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 12px; overflow: hidden; font-weight: 400; text-align: center; animation: ayat-muncul .6s ease 6s both; }
+  .ayat-ref { font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--muted); }
+  .ayat-isi { font-size: 14px; font-style: italic; line-height: 1.5; color: var(--ink); text-wrap: balance; }
+  @keyframes ayat-muncul { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 6em; } }
+  .muat + .ayat { margin: -44px 0 0; padding-bottom: 44px; }
   .gagal-muat { max-width: 520px; margin: 40px auto; padding: 18px; border-radius: 16px; background: var(--badbg); color: var(--bad); font-size: 14px; line-height: 1.5; text-align: center; }
   .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -998,7 +1004,7 @@ var DATA = window.__DATA__;
     }
     var k = VC.k;
     if (CACHE.kartu[k]) { tampilKartu(k, CACHE.kartu[k]); return; }
-    $('kIsi').innerHTML = '<div class="muat"><i></i><span>Memuat Volunteer Card…</span></div>';
+    $('kIsi').innerHTML = '<div class="muat"><i></i><span>Memuat Volunteer Card…</span></div><div class="ayat"><span class="ayat-ref">Amsal 16:32a</span><span class="ayat-isi">Orang yang sabar melebihi seorang pahlawan</span></div>';
     panggil('hsKartu', [TOK, k], function (r) { CACHE.kartu[k] = r; if (VC.k === k && TAB === 'kartu') tampilKartu(k, r); },
       function (m) { $('kIsi').innerHTML = '<div class="gagal-muat">' + esc(m) + '</div>'; });
   }
