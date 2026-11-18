@@ -288,6 +288,11 @@
   #sibuk .kt { background: #fff; border-radius: 18px; padding: 22px 26px 20px; max-width: 380px; text-align: center; font-weight: 700; font-size: 14.5px; line-height: 1.5; box-shadow: 0 30px 80px rgba(10, 0, 30, .4); }
   .putar { width: 34px; height: 34px; margin: 4px auto 12px; border-radius: 50%; border: 3.5px solid #E7E0F3; border-top-color: var(--brand); animation: putar .8s linear infinite; }
   @keyframes putar { to { transform: rotate(360deg); } }
+  /* layar tunggu: kalau belum selesai setelah beberapa detik, muncul Amsal 16:32a */
+  .ayat { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 12px; overflow: hidden; font-weight: 400; text-align: center; animation: ayat-muncul .6s ease 6s both; }
+  .ayat-ref { font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--muted); }
+  .ayat-isi { font-size: 14px; font-style: italic; line-height: 1.5; color: var(--ink); text-wrap: balance; }
+  @keyframes ayat-muncul { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 6em; } }
   .centang { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1.5px solid var(--line); border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; }
   .centang input { accent-color: var(--brand); margin: 0; }
   .centang:has(input:checked) { border-color: var(--brand); background: var(--soft); color: var(--brand); }
@@ -453,7 +458,7 @@
 <div id="modal"><div class="kotak" id="modalIsi"></div></div>
 <div id="roti" role="status"></div>
 <div id="notifPanel" role="dialog" aria-label="Notifikasi"></div>
-<div id="sibuk" hidden><div class="kt"><div class="putar" aria-hidden="true"></div><div id="sibukTeks"></div></div></div>
+<div id="sibuk" hidden><div class="kt"><div class="putar" aria-hidden="true"></div><div id="sibukTeks"></div><div class="ayat"><span class="ayat-ref">Amsal 16:32a</span><span class="ayat-isi">Orang yang sabar melebihi seorang pahlawan</span></div></div></div>
 <div id="tur" hidden><div class="tirai2"></div><div id="turLubang"></div><div id="turKartu"></div></div>
 <script type="text/plain" id="jpcc-app">
 var DATA = window.__DATA__;
@@ -781,16 +786,6 @@ function cekDraft(mnSaja) {
         if (a && c.jenis !== 'Special event' && luarIbadah(k, mn, c.sv)) tambah('aturan', mn, c.id, i, p.n + ' · ' + lbl + ' · di luar ibadah yang diutamakan (' + a.ibadah.filter(function (x) { return mnSv(x) === mn; }).join(', ') + ')');
       });
       if (kosong) tambah('kosong', mn, c.id, iKosong, kosong + ' peran belum terisi · ' + lbl);
-      if (mn === 'Kids' && ccKol(c)) {   // Kids Christ Crew: WL wajib Volunteer, musisi maks 1 yang bukan Volunteer
-        var muda = [], iMuda = -1;
-        c.n.forEach(function (v, i) {
-          if (!v || v === '-') return;
-          var lb = P[i][1], a2 = AG[kn(pisah(v).n)]; if (!a2 || relawanA(a2)) return;
-          if (lb === 'Worship leader') tambah('cc', mn, c.id, i, a2.n + ' (' + (a2.role || 'role kosong') + ') sebagai Worship leader · ' + lbl);
-          if (musikLabel(lb) && muda.indexOf(a2.k) < 0) { muda.push(a2.k); if (iMuda < 0) iMuda = i; }
-        });
-        if (muda.length > 1) tambah('cc', mn, c.id, iMuda, muda.length + ' musisi bukan Volunteer (maks 1): ' + muda.map(function (k) { return AG[k].n + ' (' + (AG[k].role || '–') + ')'; }).join(', ') + ' · ' + lbl);
-      }
     });
   });
   Object.keys(tglDraft).forEach(function (dk) {   // belum ada PIC: per ministry & tanggal (Youth tidak dicek)
@@ -801,16 +796,11 @@ function cekDraft(mnSaja) {
   });
   return out;
 }
-/* Kids Christ Crew (CC): WL wajib Volunteer; Singer boleh Young Volunteer; musisi maks 1 yang bukan Volunteer (Young Volunteer / Trainee) */
-function ccKol(c) { return /christ\s*crew/i.test(c.acara || '') || /(^|\s)CC(\s|$)/.test(c.sv || ''); }
-function relawanA(a) { var r = String(a.role || ''); return /volunteer/i.test(r) && !/young/i.test(r); }
-function musikLabel(lb) { return /^(Music director|Keys|Guitar|Bass|Drums|Violin|Saxophone|Perkusi|Percussion)/i.test(lb); }
 var JENIS_CEK = [
   ['blok', 'Terjadwal saat blockout / cuti peran', 'bad', 'Orangnya sudah mengisi blockout di tanggal itu, atau sedang cuti untuk peran itu. Ganti, atau batalkan blockout-nya kalau sudah tidak berlaku.'],
   ['bentrok', 'Bentrok di tanggal yang sama', 'warn', 'Satu orang di dua service pada tanggal yang sama (beda campus, atau nomor ibadahnya tumpang tindih).'],
   ['asing', 'Nama tidak ada di Database', 'bad', 'Cek ejaan atau daftarkan dulu di Database. Nama ini tidak bisa dievaluasi dan tidak muncul di pencarian.'],
   ['luar', 'Di luar daftar pilihan', 'bad', 'Nama ini tidak ada di daftar pilihan sel itu: tidak aktif di ministry ini, bukan campus-nya, posisinya tidak cocok, atau (kolom Youth Invasion) tidak ada di tab Youth Invasion. Ganti, kecuali memang disengaja.'],
-  ['cc', 'Aturan Christ Crew (Kids)', 'bad', 'Kids CC: Worship leader wajib Volunteer; musisi paling banyak 1 yang bukan Volunteer (Young Volunteer / Trainee). Singer boleh Young Volunteer, bebas jumlahnya.'],
   ['kode', 'Kode service tidak dikenal', 'abu', 'Service harus sama dengan daftar di Pengaturan supaya campus, call time & pilihan namanya terbaca. Special event di luar campus boleh diabaikan.'],
   ['turut', 'Berturut-turut', 'ungu', 'Melayani lagi dalam 7 hari di ministry yang sama (PIC tidak dihitung).'],
   ['lebih', 'Lebih dari 1x sebulan', 'kuning', 'Boleh, tapi pastikan memang disengaja.'],
@@ -1690,13 +1680,14 @@ function modalAkun(i) {
 var TUNDA = null;
 function val(id) { var e = $(id); return e ? String(e.value).trim() : ''; }
 var KL = function () { return { sig: SIG }; };
+var AYAT = '<div class="ayat"><span class="ayat-ref">Amsal 16:32a</span><span class="ayat-isi">Orang yang sabar melebihi seorang pahlawan</span></div>'; // layar tunggu yang lama: muncul pelan-pelan (CSS .ayat)
 function sibuk(teks) { var e = $('sibuk'); if (teks) { $('sibukTeks').textContent = teks; e.hidden = false; } else e.hidden = true; }
 var SEMUA_BAGIAN = ['input', 'terbit', 'blockout', 'pic', 'yi', 'formasi', 'atur', 'log', 'akun'];
 /* pekerjaan yang menunggu server (layar ditahan sebentar); isian sel yang belum terkirim diselesaikan dulu */
 function kerja(teks, janji, sesudah) {
   if (kerja.jalan) return;
   kerja.jalan = true; sibuk(teks);
-  var lama = setTimeout(function () { sibuk(teks + ' Masih diproses, mohon tunggu…'); }, 15000);
+  var lama = 0; // kalau lama: ayat Amsal 16:32a muncul di layar tunggu (#sibuk .ayat)
   var selesai = function () { clearTimeout(lama); kerja.jalan = false; sibuk(''); };
   return tuntaskan().then(janji).then(function (r) {
     selesai(); terima(r);
@@ -1926,7 +1917,7 @@ function gambarMasuk(mode, pesan) {
   MODE = mode;
   var kunci = mode === 'kunci', h = '<span class="gembok">' + LOGO + '</span><div class="eyebrow">JPCC Worship<span>People</span></div>';
   if (mode === 'muat') {
-    h += '<h1>Scheduling</h1><p>' + esc(pesan || 'Memuat data jadwal…') + '</p><div class="putar" aria-hidden="true"></div>';
+    h += '<h1>Scheduling</h1><p>' + esc(pesan || 'Memuat data jadwal…') + '</p><div class="putar" aria-hidden="true"></div>' + AYAT;
   } else if (mode === 'ganti') {
     h += '<h1>Buat PIN baru</h1><p>Halo <b>' + esc(S.calon.nama.split(' ')[0]) + '</b>, PIN dari admin hanya untuk masuk pertama kali. Sekarang buat PIN pribadimu.</p>' +
       '<label class="lbl" for="gPin1">PIN baru</label>' + kotakPin('gPin1', true) + '<label class="lbl" for="gPin2">Ulangi PIN baru</label>' + kotakPin('gPin2', false) +
@@ -1994,7 +1985,7 @@ function simpanPinBaru() {
 }
 function muatData(pinBaru) {
   gambarMasuk('muat');
-  var lama = setTimeout(function () { var p = $('mKotak').querySelector('p'); if (p) p.textContent = 'Masih memuat data jadwal, sebentar lagi…'; }, 8000);
+  var lama = 0; // kalau lama: ayat Amsal 16:32a muncul (AYAT di layar muat)
   api('scData').then(function (r) {
     clearTimeout(lama); VER = {}; terima(r); masukApp(); mulaiRealtime();
     if (pinBaru) roti('✓ PIN baru tersimpan. Pakai PIN ini setiap masuk.');
@@ -2605,14 +2596,14 @@ var DB = null, DBF = { q: '', st: 'aktif', mn: '', kc: '', pos: '' }, DBV = '';
 var DBK = { nama: 1, lain: 2, p1: 3, p2: 4, p3: 5, wl: 6, ur: 7, tk: 8, sh: 9, umum: 10, youth: 11, kids: 12, role: 13, form: 14, tglForm: 15, home: 16, sebagai: 17, keys: 18, bass: 19, drum: 20, gitar: 21, skor: 22, aktif: 24, suara: 25, wlmn: 26, va: 27, m1: 28 };
 function muatDb(diam) {
   if (!boleh('database')) return Promise.resolve();
-  if (!diam && !DB) $('isi').innerHTML = '<div class="kartu"><div class="kosong">Memuat Database…</div></div>';
+  if (!diam && !DB) $('isi').innerHTML = '<div class="kartu"><div class="kosong">Memuat Database…' + AYAT + '</div></div>';
   return api('scDbData').then(function (r) { DB = r; DBV = r.v; if (S.hal === 'db') gambarAman(); if (diam && $('laci').classList.contains('buka') && DBE.baris) roti('ℹ Database baru saja diubah orang lain. Data di layar sudah diperbarui.'); },
     function (e) { if (S.hal === 'db') $('isi').innerHTML = '<div class="kartu"><div class="pesan bad">' + esc(e.message) + '</div></div>'; });
 }
 function dbAktif(r) { return !/inactive|resigned/i.test(r[DBK.role]); }
 LAYAR.db = function () {
   if (!boleh('database')) return '<div class="kartu"><div class="kosong">Bagian ini hanya untuk akun Admin + Database.</div></div>';
-  if (!DB) { setTimeout(function () { muatDb(false); }, 0); return '<div class="kartu"><div class="kosong">Memuat Database…</div></div>'; }
+  if (!DB) { setTimeout(function () { muatDb(false); }, 0); return '<div class="kartu"><div class="kosong">Memuat Database…' + AYAT + '</div></div>'; }
   var F = DBF, q = kn(F.q), pos = (DB.pilihan.pos || []);
   var L = DB.baris.filter(function (r) {
     if (F.st === 'aktif' && !dbAktif(r)) return false; if (F.st === 'non' && dbAktif(r)) return false;
