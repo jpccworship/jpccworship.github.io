@@ -41,12 +41,17 @@
 
   function mulai(hal) {
     var lapis = document.getElementById('jpcc-muat'), teks = lapis.querySelector('.jm-teks'), ulang = lapis.querySelector('.jm-ulang');
+    // belum selesai setelah beberapa detik: tampilkan Amsal 16:32a di bawah tulisan memuat
+    var ayat = document.createElement('div');
+    ayat.className = 'jm-ayat';
+    ayat.innerHTML = '<span class="jm-ayat-ref">Amsal 16:32a</span><span class="jm-ayat-isi">Orang yang sabar melebihi seorang pahlawan</span>';
+    ulang.parentNode.insertBefore(ayat, ulang);
     var awal = teks.textContent, coba = 0, lama;
     var muat = function () {
       coba++;
       lapis.classList.remove('gagal'); ulang.hidden = true; teks.textContent = awal;
       clearTimeout(lama);
-      lama = setTimeout(function () { teks.textContent = 'Masih memuat, sebentar lagi…'; }, 7000);
+      lama = setTimeout(function () { lapis.classList.add('lama'); }, 6000);
       fetch(API + '?api=' + encodeURIComponent(hal))
         .then(function (r) { if (!r.ok) throw new Error('Server tidak menjawab (' + r.status + ').'); return r.json(); })
         .then(function (j) {
