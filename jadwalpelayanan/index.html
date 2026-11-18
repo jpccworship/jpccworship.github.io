@@ -484,6 +484,10 @@
   .bo-peran label { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid #DCD3EC; border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 600; cursor: pointer; background: #fff; }
   .bo-peran label input { accent-color: var(--brand); margin: 0; }
   .bo-peran label:has(input:checked) { border-color: var(--brand); background: #F3EFF9; color: var(--brand); }
+  .bo-ib { margin: 0 0 2px 30px; }
+  .bo-ib[hidden] { display: none; }
+  .bo-ib-ket { font-size: 13px; line-height: 1.45; color: var(--muted); margin: 0 0 6px; }
+  .bo-ib-ket b { color: #3D3646; }
   .bo-peran-ket { width: 100%; font-size: 13px; color: var(--muted); margin-bottom: 2px; }
 </style>
 </head>
@@ -590,6 +594,7 @@
       <div class="bo-l"><span class="no">3</span>Berlaku untuk <span class="w">*</span></div>
       <div class="bo-jenis" id="boJenis">
         <label class="op"><input type="radio" name="boJenis" value="semua" checked><span><b>Semua pelayanan</b><small>Tidak dijadwalkan sama sekali di tanggal itu.</small></span></label>
+        <div class="bo-ib" id="boIb" hidden></div>
         <label class="op"><input type="radio" name="boJenis" value="peran"><span><b>Peran tertentu saja (cuti peran)</b><small>Mis. cuti sebagai Music director, tapi tetap bisa dijadwalkan sebagai gitaris.</small></span></label>
         <div class="bo-peran" id="boPeran" hidden></div>
       </div>
@@ -1556,7 +1561,7 @@ var PARAM = window.__PARAM__;
     return { mulai: tambahHari(kini, 31), tutup: kini, idx: -1 };
   }
   var boAtur = boHitung(hariIni()), boMin = boAtur.mulai;
-  var bo = { o: null, mulai: '', selesai: '', ym: boMin.slice(0, 7), sudah: [], kirim: false };   // kalender langsung di bulan yang sudah bisa dipilih
+  var bo = { o: null, mulai: '', selesai: '', ym: boMin.slice(0, 7), sudah: [], kirim: false, ib: [] };   // kalender langsung di bulan yang sudah bisa dipilih
   var boQ = $('boQ'), boSaran = $('boSaran'), boHapus = $('boHapus'), boKal = $('boKal'), boAlasan = $('boAlasan'),
     boDesk = $('boDesk'), boKirim = $('boKirim'), boPilihan = [], boAktif = -1;
   BO.alasan.forEach(function (a) { var op = document.createElement('option'); op.value = a; op.textContent = a; boAlasan.appendChild(op); });
@@ -1611,18 +1616,18 @@ var PARAM = window.__PARAM__;
         boGambarSudah(); gambarKal();
       }).withFailureHandler(function () { if (bo.o === d) $('boSudah').textContent = ''; }).blockoutSaya(d.n);
     }
-    gambarKal(); boIsiPeran(); boCek();
+    gambarKal(); boIsiPeran(); boIsiIbadah(); boCek();
   }
   function boLepasNama() {
     bo.o = null; bo.sudah = [];
     $('boInfo').hidden = true;
-    gambarKal(); boIsiPeran(); boCek();
+    gambarKal(); boIsiPeran(); boIsiIbadah(); boCek();
   }
   function boGambarSudah() {
     var el = $('boSudah');
     var semua = bo.sudah.filter(function (r) { return !r[2]; }), peran = bo.sudah.filter(function (r) { return r[2]; });
     if (!bo.sudah.length) { el.textContent = ''; return; }
-    el.innerHTML = (semua.length ? 'Blockout yang sudah tercatat: <b>' + semua.map(function (r) { return esc(rentang(r[0], r[1])); }).join(' · ') + '</b>. ' : '') +
+    el.innerHTML = (semua.length ? 'Blockout yang sudah tercatat: <b>' + semua.map(function (r) { return esc(rentang(r[0], r[1]) + (r[3] ? ' (hanya ' + r[3] + ')' : '')); }).join(' · ') + '</b>. ' : '') +
       (peran.length ? 'Cuti peran: <b>' + peran.map(function (r) { return esc(r[2] + ' · ' + rentang(r[0], r[1])); }).join(' · ') + '</b>. ' : '') + 'Mau membatalkan? Hubungi tim People.<br>';
   }
 
@@ -1728,10 +1733,36 @@ var PARAM = window.__PARAM__;
       daftar.map(function (p) { return '<label><input type="checkbox" value="' + esc(p) + '"><span>' + esc(p) + '</span></label>'; }).join('');
   }
   boIsiPeran();
+  // berlaku di ibadah mana: default Semua (semua ibadah yang dia layani); bisa dipilih ibadah tertentu, mis. hanya Youth
+  var boIbEl = $('boIb');
+  function boMinOrang(d) { return d && d.min ? String(d.min).split(/\s*·\s*/).filter(function (m) { return /^(Umum|Youth|Kids)$/.test(m); }) : []; }
+  function boIsiIbadah() {
+    var mins = boMinOrang(bo.o);
+    bo.ib = [];
+    if (mins.length < 2) { boIbEl.innerHTML = ''; boIbEl.hidden = true; return; }
+    boIbEl.innerHTML = '<div class="bo-ib-ket">Di ibadah mana? Biarkan <b>Semua</b> kalau tidak bisa melayani sama sekali. Pilih ibadahnya kalau hanya berhalangan di ibadah itu, mis. tidak bisa ikut latihan Youth tapi tetap bisa melayani di Umum.</div>' +
+      '<div class="bo-peran">' + ['Semua'].concat(mins).map(function (m) {
+        return '<label><input type="checkbox" name="boIb" value="' + m + '"' + (m === 'Semua' ? ' checked' : '') + '><span>' + (m === 'Semua' ? 'Semua (' + mins.join(', ') + ')' : m + ' saja') + '</span></label>';
+      }).join('') + '</div>';
+    boIbEl.hidden = boJenis() !== 'semua';
+  }
+  boIbEl.addEventListener('change', function (e) {
+    var t = e.target;
+    if (!t || t.name !== 'boIb') return;
+    var kotak = Array.prototype.slice.call(boIbEl.querySelectorAll('input[name="boIb"]')), semua = kotak[0], lain = kotak.slice(1);
+    if (t === semua) { if (semua.checked) lain.forEach(function (x) { x.checked = false; }); else semua.checked = true; }   // Semua dilepas dengan memilih ibadahnya
+    else {
+      var n = lain.filter(function (x) { return x.checked; }).length;
+      if (!n || n === lain.length) { lain.forEach(function (x) { x.checked = false; }); semua.checked = true; }   // semua ibadah dipilih = Semua
+      else semua.checked = false;
+    }
+    bo.ib = semua.checked ? [] : lain.filter(function (x) { return x.checked; }).map(function (x) { return x.value; });
+    boCek();
+  });
   if (!(BO.peran || []).length) document.querySelector('#boJenis input[value="peran"]').closest('label').hidden = true;
   function boJenis() { var r = document.querySelector('input[name="boJenis"]:checked'); return r ? r.value : 'semua'; }
   function boPeranDipilih() { return Array.prototype.filter.call(boPeranEl.querySelectorAll('input'), function (x) { return x.checked; }).map(function (x) { return x.value; }); }
-  $('boJenis').addEventListener('change', function () { boPeranEl.hidden = boJenis() !== 'peran'; boCek(); });
+  $('boJenis').addEventListener('change', function () { boPeranEl.hidden = boJenis() !== 'peran'; boIbEl.hidden = boJenis() !== 'semua' || !boIbEl.innerHTML; boCek(); });
   function boCek() {
     var kurang = [];
     if (!bo.o) kurang.push('nama');
@@ -1781,18 +1812,19 @@ var PARAM = window.__PARAM__;
     var g = window.google && google.script && google.script.run;
     if (!g) { boPesan('gagal', 'Belum bisa mengirim dari halaman ini. Buka lewat link resmi halaman Jadwal Pelayanan.'); return; }
     bo.kirim = true; boKirim.textContent = 'Mengirim…'; boCek();
-    var data = { nama: bo.o.n, mulai: bo.mulai, selesai: bo.selesai || bo.mulai, alasan: boAlasan.value, deskripsi: boDesk.value.trim(), peran: boJenis() === 'peran' ? boPeranDipilih() : [] };
+    var data = { nama: bo.o.n, mulai: bo.mulai, selesai: bo.selesai || bo.mulai, alasan: boAlasan.value, deskripsi: boDesk.value.trim(), peran: boJenis() === 'peran' ? boPeranDipilih() : [], ibadah: boJenis() === 'semua' ? bo.ib.slice() : [] };
     google.script.run.withSuccessHandler(function (r) {
       bo.kirim = false; boKirim.textContent = 'Kirim blockout';
-      bo.sudah.push(r.peran ? [r.mulai, r.selesai, r.peran] : [r.mulai, r.selesai]);
+      bo.sudah.push(r.peran ? [r.mulai, r.selesai, r.peran] : [r.mulai, r.selesai, '', r.berlaku || '']);
       bo.mulai = bo.selesai = ''; boAlasan.value = ''; boDesk.value = '';
       document.querySelector('input[name="boJenis"][value="semua"]').checked = true; boPeranEl.hidden = true;
       Array.prototype.forEach.call(boPeranEl.querySelectorAll('input'), function (x) { x.checked = false; });
+      boIsiIbadah();
       boGambarSudah(); gambarKal(); boCek();
       if (r.peran) { boPesan('ok', '✓ <b>Cuti peran tersimpan.</b> ' + esc(r.nama) + ' · ' + esc(rentang(r.mulai, r.selesai)) + ' (' + r.hari + ' hari) · ' + esc(r.alasan) +
         '. Selama itu kamu tidak dijadwalkan sebagai <b>' + esc(r.peran) + '</b>, tapi tetap bisa dijadwalkan di peran lain.'); return; }
       boPesan('ok', '✓ <b>Blockout tersimpan.</b> ' + esc(r.nama) + ' · ' + esc(rentang(r.mulai, r.selesai)) + ' (' + r.hari + ' hari) · ' + esc(r.alasan) +
-        '. Tim scheduling tidak akan memasukkan namamu di tanggal itu. Kalau ada tanggal lain, pilih lagi di kalender.');
+        (r.berlaku ? '. Tim scheduling tidak akan memasukkan namamu di ibadah <b>' + esc(r.berlaku) + '</b> pada tanggal itu; di ibadah lain kamu tetap bisa dijadwalkan.' : '. Tim scheduling tidak akan memasukkan namamu di tanggal itu.') + ' Kalau ada tanggal lain, pilih lagi di kalender.');
     }).withFailureHandler(function (err) {
       bo.kirim = false; boKirim.textContent = 'Kirim blockout'; boCek();
       boPesan('gagal', '✗ ' + esc(err && err.message ? err.message : String(err)));
