@@ -11,6 +11,12 @@
   font-weight: 800; cursor: pointer; }
 @keyframes jm-putar { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #jpcc-muat .jm-putar { animation-duration: 2.4s; } }
+/* belum selesai memuat setelah beberapa detik: Amsal 16:32a */
+#jpcc-muat .jm-ayat { display: none; flex-direction: column; align-items: center; gap: 3px; }
+#jpcc-muat.lama:not(.gagal) .jm-ayat { display: flex; animation: jm-ayat .6s ease both; }
+#jpcc-muat .jm-ayat-ref { font-size: 12px; font-weight: 700; letter-spacing: .03em; color: #6B6575; }
+#jpcc-muat .jm-ayat-isi { font-size: 15px; font-style: italic; line-height: 1.5; color: #3D3646; text-wrap: balance; }
+@keyframes jm-ayat { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 /* logo JPCC Worship di kepala halaman */
 .jw-kop { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .jw-kop .jw-teks { min-width: 0; }
