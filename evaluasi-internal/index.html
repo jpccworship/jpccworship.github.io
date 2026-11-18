@@ -46,6 +46,12 @@
 
   .pesan { margin-top: 14px; border-radius: 14px; padding: 12px 14px; font-size: 14px; line-height: 1.55; }
   .pesan.muat { background: var(--soft); color: #4A4155; }
+  /* layar tunggu: kalau belum selesai setelah beberapa detik, muncul Amsal 16:32a */
+  .ayat { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 12px; overflow: hidden; font-weight: 400; text-align: center; animation: ayat-muncul .6s ease 6s both; }
+  .ayat-ref { font-size: 12px; font-weight: 700; letter-spacing: .03em; color: var(--muted); }
+  .ayat-isi { font-size: 14px; font-style: italic; line-height: 1.5; color: var(--ink); text-wrap: balance; }
+  @keyframes ayat-muncul { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 6em; } }
+  .pesan .ayat { align-items: flex-start; text-align: left; margin-top: 6px; }
   .pesan.kosong { background: var(--soft); color: #4A4155; }
   .pesan.ok { background: #E6F4EA; border: 1px solid #B7DFC2; color: #0D652D; }
   .pesan.gagal { background: #FCE8E6; border: 1px solid #F5C2BD; color: #A50E0E; }
@@ -204,7 +210,7 @@ var DATA = window.__DATA__;
     reset();
     var r = run();
     if (!r) { pesan('gagal', 'Halaman ini perlu dibuka lewat link resmi Evaluasi Pelayanan.'); return; }
-    pesan('muat', 'Memuat jadwal pelayananmu…');
+    pesan('muat', 'Memuat jadwal pelayananmu…<div class="ayat"><span class="ayat-ref">Amsal 16:32a</span><span class="ayat-isi">Orang yang sabar melebihi seorang pahlawan</span></div>');
     r.withSuccessHandler(function (x) {
       if (norm(q.value) !== norm(d.n)) return;
       st.nama = x.nama; st.jadwal = x.jadwal || [];
