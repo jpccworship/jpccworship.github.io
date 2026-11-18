@@ -516,6 +516,8 @@ var DATA = window.__DATA__;
       lihat('vGagal'); $('ulang').addEventListener('click', function () { muat(); });
     });
   }
+  // blockout orang ke-i di tanggal tg untuk ibadah mn (blockout bisa hanya untuk ibadah tertentu, mis. 'Youth')
+  function blokDi(i, tg, mn) { return (IX.blok[i] || []).some(function (b) { return b[0] <= tg && tg <= b[1] && (!b[2] || !mn || b[2].indexOf(mn) >= 0); }); }
   function siapkan() {
     IX = { tugasNama: {}, tugasSlot: {}, semuaTgl: {}, semuaNamaBln: {}, org: {}, blok: {}, nk: {} };
     D.nama.forEach(function (n, i) { IX.nk[norm(n)] = i; });
@@ -529,7 +531,7 @@ var DATA = window.__DATA__;
       (IX.semuaNamaBln[k] = IX.semuaNamaBln[k] || {})[s[0]] = true;
     });
     D.org.forEach(function (o) { IX.org[o[0]] = o; });
-    D.blok.forEach(function (b) { (IX.blok[b[0]] = IX.blok[b[0]] || []).push([b[1], b[2]]); });
+    D.blok.forEach(function (b) { (IX.blok[b[0]] = IX.blok[b[0]] || []).push([b[1], b[2], b[3] || '']); });
     // daftar nama: yang terjadwal (bukan Choir saja), PIC, semua nama Database
     var terj = {};
     D.tugas.forEach(function (t) { if (D.slot[t[0]][1] >= D.batas && t[2] !== 'Choir') terj[t[1]] = true; });
@@ -666,7 +668,7 @@ var DATA = window.__DATA__;
     var saya = iNama(pilihNama.nilai), ym = tg.slice(0, 7);
     var k = D.org.filter(function (o) {
       if (!re.test(o[1]) || !o[kolAkt] || o[7] || sibuk[o[0]] || o[0] === saya) return false;
-      if ((IX.blok[o[0]] || []).some(function (b) { return b[0] <= tg && tg <= b[1]; })) return false;
+      if (blokDi(o[0], tg, mn)) return false;
       return !tukar || bisaDitukar(D.nama[o[0]]).length > 0;
     }).map(function (o) {
       return { n: D.nama[o[0]], cnt: Object.keys(IX.semuaNamaBln[o[0] + '|' + ym] || {}).length, ket: (o[2] || '–') + '  ·  ' + o[3],
@@ -703,7 +705,7 @@ var DATA = window.__DATA__;
       var tg = D.slot[D.tugas[F.jadwal][0]][1], gi = iNama(g);
       var sama = (IX.semuaTgl[tg] || []).filter(function (x) { return x[1] === gi; }).map(function (x) { return x[2]; });
       var bln = Object.keys(IX.semuaNamaBln[gi + '|' + tg.slice(0, 7)] || {}).length;
-      var blk = (IX.blok[gi] || []).some(function (b) { return b[0] <= tg && tg <= b[1]; });
+      var blk = blokDi(gi, tg, D.slot[D.tugas[F.jadwal][0]][2]);
       var ket = '   ·   jadwal bulan ' + BLN[+tg.slice(5, 7) - 1] + ': ' + bln + 'x';
       c.innerHTML = '<div class="info-k ' + (sama.length || blk ? 'warn' : 'ok') + '">' +
         (sama.length ? '⚠ Sudah bertugas di tanggal itu: ' + esc(sama.join('; ')) : blk ? '⚠ Sedang blockout di tanggal itu' : '✓ Kosong di tanggal itu') + esc(ket) + '</div>';
@@ -725,7 +727,7 @@ var DATA = window.__DATA__;
       else {
         var tg2 = D.slot[D.tugas[F.tukar][0]][1], ni = iNama(n);
         var sama2 = (IX.semuaTgl[tg2] || []).filter(function (x) { return x[1] === ni; }).map(function (x) { return x[2]; });
-        var blk2 = (IX.blok[ni] || []).some(function (b) { return b[0] <= tg2 && tg2 <= b[1]; });
+        var blk2 = blokDi(ni, tg2, D.slot[D.tugas[F.tukar][0]][2]);
         ct.innerHTML = '<div class="info-k ' + (sama2.length || blk2 ? 'warn' : 'ok') + '">' +
           (sama2.length ? '⚠ ' + esc(n) + ' sudah bertugas di ' + esc(labelTgl(tg2)) + ': ' + esc(sama2.join('; ')) :
            blk2 ? '⚠ ' + esc(n) + ' sedang blockout di ' + esc(labelTgl(tg2)) : '✓ ' + esc(n) + ' kosong di ' + esc(labelTgl(tg2))) + '</div>';
