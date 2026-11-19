@@ -72,7 +72,7 @@ var DATA = window.__DATA__;
   function gambar() {
     var mentee = X.sebagai === 'Mentee';
     var h = '<h1>Feedback mentoring</h1><p class="sub">Halo <b>' + esc(X.nama) + '</b>, isi sebagai <b>' + esc(X.sebagai.toLowerCase()) + '</b>. Jawabanmu dibaca Tim Evaluation untuk memantau dan membantu jalannya mentoring.</p>' +
-      '<div class="kartu"><dl class="info"><dt>' + (mentee ? 'Mentor' : 'Mentee') + '</dt><dd>' + esc(X.partner) + '</dd><dt>Bidang</dt><dd>' + esc(X.bidang) + '</dd>' +
+      '<div class="kartu"><dl class="info"><dt>' + (mentee ? 'Mentor' : 'Mentee') + '</dt><dd>' + esc(X.partner) + '</dd>' + (X.fokus || X.bidang ? '<dt>Fokus</dt><dd>' + esc(X.fokus || X.bidang) + '</dd>' : '') +
       '<dt>Cycle</dt><dd>' + esc(X.cycle || '–') + '</dd><dt>Periode</dt><dd>' + esc(lp(X.mulai) + ' – ' + lp(X.selesai)) + '</dd></dl></div>';
     if (X.status === 'Dihentikan') { $('isi').innerHTML = h + '<div class="gagal">Mentoring ini sudah dihentikan, feedback tidak perlu diisi lagi.</div>'; return; }
     h += '<div class="kartu"><span class="lbl">Feedback untuk bulan ke-</span><div class="bln" id="bln">';
