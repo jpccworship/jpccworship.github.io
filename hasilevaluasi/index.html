@@ -392,14 +392,15 @@
   .pas-d .pas-pan { width: 8px; height: 8px; border-right: 2px solid #9C97A3; border-bottom: 2px solid #9C97A3; transform: rotate(45deg); margin-top: -4px; }
   .pas-d[open] .pas-pan { transform: rotate(-135deg); margin-top: 4px; }
   .pas-d .orang-l { font-weight: 800; }
+  .pas-fk { font-size: 13px; color: #4A4155; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .pas-isi { padding: 4px 14px 14px; background: var(--soft); }
   .pas-isi .pas-m > div { background: #fff; }
   /* editor tambah pasangan (banyak sekaligus) */
-  .mb-kol, .mb-baris { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 150px 34px; gap: 8px; align-items: center; }
+  .mb-kol, .mb-baris { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 34px; gap: 8px; align-items: center; }
   .mb-kol { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 4px 0 6px; }
   .mb-baris { margin-bottom: 8px; }
   .mb-baris .kotak { position: relative; display: block; }
-  .mb-baris .kotak .inp, .mb-baris select { width: 100%; }
+  .mb-baris .kotak .inp, .mb-baris > .inp { width: 100%; }
   .mb-baris .saran { top: 46px; }
   .bln-thn { display: flex; gap: 6px; }
   .bln-thn select { flex: 1; min-width: 0; }
@@ -1227,7 +1228,7 @@ var DATA = window.__DATA__;
     var me = sebagai(true), mo = sebagai(false);
     var h = '<div class="mm-ring"><div><small>Sebagai mentee</small><b>' + (me.c ? me.c + ' cycle' : '–') + '</b><span>' + (me.c ? esc(rentangBln(me.awal, me.akhir)) : 'belum pernah') + '</span></div>' +
       '<div><small>Sebagai mentor</small><b>' + (mo.c ? mo.c + ' cycle' : '–') + '</b><span>' + (mo.c ? mo.n + ' mentee · ' + esc(rentangBln(mo.awal, mo.akhir)) : 'belum pernah') + '</span></div></div>';
-    h += '<div class="tbl-wrap"><table class="t"><thead><tr><th>Periode</th><th>Sebagai</th><th>Pasangan</th><th>Bidang</th><th class="c">Skor mentee<br>sebelum → selama</th><th class="c">Feedback<br>mentee · mentor</th><th class="c">Jadwal bareng</th><th>Status</th></tr></thead><tbody>' +
+    h += '<div class="tbl-wrap"><table class="t"><thead><tr><th>Periode</th><th>Sebagai</th><th>Pasangan</th><th>Fokus</th><th class="c">Skor mentee<br>sebelum → selama</th><th class="c">Feedback<br>mentee · mentor</th><th class="c">Jadwal bareng</th><th>Status</th></tr></thead><tbody>' +
       L.map(function (p) {
         var c = IX.cyc[p[1]] || ['', '(cycle?)', '', ''], mentee = p[9] === k, fb = IX.fb[p[0]] || [];
         var fbM = rata(fb.filter(function (f) { return f[2] === 'Mentee'; }).map(function (f) { return f[6]; })), fbT = rata(fb.filter(function (f) { return f[2] === 'Mentor'; }).map(function (f) { return f[6]; }));
@@ -1235,7 +1236,7 @@ var DATA = window.__DATA__;
         return '<tr><td style="white-space:nowrap"><b>' + esc(rentangBln(c[2], c[3])) + '</b><div class="kecil">' + esc(c[1]) + '</div></td>' +
           '<td><span class="chip' + (mentee ? '' : ' hijau') + '">' + (mentee ? 'Mentee' : 'Mentor') + '</span></td>' +
           '<td>' + (mentee ? orangL(p[8], p[3]) : orangL(p[9], p[4])) + '<div class="kecil">' + (mentee ? 'mentor' : 'mentee') + '</div></td>' +
-          '<td>' + esc(p[2]) + '</td>' +
+          '<td class="kecil" style="min-width:150px">' + esc(p[5] || p[2] || '–') + '</td>' +
           '<td class="c" style="white-space:nowrap">' + nilai(p[10]) + ' → ' + nilai(p[11]) + (dl !== null ? ' <b class="' + kelasDelta(dl) + '">' + teksDelta(dl) + '</b>' : '') + '<div class="kecil">' + p[12] + ' pelayanan dinilai</div></td>' +
           '<td class="c">' + (fbM !== null ? nilai(fbM, 1) : '–') + ' · ' + (fbT !== null ? nilai(fbT, 1) : '–') + '</td>' +
           '<td class="c">' + bareng + '×</td><td>' + chipStatusPas(p) + '</td></tr>';
@@ -1643,14 +1644,14 @@ var DATA = window.__DATA__;
     var P = (IX.pasCyc[MM.cyc] || []).slice().sort(function (a, b) { return a[4] < b[4] ? -1 : a[4] > b[4] ? 1 : 0; });
     h += '<div class="kartu"><div class="bag-h"><div><h3 class="judul-bag">Pasangan di cycle ini · ' + P.length + '</h3><p class="ket">Klik baris untuk detail: jadwal bareng, feedback, monitoring, link feedback.</p></div>' +
       '<button type="button" class="btn2 isi" id="mmPasBaru">+ Tambah pasangan</button></div>' +
-      (P.length ? '<div class="pas-list"><div class="pas-kol"><span>Mentee</span><span>Mentor</span><span>Bidang</span><span>Skor mentee</span><span>Status</span><span></span></div>' + P.map(barisPasangan).join('') + '</div>'
+      (P.length ? '<div class="pas-list"><div class="pas-kol"><span>Mentee</span><span>Mentor</span><span>Fokus</span><span>Skor mentee</span><span>Status</span><span></span></div>' + P.map(barisPasangan).join('') + '</div>'
         : '<div class="kosong">Belum ada pasangan. Tekan <b>+ Tambah pasangan</b>, lalu pilih mentee &amp; mentornya dari Database.</div>') + '</div>';
     $('mmIsi').innerHTML = h;
   }
   function barisPasangan(p) {
     var dl = p[10] !== '' && p[11] !== '' ? p[11] - p[10] : null;
     return '<details class="pas-d"><summary><span data-l="Mentee">' + orangL(p[9], p[4]) + '</span><span data-l="Mentor">' + orangL(p[8], p[3]) + '</span>' +
-      '<span data-l="Bidang"><span class="tag" style="--c:#4B2E83">' + esc(p[2]) + '</span></span>' +
+      '<span data-l="Fokus" class="pas-fk">' + (p[5] || p[2] ? esc(p[5] || p[2]) : '<span style="color:var(--muted)">–</span>') + '</span>' +
       '<span data-l="Skor mentee">' + nilai(p[10]) + ' → ' + nilai(p[11]) + (dl !== null ? ' <b class="' + kelasDelta(dl) + '">' + teksDelta(dl) + '</b>' : '') + '</span>' +
       '<span data-l="Status">' + chipStatusPas(p) + '</span><i class="pas-pan" aria-hidden="true"></i></summary>' + kartuPasangan(p) + '</details>';
   }
@@ -1747,26 +1748,14 @@ var DATA = window.__DATA__;
       $('cYa').addEventListener('click', function () { panggil('hsHapusCycle', [TOK, id], function (r) { tutupModal(); toast(r.pesan); MM.cyc = ''; muat(true); }, function (m) { el.textContent = m; }); });
     });
   }
-  var KATA_BIDANG = { 'Worship leader': /WL\/MD|worship leader|\bwl\b/i, 'Music director': /WL\/MD|music director|\bmd\b/i, 'Singer': /vocal|singer|vokal/i, 'Keys': /keys|keyboard|piano/i,
-    'Guitar': /guitar|gitar/i, 'Bass': /bass/i, 'Drums': /drum/i, 'Strings & brass': /violin|viola|cello|sax|string|brass|trumpet|trombone|flute/i, 'Perkusi': /perkusi|percussion/i, 'Playback engineer': /playback/i };
-  function saringBidang(bidang) {
-    var kata = KATA_BIDANG[bidang];
-    return function (o) { return !kata || kata.test(o[2]); };
-  }
-  /** Bidang dari posisi orang di Database: posisi yang ditulis paling depan (Position 1 dulu). */
-  function tebakBidang(o) {
-    var t = String(o && o[2] || ''), best = '', pos = 1e9;
-    D.opsi.bidang.forEach(function (b) { var re = KATA_BIDANG[b], i = re ? t.search(re) : -1; if (i >= 0 && i < pos) { pos = i; best = b; } });
-    return best;
-  }
-  /** Tambah banyak pasangan sekaligus ke satu cycle (nama dari Database). */
+  /** Tambah banyak pasangan sekaligus ke satu cycle (nama dari Database). Mentor boleh dari instrumen / peran apa pun. */
   function editorBanyak(cycId) {
     var c = IX.cyc[cycId];
     if (!c) return;
     var sudah = {};
     (IX.pasCyc[cycId] || []).forEach(function (p) { if (p[6] !== 'Dihentikan') sudah[p[9]] = p[3]; });
-    var isi = '<p class="ket" style="margin-top:0">' + esc(c[1] + ' · ' + rentangBln(c[2], c[3])) + '. Ketik nama mentee &amp; mentornya, lalu pilih dari daftar (Database). Bidang terisi otomatis dari posisi mentee, bisa diganti. Satu mentor boleh punya beberapa mentee.</p>' +
-      '<div class="mb-kol"><span>Mentee</span><span>Mentor</span><span>Bidang</span><span></span></div><div id="bRows"></div>' +
+    var isi = '<p class="ket" style="margin-top:0">' + esc(c[1] + ' · ' + rentangBln(c[2], c[3])) + '. Ketik nama mentee &amp; mentornya, lalu pilih dari daftar (Database). Mentor tidak harus satu instrumen, mis. bass mentorin drum, keys mentorin guitar, MD mentorin WL. Satu mentor boleh punya beberapa mentee.</p>' +
+      '<div class="mb-kol"><span>Mentee</span><span>Mentor</span><span>Fokus mentee (opsional)</span><span></span></div><div id="bRows"></div>' +
       '<button type="button" class="btn2" id="bTambah" style="margin-top:2px">+ Tambah baris</button><div class="salah-f" id="bSalah"></div>';
     bukaModal('Tambah pasangan · ' + c[1], isi, '<button type="button" class="btn2" data-tutup>Batal</button><button type="button" class="btn" id="bSimpan">Simpan pasangan</button>');
     var baris = function () {
@@ -1774,23 +1763,18 @@ var DATA = window.__DATA__;
       el.className = 'mb-baris';
       el.innerHTML = '<span class="kotak"><input class="inp" data-f="mentee" autocomplete="off" placeholder="Nama mentee"><span class="saran"></span></span>' +
         '<span class="kotak"><input class="inp" data-f="mentor" autocomplete="off" placeholder="Nama mentor"><span class="saran"></span></span>' +
-        '<select data-f="bidang" aria-label="Bidang"><option value="">Bidang…</option>' + opsiSel(D.opsi.bidang, '') + '</select>' +
+        '<input class="inp" data-f="fokus" maxlength="600" placeholder="mis. groove & timing bareng bass">' +
         '<button type="button" class="ikon" data-hapus aria-label="Hapus baris">' + IKON_X + '</button>';
       $('bRows').appendChild(el);
-      var q = function (f) { return el.querySelector('[data-f="' + f + '"]'); }, manual = false;
-      var tebak = function () { var k = IX.nama[norm(q('mentee').value)]; if (k && !manual) { var b = tebakBidang(IX.orang[k]); if (b) q('bidang').value = b; } };
-      q('bidang').addEventListener('change', function () { manual = true; });
-      Pilih(q('mentee'), q('mentee').nextElementSibling, function (o) { q('mentee').value = o[1]; tebak(); },
+      var q = function (f) { return el.querySelector('[data-f="' + f + '"]'); };
+      Pilih(q('mentee'), q('mentee').nextElementSibling, function (o) { q('mentee').value = o[1]; },
         { ket: function (o) { return sudah[o[0]] ? ' · sudah di cycle ini (mentor: ' + sudah[o[0]] + ')' : ''; } });
       Pilih(q('mentor'), q('mentor').nextElementSibling, function (o) { q('mentor').value = o[1]; }, {
         awal: function () {
-          var b = q('bidang').value, km = IX.nama[norm(q('mentee').value)];
-          if (!b) return [];
-          var f = saringBidang(b);
-          return D.orang.filter(function (o) { return f(o) && o[5] !== '' && o[0] !== km; }).sort(function (x, z) { return z[5] - x[5]; }).slice(0, 8);
+          var km = IX.nama[norm(q('mentee').value)];
+          return D.orang.filter(function (o) { return o[5] !== '' && o[0] !== km; }).sort(function (x, z) { return z[5] - x[5]; }).slice(0, 8);
         },
-        judulAwal: 'Saran mentor · skor tertinggi di bidang ini' });
-      q('mentee').addEventListener('change', tebak);
+        judulAwal: 'Saran mentor · skor tertinggi (instrumen apa pun)' });
       return el;
     };
     baris(); baris(); baris();
@@ -1800,24 +1784,23 @@ var DATA = window.__DATA__;
       if (!b) return;
       var r = b.closest('.mb-baris');
       if ($('bRows').children.length > 1) r.parentNode.removeChild(r);
-      else Array.prototype.forEach.call(r.querySelectorAll('input,select'), function (x) { x.value = ''; });
+      else Array.prototype.forEach.call(r.querySelectorAll('input'), function (x) { x.value = ''; });
     });
     $('bSimpan').addEventListener('click', function () {
       var list = [], salah = '', dipakai = {};
       Array.prototype.forEach.call($('bRows').children, function (r, i) {
         if (salah) return;
         var v = function (f) { return r.querySelector('[data-f="' + f + '"]').value.trim(); };
-        var me = v('mentee'), mo = v('mentor'), bd = v('bidang'), no = 'Baris ' + (i + 1) + ': ';
+        var me = v('mentee'), mo = v('mentor'), no = 'Baris ' + (i + 1) + ': ';
         if (!me && !mo) return;
         var kme = IX.nama[norm(me)], kmo = IX.nama[norm(mo)];
         if (!kme) { salah = no + (me ? '"' + me + '" tidak ada di Database. Pilih dari daftar nama.' : 'isi nama mentee.'); return; }
         if (!kmo) { salah = no + (mo ? '"' + mo + '" tidak ada di Database. Pilih dari daftar nama.' : 'isi nama mentor.'); return; }
         if (kme === kmo) { salah = no + 'mentor dan mentee tidak boleh orang yang sama.'; return; }
-        if (!bd) { salah = no + 'pilih bidang.'; return; }
         if (sudah[kme]) { salah = no + IX.orang[kme][1] + ' sudah punya mentor di cycle ini (' + sudah[kme] + ').'; return; }
         if (dipakai[kme]) { salah = IX.orang[kme][1] + ' diisi dua kali sebagai mentee (baris ' + dipakai[kme] + ' dan ' + (i + 1) + ').'; return; }
         dipakai[kme] = i + 1;
-        list.push({ mentee: IX.orang[kme][1], mentor: IX.orang[kmo][1], bidang: bd });
+        list.push({ mentee: IX.orang[kme][1], mentor: IX.orang[kmo][1], bidang: '', fokus: v('fokus') });
       });
       if (salah) { $('bSalah').textContent = salah; return; }
       if (!list.length) { $('bSalah').textContent = 'Isi minimal satu pasangan.'; return; }
@@ -1830,18 +1813,16 @@ var DATA = window.__DATA__;
   function editorPasangan(id) {
     var p = id ? IX.pas[id] : null, val = { mentor: p ? p[3] : '', mentee: p ? p[4] : '' };
     var isi = '<div class="fg"><label>Cycle<select id="pCyc">' + D.cycle.map(function (c) { return '<option value="' + esc(c[0]) + '"' + ((p ? p[1] : MM.cyc) === c[0] ? ' selected' : '') + '>' + esc(c[1]) + '</option>'; }).join('') + '</select></label>' +
-      '<label>Bidang (instrumen / peran)<select id="pBidang">' + opsiSel(D.opsi.bidang, p ? p[2] : 'Keys') + '</select></label>' +
-      '<label class="full">Mentor<span class="kotak" style="position:relative;display:block"><input class="inp" id="pMentor" style="width:100%" autocomplete="off" value="' + esc(val.mentor) + '" placeholder="Ketik nama, atau pilih dari saran (skor tertinggi di bidang ini)"><span class="saran" id="pSaranMentor" style="top:46px"></span></span></label>' +
-      '<label class="full">Mentee<span class="kotak" style="position:relative;display:block"><input class="inp" id="pMentee" style="width:100%" autocomplete="off" value="' + esc(val.mentee) + '" placeholder="Ketik nama, atau pilih dari saran (skor terendah di bidang ini)"><span class="saran" id="pSaranMentee" style="top:46px"></span></span></label>' +
-      '<label class="full">Fokus / target<textarea id="pFokus" maxlength="600" placeholder="mis. Voicing & dinamika, konsisten dengan click">' + esc(p ? p[5] : '') + '</textarea></label>' +
+      '<label class="full">Mentor<span class="kotak" style="position:relative;display:block"><input class="inp" id="pMentor" style="width:100%" autocomplete="off" value="' + esc(val.mentor) + '" placeholder="Ketik nama (instrumen / peran apa pun), atau pilih dari saran"><span class="saran" id="pSaranMentor" style="top:46px"></span></span></label>' +
+      '<label class="full">Mentee<span class="kotak" style="position:relative;display:block"><input class="inp" id="pMentee" style="width:100%" autocomplete="off" value="' + esc(val.mentee) + '" placeholder="Ketik nama, atau pilih dari saran (skor terendah)"><span class="saran" id="pSaranMentee" style="top:46px"></span></span></label>' +
+      '<label class="full">Fokus mentee (yang mau ditingkatkan)<textarea id="pFokus" maxlength="600" placeholder="mis. groove & timing bareng bass, voicing & dinamika, stage readiness">' + esc(p ? p[5] : '') + '</textarea></label>' +
       '<label class="full">Status<span class="seg" id="pStatus">' + D.opsi.statusPasangan.map(function (s) { return '<button type="button" data-v="' + s + '"' + ((p ? p[6] : 'Aktif') === s ? ' class="on"' : '') + '>' + s + '</button>'; }).join('') + '</span></label>' +
       '<label class="full">Catatan<textarea id="pCat" maxlength="1500">' + esc(p ? p[7] : '') + '</textarea></label></div>' +
-      '<p class="ket" style="margin:10px 0 0">Mentor & mentee sebaiknya dijadwalkan di service yang sama minimal 1x sebulan (mis. Keys 1 & Keys 2). Pasangan ini muncul di tab <b>Mentor Mentee</b> file Admin untuk penjadwal.</p><div class="salah-f" id="pSalah"></div>';
+      '<p class="ket" style="margin:10px 0 0">Mentor & mentee sebaiknya dijadwalkan di service yang sama minimal 1x sebulan (mis. drum & bass, keys & guitar, WL & MD). Pasangan ini muncul di tab <b>Mentor Mentee</b> file Admin untuk penjadwal.</p><div class="salah-f" id="pSalah"></div>';
     bukaModal(id ? 'Ubah pasangan' : 'Pasangan mentor–mentee baru', isi, (id ? '<button type="button" class="btn2 merah kiri" id="pHapus">Hapus</button>' : '') + '<button type="button" class="btn2" data-tutup>Batal</button><button type="button" class="btn" id="pSimpan">Simpan pasangan</button>');
     var urutBidang = function (naik) {
       return function () {
-        var f = saringBidang($('pBidang').value);
-        return D.orang.filter(function (o) { return f(o) && o[5] !== ''; }).sort(function (a, b) { return naik ? a[5] - b[5] : b[5] - a[5]; }).slice(0, 8);
+        return D.orang.filter(function (o) { return o[5] !== ''; }).sort(function (a, b) { return naik ? a[5] - b[5] : b[5] - a[5]; }).slice(0, 8);
       };
     };
     Pilih($('pMentor'), $('pSaranMentor'), function (o) { $('pMentor').value = o[1]; }, { awal: urutBidang(false), judulAwal: 'Saran mentor · skor tertinggi', saring: null });
@@ -1849,7 +1830,7 @@ var DATA = window.__DATA__;
     $('pStatus').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; Array.prototype.forEach.call($('pStatus').children, function (x) { x.classList.toggle('on', x === b); }); });
     $('pSimpan').addEventListener('click', function () {
       var cek = function (n) { return IX.nama[norm(n)] ? IX.orang[IX.nama[norm(n)]][1] : ''; };
-      var x = { id: id || '', cyc: $('pCyc').value, bidang: $('pBidang').value, mentor: cek($('pMentor').value), mentee: cek($('pMentee').value),
+      var x = { id: id || '', cyc: $('pCyc').value, bidang: p ? p[2] : '', mentor: cek($('pMentor').value), mentee: cek($('pMentee').value),
         fokus: $('pFokus').value.trim(), status: $('pStatus').querySelector('.on').getAttribute('data-v'), cat: $('pCat').value.trim() };
       if (!x.mentor) { $('pSalah').textContent = 'Pilih mentor dari daftar nama (Database).'; return; }
       if (!x.mentee) { $('pSalah').textContent = 'Pilih mentee dari daftar nama (Database).'; return; }
@@ -1864,7 +1845,7 @@ var DATA = window.__DATA__;
   }
   function editorMonitor(id) {
     var p = IX.pas[id], prog = '';
-    var isi = '<p class="ket" style="margin-top:0">' + esc(p[3] + ' → ' + p[4] + ' · ' + p[2]) + '</p><div class="fg"><label>Tanggal<input class="inp" id="oT" type="date" value="' + esc(D.kini) + '"></label>' +
+    var isi = '<p class="ket" style="margin-top:0">' + esc(p[3] + ' → ' + p[4] + (p[5] ? ' · ' + p[5] : '')) + '</p><div class="fg"><label>Tanggal<input class="inp" id="oT" type="date" value="' + esc(D.kini) + '"></label>' +
       '<label>Jenis<select id="oJenis">' + opsiSel(D.opsi.jenisMonitor, (IX.mon[id] || []).length ? 'Check-in' : 'Kick-off') + '</select></label>' +
       '<label class="full">Progres (opsional)<span class="nilai-pilih" id="oProg">' + [1, 2, 3, 4, 5].map(function (v) { return '<button type="button" data-v="' + v + '">' + v + '</button>'; }).join('') + '</span><small>1 = belum ada kemajuan · 3 = sesuai rencana · 5 = jauh melampaui target</small></label>' +
       '<label class="full">Catatan<textarea id="oCat" maxlength="1500" placeholder="Apa yang sudah dilakukan, kemajuan, kendala, rencana bulan depan…"></textarea></label></div><div class="salah-f" id="oSalah"></div>';
@@ -1882,7 +1863,7 @@ var DATA = window.__DATA__;
     bukaModal('Link feedback', '<div class="muat" style="padding:30px 0"><i></i><span>Membuat link…</span></div>', '', true);
     panggil('hsLinkFeedback', [TOK, id], function (r) {
       var teks = function (peran, nama, link) {
-        return 'Halo ' + nama + ', terima kasih sudah ikut mentoring ' + p[2] + ' (' + (peran === 'mentor' ? 'mentee: ' + p[4] : 'mentor: ' + p[3]) + '). Mohon isi feedback bulan ini (±2 menit): ' + link;
+        return 'Halo ' + nama + ', terima kasih sudah ikut mentoring (' + (peran === 'mentor' ? 'mentee: ' + p[4] : 'mentor: ' + p[3]) + '). Mohon isi feedback bulan ini (±2 menit): ' + link;
       };
       var blok = function (peran, nama, link) {
         var t = teks(peran, nama, link);
@@ -1898,7 +1879,7 @@ var DATA = window.__DATA__;
   function riwayatPasangan(id) {
     var p = IX.pas[id], mon = IX.mon[id] || [], fb = (IX.fb[id] || []).slice().sort(function (a, b) { return a[4] - b[4] || (a[0] < b[0] ? -1 : 1); });
     var soal = D.opsi.soalFb;
-    var isi = '<p class="ket" style="margin-top:0">' + esc(p[3] + ' → ' + p[4] + ' · ' + p[2]) + '</p><h3 style="font-size:14px;margin:0 0 8px">Monitoring Tim Evaluation</h3>' +
+    var isi = '<p class="ket" style="margin-top:0">' + esc(p[3] + ' → ' + p[4] + (p[5] ? ' · ' + p[5] : '')) + '</p><h3 style="font-size:14px;margin:0 0 8px">Monitoring Tim Evaluation</h3>' +
       (mon.length ? '<div class="feed">' + mon.map(function (m) { return '<div class="f"><div class="h"><span>' + esc(m[3] + ' · ' + lt(m[2])) + '</span><span>' + (m[4] ? 'progres ' + m[4] + '/5' : '') + '</span></div>' + esc(m[5]) + '</div>'; }).join('') + '</div>' : '<div class="kosong">Belum ada catatan monitoring.</div>') +
       '<h3 style="font-size:14px;margin:18px 0 8px">Feedback mentor &amp; mentee</h3>' +
       (fb.length ? '<div class="tbl-wrap"><table class="t"><thead><tr><th>Bulan</th><th>Dari</th>' + [1, 2, 3, 4].map(function (i) { return '<th class="c" title="' + esc(soal.Mentee[i - 1] + ' / ' + soal.Mentor[i - 1]) + '">Q' + i + '</th>'; }).join('') + '<th class="c">Rata-rata</th><th>Catatan</th></tr></thead><tbody>' +
