@@ -376,6 +376,57 @@
   .pas-f { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
   .catatan-mm { margin-top: 10px; font-size: 13px; line-height: 1.5; color: #3C3744; background: var(--soft); border-radius: 12px; padding: 9px 12px; }
   .catatan-mm small { display: block; color: var(--muted); font-size: 11.5px; }
+  /* mentor: daftar pasangan per cycle (klik baris = detail) */
+  .langkah-mm { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .langkah-mm > div { display: flex; gap: 10px; background: #FBFAFD; border: 1px solid #F1EEF5; border-radius: 12px; padding: 12px; font-size: 13px; line-height: 1.5; color: #4A4155; }
+  .langkah-mm b { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-size: 13px; }
+  .langkah-mm strong { display: block; color: var(--ink); font-size: 14px; }
+  .pas-list { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .pas-kol, .pas-d > summary { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.3fr) minmax(0, .9fr) minmax(0, 1fr) 112px 14px; gap: 10px; align-items: center; padding: 10px 14px; }
+  .pas-kol { background: #F6F3FB; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #4A4155; }
+  .pas-d { border-top: 1px solid #F1EEF5; }
+  .pas-d > summary { cursor: pointer; list-style: none; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .pas-d > summary::-webkit-details-marker { display: none; }
+  .pas-d > summary:hover { background: #FCFBFE; }
+  .pas-d[open] > summary { background: var(--soft); }
+  .pas-d .pas-pan { width: 8px; height: 8px; border-right: 2px solid #9C97A3; border-bottom: 2px solid #9C97A3; transform: rotate(45deg); margin-top: -4px; }
+  .pas-d[open] .pas-pan { transform: rotate(-135deg); margin-top: 4px; }
+  .pas-d .orang-l { font-weight: 800; }
+  .pas-isi { padding: 4px 14px 14px; background: var(--soft); }
+  .pas-isi .pas-m > div { background: #fff; }
+  /* editor tambah pasangan (banyak sekaligus) */
+  .mb-kol, .mb-baris { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 150px 34px; gap: 8px; align-items: center; }
+  .mb-kol { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 4px 0 6px; }
+  .mb-baris { margin-bottom: 8px; }
+  .mb-baris .kotak { position: relative; display: block; }
+  .mb-baris .kotak .inp, .mb-baris select { width: 100%; }
+  .mb-baris .saran { top: 46px; }
+  .bln-thn { display: flex; gap: 6px; }
+  .bln-thn select { flex: 1; min-width: 0; }
+  details.detail-op > summary { cursor: pointer; font-size: 13px; font-weight: 800; color: var(--brand); }
+  /* Volunteer Card: riwayat mentorship */
+  .mm-ring { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .mm-ring > div { background: #FBFAFD; border: 1px solid #F1EEF5; border-radius: 12px; padding: 10px 12px; }
+  .mm-ring small { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .mm-ring b { display: block; font-size: 18px; margin-top: 2px; }
+  .mm-ring span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  /* dashboard: "N orang" bisa diklik */
+  .link-n { background: none; border: 0; padding: 0; font: inherit; font-weight: 800; color: var(--bad); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .link-n:hover { color: #A11F17; }
+  .butir-k { display: inline-flex; align-items: center; gap: 6px; margin: 2px 12px 2px 0; font-size: 13px; }
+  @media (max-width: 720px) {
+    .langkah-mm { grid-template-columns: 1fr; }
+    .pas-kol { display: none; }
+    .pas-d > summary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 14px; row-gap: 8px; }
+    .pas-d > summary > [data-l]::before { content: attr(data-l); display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+    .pas-d > summary > .pas-pan { grid-column: 3; grid-row: 1; }
+    .pas-d > summary > [data-l="Status"] { grid-column: 1 / span 2; }
+    #mmIsi .kpi { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .mb-kol { display: none; }
+    .mb-baris { grid-template-columns: minmax(0, 1fr) 34px; grid-template-areas: "me hp" "mo mo" "bd bd"; padding: 10px; border: 1px solid var(--line); border-radius: 12px; }
+    .mb-baris > :nth-child(1) { grid-area: me; } .mb-baris > :nth-child(2) { grid-area: mo; } .mb-baris > :nth-child(3) { grid-area: bd; } .mb-baris > :nth-child(4) { grid-area: hp; }
+    .mm-ring { grid-template-columns: 1fr; }
+  }
   .nilai-pilih { display: flex; gap: 6px; }
   .nilai-pilih button { width: 42px; height: 42px; border-radius: 11px; border: 1.5px solid #CFC7DD; background: #fff; font-size: 16px; font-weight: 800; cursor: pointer; color: var(--ink); }
   .nilai-pilih button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
@@ -887,7 +938,7 @@ var DATA = window.__DATA__;
         I.grup.map(function (g) {
           return '<tr><td class="nm sticky">' + esc(g[0]) + '</td><td class="c">' + g[1] + '</td><td class="c">' + g[2] + '</td><td class="c">' + pill(g[3], 1) + '</td>' +
             g[4].map(function (v) { return '<td class="c">' + pill(v) + '</td>'; }).join('') +
-            '<td class="kecil lebar">' + (g[5] ? esc(g[5][1]) + ' ' + pill(g[5][2]) : '–') + '</td><td class="c">' + (g[7] ? '<b style="color:var(--bad)">' + g[7] + ' orang</b>' : '–') + '</td>' +
+            '<td class="kecil lebar">' + (g[5] ? esc(g[5][1]) + ' ' + pill(g[5][2]) : '–') + '</td><td class="c">' + (g[7] ? (g[8] ? '<button type="button" class="link-n" data-perlu="' + esc(g[0]) + '" title="Lihat siapa saja">' + g[7] + ' orang</button>' : '<b style="color:var(--bad)">' + g[7] + ' orang</b>') : '–') + '</td>' +
             '<td class="kecil lebar">' + (g[6] ? esc(g[6][1]) + ' ' + pill(g[6][2]) : '–') + '</td></tr>';
         }).join('') + '</tbody></table></div></div>';
     }
@@ -955,6 +1006,18 @@ var DATA = window.__DATA__;
     $('dIsi').innerHTML = h;
     gambarSemua();
   }
+  // "N orang" di bawah standar -> daftar nama + butirnya (klik nama = Volunteer Card)
+  $('dIsi').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-perlu]');
+    if (!b || !DASH) return;
+    var g = DASH.internal.grup.filter(function (x) { return x[0] === b.getAttribute('data-perlu'); })[0];
+    if (!g || !g[8]) return;
+    var isi = '<p class="ket" style="margin-top:0">Orang dengan minimal 1 butir di bawah standar (&lt; 3.0) · ' + esc([F.periode, F.mns, F.camp].join(' · ').toLowerCase()) + '. Klik nama untuk buka Volunteer Card.</p>' +
+      '<div class="tbl-wrap"><table class="t"><thead><tr><th>Nama</th><th>Butir di bawah standar</th></tr></thead><tbody>' +
+      g[8].map(function (o) { return '<tr><td style="white-space:nowrap">' + orangL(o[0], o[1]) + '</td><td>' + o[2].map(function (x) { return '<span class="butir-k">' + esc(x[0]) + ' ' + pill(x[1]) + '</span>'; }).join('') + '</td></tr>'; }).join('') +
+      '</tbody></table></div>';
+    bukaModal('Di bawah standar · ' + g[0] + ' · ' + g[7] + ' orang', isi, '<button type="button" class="btn2" data-tutup>Tutup</button>');
+  });
   function gambarSemua() {
     var I = DASH.internal, A = D.opsi.aspek, q = norm(cariSemua);
     var L = I.semua.filter(function (o) { return !q || norm(o[1] + ' ' + o[5] + ' ' + o[6]).indexOf(q) >= 0; });
@@ -1053,10 +1116,8 @@ var DATA = window.__DATA__;
       h += '<div class="kartu"><div class="kosong">Belum ada hasil evaluasi dari rekan untuk ' + esc(d.n || o[1]) + '.</div></div>';
     }
     // perjalanan, program, mentoring
-    h += '<div class="grid-2">';
     h += '<div class="kartu"><h3>Perjalanan</h3><p class="ket">Audisi → induction → probation → deployment (dari program Tim Development).</p>' + perjalananOrang(prog) + '</div>';
-    h += '<div class="kartu"><h3>Mentoring</h3>' + mentoringOrang(k) + '</div>';
-    h += '</div>';
+    h += '<div class="kartu"><h3>Riwayat mentorship</h3><p class="ket">Semua cycle mentor–mentee yang pernah diikuti. Skor mentee = rata-rata evaluasi rekan: 3 pelayanan sebelum cycle → selama cycle (bidang yang sama).</p>' + mentoringOrang(k) + '</div>';
     var belajar = prog.filter(function (p) { return D.opsi.belajar.indexOf(p[1]) >= 0; });
     h += '<div class="kartu"><h3>Program &amp; training</h3><p class="ket">Skor sebelum / sesudah = rata-rata 3 pelayanan terakhir sebelum dan 3 pelayanan pertama sesudah program.</p>' +
       (belajar.length ? '<div class="tbl-wrap"><table class="t"><thead><tr><th>Tanggal</th><th>Program</th><th>Sebagai</th><th>Status</th><th class="c">Sebelum</th><th class="c">Sesudah</th><th class="c">Perubahan</th></tr></thead><tbody>' +
@@ -1154,20 +1215,33 @@ var DATA = window.__DATA__;
     return ada ? h : '<div class="kosong">Belum tercatat di program audisi / induction / probation / deployment (anggota lama, atau datanya belum diisi).</div>';
   }
   function mentoringOrang(k) {
-    var L = D.pasangan.filter(function (p) { return p[8] === k || p[9] === k; });
+    var mulaiC = function (p) { return (IX.cyc[p[1]] || [])[2] || ''; };
+    var L = D.pasangan.filter(function (p) { return p[8] === k || p[9] === k; }).sort(function (a, b) { return mulaiC(a) < mulaiC(b) ? 1 : mulaiC(a) > mulaiC(b) ? -1 : 0; });
     if (!L.length) return '<div class="kosong">Belum pernah ikut program mentor–mentee.</div>';
-    return L.map(function (p) {
-      var c = IX.cyc[p[1]] || ['', '(cycle?)', '', ''], mentee = p[9] === k, fb = IX.fb[p[0]] || [], mon = IX.mon[p[0]] || [];
-      var fbM = rata(fb.filter(function (f) { return f[2] === 'Mentee'; }).map(function (f) { return f[6]; })), fbT = rata(fb.filter(function (f) { return f[2] === 'Mentor'; }).map(function (f) { return f[6]; }));
-      var bareng = Object.keys(p[13]).reduce(function (a, b) { return a + (p[13][b] || 0); }, 0);
-      return '<div class="mm-kartu"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>' + (mentee ? 'Mentee dari ' + orangL(p[8], p[3]) : 'Mentor untuk ' + orangL(p[9], p[4])) + '</b>' + chipStatusPas(p) + '</div>' +
-        '<div class="kecil" style="font-size:12.5px;color:var(--muted);margin-top:4px">' + esc(p[2] + ' · ' + c[1] + ' · ' + rentang(c[2], c[3])) + '</div>' +
-        '<div class="pas-m" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><small>Skor mentee</small><b>' + nilai(p[10]) + ' → ' + nilai(p[11]) + '</b><span>sebelum → selama</span></div>' +
-        '<div><small>Feedback</small><b>' + (fbM !== null ? nilai(fbM, 1) : '–') + ' · ' + (fbT !== null ? nilai(fbT, 1) : '–') + '</b><span>dari mentee · mentor</span></div><div><small>Dijadwal bareng</small><b>' + bareng + '×</b><span>' + mon.length + ' catatan monitoring</span></div></div>' +
-        (mon[0] ? '<div class="catatan-mm"><small>' + esc(mon[0][3] + ' · ' + lp(mon[0][2])) + '</small>' + esc(mon[0][5]) + '</div>' : '') + '</div>';
-    }).join('');
+    var sebagai = function (mentee) {
+      var X = L.filter(function (p) { return (p[9] === k) === mentee; }), cy = {};
+      X.forEach(function (p) { if (IX.cyc[p[1]]) cy[p[1]] = IX.cyc[p[1]]; });
+      var C3 = Object.keys(cy).map(function (i) { return cy[i]; }).sort(function (a, b) { return a[2] < b[2] ? -1 : 1; });
+      return { n: X.length, c: C3.length, awal: C3.length ? C3[0][2] : '', akhir: C3.length ? C3[C3.length - 1][3] : '' };
+    };
+    var me = sebagai(true), mo = sebagai(false);
+    var h = '<div class="mm-ring"><div><small>Sebagai mentee</small><b>' + (me.c ? me.c + ' cycle' : '–') + '</b><span>' + (me.c ? esc(rentangBln(me.awal, me.akhir)) : 'belum pernah') + '</span></div>' +
+      '<div><small>Sebagai mentor</small><b>' + (mo.c ? mo.c + ' cycle' : '–') + '</b><span>' + (mo.c ? mo.n + ' mentee · ' + esc(rentangBln(mo.awal, mo.akhir)) : 'belum pernah') + '</span></div></div>';
+    h += '<div class="tbl-wrap"><table class="t"><thead><tr><th>Periode</th><th>Sebagai</th><th>Pasangan</th><th>Bidang</th><th class="c">Skor mentee<br>sebelum → selama</th><th class="c">Feedback<br>mentee · mentor</th><th class="c">Jadwal bareng</th><th>Status</th></tr></thead><tbody>' +
+      L.map(function (p) {
+        var c = IX.cyc[p[1]] || ['', '(cycle?)', '', ''], mentee = p[9] === k, fb = IX.fb[p[0]] || [];
+        var fbM = rata(fb.filter(function (f) { return f[2] === 'Mentee'; }).map(function (f) { return f[6]; })), fbT = rata(fb.filter(function (f) { return f[2] === 'Mentor'; }).map(function (f) { return f[6]; }));
+        var dl = p[10] !== '' && p[11] !== '' ? p[11] - p[10] : null, bareng = Object.keys(p[13]).reduce(function (a, b) { return a + (p[13][b] || 0); }, 0);
+        return '<tr><td style="white-space:nowrap"><b>' + esc(rentangBln(c[2], c[3])) + '</b><div class="kecil">' + esc(c[1]) + '</div></td>' +
+          '<td><span class="chip' + (mentee ? '' : ' hijau') + '">' + (mentee ? 'Mentee' : 'Mentor') + '</span></td>' +
+          '<td>' + (mentee ? orangL(p[8], p[3]) : orangL(p[9], p[4])) + '<div class="kecil">' + (mentee ? 'mentor' : 'mentee') + '</div></td>' +
+          '<td>' + esc(p[2]) + '</td>' +
+          '<td class="c" style="white-space:nowrap">' + nilai(p[10]) + ' → ' + nilai(p[11]) + (dl !== null ? ' <b class="' + kelasDelta(dl) + '">' + teksDelta(dl) + '</b>' : '') + '<div class="kecil">' + p[12] + ' pelayanan dinilai</div></td>' +
+          '<td class="c">' + (fbM !== null ? nilai(fbM, 1) : '–') + ' · ' + (fbT !== null ? nilai(fbT, 1) : '–') + '</td>' +
+          '<td class="c">' + bareng + '×</td><td>' + chipStatusPas(p) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    return h;
   }
-
   /* ================================ PROGRAM & KALENDER ================================ */
   var KAL = { ym: '', pilih: '', mode: 'kal', jenis: 'Semua', cari: '', status: 'Semua' };
   function bisaEdit() { return AKUN === 'dev'; }
@@ -1551,21 +1625,34 @@ var DATA = window.__DATA__;
       '<div class="k int"><small>Feedback bulan ini</small><b>' + fbBln + '</b><span>dari mentor & mentee</span></div>' +
       '<div class="k int"><small>Monitoring tercatat</small><b>' + D.monitor.length + '</b><span>kick-off, check-in, evaluasi akhir</span></div></div>';
     h += '<div class="kartu"><div class="bag-h"><div class="seg" id="mmCyc">' + (C2.length ? C2.map(function (c) { return '<button type="button" data-c="' + esc(c[0]) + '"' + (c[0] === MM.cyc ? ' class="on"' : '') + '>' + esc(c[1]) + '</button>'; }).join('') : '<span class="kecil" style="padding:6px 10px">Belum ada cycle</span>') + '</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn2" id="mmCycBaru">+ Cycle baru</button>' + (MM.cyc ? '<button type="button" class="btn2" id="mmCycEdit">Ubah cycle</button><button type="button" class="btn2 isi" id="mmPasBaru">+ Pasangan</button>' : '') + '</div></div>';
+      '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn2" id="mmCycBaru">+ Cycle baru</button>' + (MM.cyc ? '<button type="button" class="btn2" id="mmCycEdit">Ubah cycle</button>' : '') + '</div></div>';
     var c = IX.cyc[MM.cyc];
     if (!c) {
-      h += '<div class="kosong">Buat cycle mentoring pertama: tentukan periode (4–6 bulan), tanggal kick-off, dan evaluasi akhir. Setelah itu tambahkan pasangan mentor–mentee.</div></div>';
+      h += '<div class="langkah-mm"><div><b>1</b><span><strong>Buat cycle</strong>Pilih bulan mulai &amp; bulan selesai, mis. Januari – Juni 2027.</span></div>' +
+        '<div><b>2</b><span><strong>Tambah pasangan</strong>Pilih mentee &amp; mentornya dari Database. Bisa banyak pasangan sekaligus.</span></div>' +
+        '<div><b>3</b><span><strong>Pantau</strong>Jadwal bareng, feedback &amp; monitoring. Riwayatnya otomatis masuk ke Volunteer Card.</span></div></div>' +
+        '<div style="margin-top:14px"><button type="button" class="btn" id="mmCycBaru2">+ Buat cycle pertama</button></div></div>';
       $('mmIsi').innerHTML = h; return;
     }
     var total = Math.max(selisih(c[2], c[3]), 1), jalan2 = Math.min(Math.max(selisih(c[2], kini), 0), total), st = statusCycle(c);
     var nB = bulanAntara(c[2], c[3]).length, ke = st === 'rencana' ? 0 : Math.min(bulanAntara(c[2], kini).length, nB);
-    h += '<div class="cyc-h"><div><h3>' + esc(c[1]) + '</h3><small>' + esc(rentang(c[2], c[3])) + ' · ' + nB + ' bulan · kick-off ' + esc(c[4] ? lt(c[4]) : '–') + (c[6] ? ' (' + esc(c[6]) + ')' : '') + ' · evaluasi akhir ' + esc(c[7] ? lt(c[7]) : '–') + '</small></div>' +
+    h += '<div class="cyc-h"><div><h3>' + esc(c[1]) + '</h3><small>' + esc(rentangBln(c[2], c[3])) + ' · ' + nB + ' bulan' + (c[4] ? ' · kick-off ' + esc(lt(c[4])) + (c[6] ? ' (' + esc(c[6]) + ')' : '') : '') + (c[7] ? ' · evaluasi akhir ' + esc(lt(c[7])) : '') + '</small></div>' +
       '<span class="chip ' + (st === 'berjalan' ? 'hijau' : 'abu') + '">' + (st === 'berjalan' ? 'Bulan ke-' + ke + ' dari ' + nB : st === 'rencana' ? 'Mulai ' + selisih(kini, c[2]) + ' hari lagi' : 'Selesai') + '</span></div>' +
       '<div class="prog-c"><div class="bar"><i style="width:' + (jalan2 / total * 100) + '%"></i></div><div class="lbl"><span>' + esc(lp(c[2])) + '</span><span>' + (st === 'berjalan' ? 'sisa ' + selisih(kini, c[3]) + ' hari' : '') + '</span><span>' + esc(lp(c[3])) + '</span></div></div>' +
       (c[8] ? '<div class="catatan-mm">' + esc(c[8]) + '</div>' : '') + '</div>';
-    var P = (IX.pasCyc[MM.cyc] || []).slice().sort(function (a, b) { return a[2] < b[2] ? -1 : a[2] > b[2] ? 1 : 0; });
-    h += P.length ? P.map(kartuPasangan).join('') : '<div class="kartu"><div class="kosong">Belum ada pasangan di cycle ini. Tekan <b>+ Pasangan</b>.</div></div>';
+    var P = (IX.pasCyc[MM.cyc] || []).slice().sort(function (a, b) { return a[4] < b[4] ? -1 : a[4] > b[4] ? 1 : 0; });
+    h += '<div class="kartu"><div class="bag-h"><div><h3 class="judul-bag">Pasangan di cycle ini · ' + P.length + '</h3><p class="ket">Klik baris untuk detail: jadwal bareng, feedback, monitoring, link feedback.</p></div>' +
+      '<button type="button" class="btn2 isi" id="mmPasBaru">+ Tambah pasangan</button></div>' +
+      (P.length ? '<div class="pas-list"><div class="pas-kol"><span>Mentee</span><span>Mentor</span><span>Bidang</span><span>Skor mentee</span><span>Status</span><span></span></div>' + P.map(barisPasangan).join('') + '</div>'
+        : '<div class="kosong">Belum ada pasangan. Tekan <b>+ Tambah pasangan</b>, lalu pilih mentee &amp; mentornya dari Database.</div>') + '</div>';
     $('mmIsi').innerHTML = h;
+  }
+  function barisPasangan(p) {
+    var dl = p[10] !== '' && p[11] !== '' ? p[11] - p[10] : null;
+    return '<details class="pas-d"><summary><span data-l="Mentee">' + orangL(p[9], p[4]) + '</span><span data-l="Mentor">' + orangL(p[8], p[3]) + '</span>' +
+      '<span data-l="Bidang"><span class="tag" style="--c:#4B2E83">' + esc(p[2]) + '</span></span>' +
+      '<span data-l="Skor mentee">' + nilai(p[10]) + ' → ' + nilai(p[11]) + (dl !== null ? ' <b class="' + kelasDelta(dl) + '">' + teksDelta(dl) + '</b>' : '') + '</span>' +
+      '<span data-l="Status">' + chipStatusPas(p) + '</span><i class="pas-pan" aria-hidden="true"></i></summary>' + kartuPasangan(p) + '</details>';
   }
   function bulanAntara(a, b) {
     var out = [], y = +a.slice(0, 4), m = +a.slice(5, 7), y2 = +b.slice(0, 4), m2 = +b.slice(5, 7);
@@ -1582,7 +1669,7 @@ var DATA = window.__DATA__;
       var kls = n ? 'ya' : ym < kini.slice(0, 7) ? 'lewat' : ym === kini.slice(0, 7) ? 'blm' : 'nanti';
       return '<i class="' + kls + '" title="' + lab + ': ' + n + 'x dijadwal bareng">' + lab + (n ? ' ' + n + '×' : kls === 'nanti' ? '' : ' 0') + '</i>';
     }).join('');
-    return '<div class="pas"><div class="pas-h"><span class="tag" style="--c:#4B2E83">' + esc(p[2]) + '</span><span class="nama">' + orangL(p[8], p[3]) + '<span class="panah">mentor →</span>' + orangL(p[9], p[4]) + '<span class="panah" style="margin-left:4px">(mentee)</span></span>' + chipStatusPas(p) + '</div>' +
+    return '<div class="pas-isi">' +
       (p[5] ? '<p class="fokus"><b>Fokus:</b> ' + esc(p[5]) + '</p>' : '') +
       '<div class="pas-m"><div><small>Skor mentee</small><b>' + nilai(p[10]) + ' → ' + nilai(p[11]) + (dl !== null ? ' <span class="' + kelasDelta(dl) + '" style="display:inline;font-size:13px;font-weight:800">' + teksDelta(dl) + '</span>' : '') + '</b><span>sebelum cycle → selama (' + p[12] + ' pelayanan)</span></div>' +
       '<div><small>Dijadwal bareng</small><div class="bln-pill">' + bln + '</div></div>' +
@@ -1596,37 +1683,149 @@ var DATA = window.__DATA__;
   $('mmIsi').addEventListener('click', function (e) {
     var b;
     if ((b = e.target.closest('#mmCyc button'))) { MM.cyc = b.getAttribute('data-c'); gambarMentor(); return; }
-    if (e.target.closest('#mmCycBaru')) { editorCycle(null); return; }
+    if (e.target.closest('#mmCycBaru') || e.target.closest('#mmCycBaru2')) { editorCycle(null); return; }
     if (e.target.closest('#mmCycEdit')) { editorCycle(MM.cyc); return; }
-    if (e.target.closest('#mmPasBaru')) { editorPasangan(null); return; }
+    if (e.target.closest('#mmPasBaru')) { editorBanyak(MM.cyc); return; }
     if ((b = e.target.closest('[data-ubah-pas]'))) { editorPasangan(b.getAttribute('data-ubah-pas')); return; }
     if ((b = e.target.closest('[data-mon]'))) { editorMonitor(b.getAttribute('data-mon')); return; }
     if ((b = e.target.closest('[data-link]'))) { linkFeedback(b.getAttribute('data-link')); return; }
     if ((b = e.target.closest('[data-riwayat]'))) { riwayatPasangan(b.getAttribute('data-riwayat')); }
   });
+  function rentangBln(a, b) {
+    if (!a) return '–';
+    b = b || a;
+    var ma = BLN[+a.slice(5, 7) - 1], mb = BLN[+b.slice(5, 7) - 1], ya = a.slice(0, 4), yb = b.slice(0, 4);
+    return a.slice(0, 7) === b.slice(0, 7) ? ma + ' ' + ya : ya === yb ? ma + ' – ' + mb + ' ' + yb : ma + ' ' + ya + ' – ' + mb + ' ' + yb;
+  }
+  function akhirBulan(ym) { return tambahHari(tambahBulan(ym + '-01', 1), -1); }
   function editorCycle(id) {
     var c = id ? IX.cyc[id] : null, kini = D.kini;
-    var mulai = c ? c[2] : tambahBulan(kini.slice(0, 8) + '01', 1), selesai = c ? c[3] : tambahHari(tambahBulan(mulai, 6), -1);
-    var isi = '<div class="fg"><label class="full">Nama cycle<input class="inp" id="cNama" maxlength="120" value="' + esc(c ? c[1] : 'Cycle · ' + BLN[tglObj(mulai).getMonth()] + ' – ' + BLN[tglObj(selesai).getMonth()] + ' ' + selesai.slice(0, 4)) + '"></label>' +
-      '<label>Mulai<input class="inp" id="cMulai" type="date" value="' + esc(mulai) + '"></label><label>Selesai <small>(biasanya 4–6 bulan)</small><input class="inp" id="cSelesai" type="date" value="' + esc(selesai) + '"></label>' +
-      '<label>Tanggal kick-off<input class="inp" id="cKo" type="date" value="' + esc(c ? c[4] : mulai) + '"></label><label>Jam kick-off<input class="inp" id="cJam" maxlength="40" value="' + esc(c ? c[5] : '') + '" placeholder="mis. 10.00–12.00"></label>' +
-      '<label>Lokasi kick-off<input class="inp" id="cLok" maxlength="160" value="' + esc(c ? c[6] : '') + '"></label><label>Evaluasi akhir<input class="inp" id="cAkhir" type="date" value="' + esc(c ? c[7] : selesai) + '"></label>' +
-      '<label class="full">Catatan<textarea id="cCat" maxlength="1500" placeholder="Tujuan cycle, aturan main, jadwal check-in…">' + esc(c ? c[8] : '') + '</textarea></label></div><div class="salah-f" id="cSalah"></div>';
-    bukaModal(id ? 'Ubah cycle' : 'Cycle mentoring baru', isi, (id ? '<button type="button" class="btn2 merah kiri" id="cHapus">Hapus</button>' : '') + '<button type="button" class="btn2" data-tutup>Batal</button><button type="button" class="btn" id="cSimpan">Simpan cycle</button>');
-    $('cMulai').addEventListener('change', function () { if (!id) { $('cSelesai').value = tambahHari(tambahBulan($('cMulai').value, 6), -1); $('cKo').value = $('cMulai').value; $('cAkhir').value = $('cSelesai').value; } });
+    var awal = c ? c[2].slice(0, 7) : tambahBulan(kini.slice(0, 8) + '01', 1).slice(0, 7);
+    var akhir = c ? c[3].slice(0, 7) : tambahBulan(awal + '-01', 5).slice(0, 7);
+    var thn = [], y0 = +kini.slice(0, 4) - 1;
+    for (var y = y0; y <= y0 + 4; y++) thn.push(y);
+    [awal, akhir].forEach(function (x) { var t = +x.slice(0, 4); if (thn.indexOf(t) < 0) thn.push(t); });
+    thn.sort();
+    var pilihBln = function (pre, x) {
+      return '<span class="bln-thn"><select id="' + pre + 'B" aria-label="Bulan">' + BLN_P.map(function (n, i) { return '<option value="' + pad(i + 1) + '"' + (+x.slice(5, 7) === i + 1 ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select>' +
+        '<select id="' + pre + 'Y" aria-label="Tahun">' + thn.map(function (t) { return '<option' + (+x.slice(0, 4) === t ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></span>';
+    };
+    var namaOto = function (a, b) { return 'Cycle ' + rentangBln(a + '-01', b + '-01'); };
+    var adaDetail = c && (c[4] || c[5] || c[6] || c[7] || c[8]);
+    var isi = '<div class="fg"><label>Dari bulan' + pilihBln('cA', awal) + '</label><label>Sampai bulan' + pilihBln('cZ', akhir) + '</label>' +
+      '<p class="ket full" id="cInfo" style="margin:-4px 0 0"></p>' +
+      '<label class="full">Nama cycle<input class="inp" id="cNama" maxlength="120" value="' + esc(c ? c[1] : namaOto(awal, akhir)) + '"></label>' +
+      '<details class="full detail-op"' + (adaDetail ? ' open' : '') + '><summary>Detail tambahan (opsional): kick-off, evaluasi akhir, catatan</summary><div class="fg" style="margin-top:12px">' +
+      '<label>Tanggal kick-off<input class="inp" id="cKo" type="date" value="' + esc(c ? c[4] : '') + '"></label><label>Jam kick-off<input class="inp" id="cJam" maxlength="40" value="' + esc(c ? c[5] : '') + '" placeholder="mis. 10.00–12.00"></label>' +
+      '<label>Lokasi kick-off<input class="inp" id="cLok" maxlength="160" value="' + esc(c ? c[6] : '') + '"></label><label>Evaluasi akhir<input class="inp" id="cAkhir" type="date" value="' + esc(c ? c[7] : '') + '"></label>' +
+      '<label class="full">Catatan<textarea id="cCat" maxlength="1500" placeholder="Tujuan cycle, aturan main, jadwal check-in…">' + esc(c ? c[8] : '') + '</textarea></label></div></details></div><div class="salah-f" id="cSalah"></div>';
+    bukaModal(id ? 'Ubah cycle' : 'Cycle mentoring baru', isi, (id ? '<button type="button" class="btn2 merah kiri" id="cHapus">Hapus</button>' : '') + '<button type="button" class="btn2" data-tutup>Batal</button><button type="button" class="btn" id="cSimpan">' + (id ? 'Simpan cycle' : 'Simpan, lalu tambah pasangan') + '</button>');
+    var namaManual = !!c && c[1] !== namaOto(awal, akhir);
+    var ym = function (pre) { return $(pre + 'Y').value + '-' + $(pre + 'B').value; };
+    var segar = function () {
+      var a = ym('cA'), b = ym('cZ'), n = b >= a ? bulanAntara(a + '-01', b + '-01').length : 0;
+      $('cInfo').textContent = n ? n + ' bulan · ' + lp(a + '-01') + ' s/d ' + lp(akhirBulan(b)) + (n < 3 || n > 6 ? ' · biasanya 4–6 bulan' : '') : 'Bulan selesai harus sama atau sesudah bulan mulai.';
+      $('cInfo').style.color = n ? '' : 'var(--bad)';
+      if (!namaManual && n) $('cNama').value = namaOto(a, b);
+    };
+    ['cAB', 'cAY', 'cZB', 'cZY'].forEach(function (x) { $(x).addEventListener('change', segar); });
+    $('cNama').addEventListener('input', function () { namaManual = true; });
+    segar();
     $('cSimpan').addEventListener('click', function () {
-      var x = { id: id || '', nama: $('cNama').value.trim(), mulai: $('cMulai').value, selesai: $('cSelesai').value, ko: $('cKo').value, jam: $('cJam').value.trim(), lokasi: $('cLok').value.trim(), akhir: $('cAkhir').value, cat: $('cCat').value.trim() };
+      var a = ym('cA'), b = ym('cZ');
+      if (b < a) { $('cSalah').textContent = 'Bulan selesai harus sama atau sesudah bulan mulai.'; return; }
+      var x = { id: id || '', nama: $('cNama').value.trim(), mulai: a + '-01', selesai: akhirBulan(b), ko: $('cKo').value, jam: $('cJam').value.trim(), lokasi: $('cLok').value.trim(), akhir: $('cAkhir').value, cat: $('cCat').value.trim() };
       $('cSimpan').disabled = true;
-      panggil('hsSimpanCycle', [TOK, x], function (r) { tutupModal(); toast(r.pesan); MM.cyc = r.id; muat(true); }, function (m) { $('cSalah').textContent = m; $('cSimpan').disabled = false; });
+      panggil('hsSimpanCycle', [TOK, x], function (r) {
+        tutupModal(); toast(r.pesan); MM.cyc = r.id;
+        muat(true, id ? null : function () { if (IX.cyc[r.id]) editorBanyak(r.id); });
+      }, function (m) { $('cSalah').textContent = m; $('cSimpan').disabled = false; });
     });
     if ($('cHapus')) $('cHapus').addEventListener('click', function () {
-      panggil('hsHapusCycle', [TOK, id], function (r) { tutupModal(); toast(r.pesan); MM.cyc = ''; muat(true); }, function (m) { $('cSalah').textContent = m; });
+      var n = (IX.pasCyc[id] || []).length, el = $('cSalah');
+      el.innerHTML = '<span style="color:var(--ink)">Hapus cycle ini' + (n ? ' (' + n + ' pasangan di dalamnya)' : '') + '?</span> <button type="button" class="btn2 kecil merah" id="cYa">Hapus</button>';
+      $('cYa').addEventListener('click', function () { panggil('hsHapusCycle', [TOK, id], function (r) { tutupModal(); toast(r.pesan); MM.cyc = ''; muat(true); }, function (m) { el.textContent = m; }); });
     });
   }
+  var KATA_BIDANG = { 'Worship leader': /WL\/MD|worship leader|\bwl\b/i, 'Music director': /WL\/MD|music director|\bmd\b/i, 'Singer': /vocal|singer|vokal/i, 'Keys': /keys|keyboard|piano/i,
+    'Guitar': /guitar|gitar/i, 'Bass': /bass/i, 'Drums': /drum/i, 'Strings & brass': /violin|viola|cello|sax|string|brass|trumpet|trombone|flute/i, 'Perkusi': /perkusi|percussion/i, 'Playback engineer': /playback/i };
   function saringBidang(bidang) {
-    var kata = { 'Worship leader': /WL\/MD|worship leader|\bwl\b/i, 'Music director': /WL\/MD|music director|\bmd\b/i, 'Singer': /vocal|singer|vokal/i, 'Keys': /keys|keyboard|piano/i,
-      'Guitar': /guitar|gitar/i, 'Bass': /bass/i, 'Drums': /drum/i, 'Strings & brass': /violin|viola|cello|sax|string|brass|trumpet|trombone|flute/i, 'Perkusi': /perkusi|percussion/i, 'Playback engineer': /playback/i }[bidang];
+    var kata = KATA_BIDANG[bidang];
     return function (o) { return !kata || kata.test(o[2]); };
+  }
+  /** Bidang dari posisi orang di Database: posisi yang ditulis paling depan (Position 1 dulu). */
+  function tebakBidang(o) {
+    var t = String(o && o[2] || ''), best = '', pos = 1e9;
+    D.opsi.bidang.forEach(function (b) { var re = KATA_BIDANG[b], i = re ? t.search(re) : -1; if (i >= 0 && i < pos) { pos = i; best = b; } });
+    return best;
+  }
+  /** Tambah banyak pasangan sekaligus ke satu cycle (nama dari Database). */
+  function editorBanyak(cycId) {
+    var c = IX.cyc[cycId];
+    if (!c) return;
+    var sudah = {};
+    (IX.pasCyc[cycId] || []).forEach(function (p) { if (p[6] !== 'Dihentikan') sudah[p[9]] = p[3]; });
+    var isi = '<p class="ket" style="margin-top:0">' + esc(c[1] + ' · ' + rentangBln(c[2], c[3])) + '. Ketik nama mentee &amp; mentornya, lalu pilih dari daftar (Database). Bidang terisi otomatis dari posisi mentee, bisa diganti. Satu mentor boleh punya beberapa mentee.</p>' +
+      '<div class="mb-kol"><span>Mentee</span><span>Mentor</span><span>Bidang</span><span></span></div><div id="bRows"></div>' +
+      '<button type="button" class="btn2" id="bTambah" style="margin-top:2px">+ Tambah baris</button><div class="salah-f" id="bSalah"></div>';
+    bukaModal('Tambah pasangan · ' + c[1], isi, '<button type="button" class="btn2" data-tutup>Batal</button><button type="button" class="btn" id="bSimpan">Simpan pasangan</button>');
+    var baris = function () {
+      var el = document.createElement('div');
+      el.className = 'mb-baris';
+      el.innerHTML = '<span class="kotak"><input class="inp" data-f="mentee" autocomplete="off" placeholder="Nama mentee"><span class="saran"></span></span>' +
+        '<span class="kotak"><input class="inp" data-f="mentor" autocomplete="off" placeholder="Nama mentor"><span class="saran"></span></span>' +
+        '<select data-f="bidang" aria-label="Bidang"><option value="">Bidang…</option>' + opsiSel(D.opsi.bidang, '') + '</select>' +
+        '<button type="button" class="ikon" data-hapus aria-label="Hapus baris">' + IKON_X + '</button>';
+      $('bRows').appendChild(el);
+      var q = function (f) { return el.querySelector('[data-f="' + f + '"]'); }, manual = false;
+      var tebak = function () { var k = IX.nama[norm(q('mentee').value)]; if (k && !manual) { var b = tebakBidang(IX.orang[k]); if (b) q('bidang').value = b; } };
+      q('bidang').addEventListener('change', function () { manual = true; });
+      Pilih(q('mentee'), q('mentee').nextElementSibling, function (o) { q('mentee').value = o[1]; tebak(); },
+        { ket: function (o) { return sudah[o[0]] ? ' · sudah di cycle ini (mentor: ' + sudah[o[0]] + ')' : ''; } });
+      Pilih(q('mentor'), q('mentor').nextElementSibling, function (o) { q('mentor').value = o[1]; }, {
+        awal: function () {
+          var b = q('bidang').value, km = IX.nama[norm(q('mentee').value)];
+          if (!b) return [];
+          var f = saringBidang(b);
+          return D.orang.filter(function (o) { return f(o) && o[5] !== '' && o[0] !== km; }).sort(function (x, z) { return z[5] - x[5]; }).slice(0, 8);
+        },
+        judulAwal: 'Saran mentor · skor tertinggi di bidang ini' });
+      q('mentee').addEventListener('change', tebak);
+      return el;
+    };
+    baris(); baris(); baris();
+    $('bTambah').addEventListener('click', function () { baris().querySelector('input').focus(); });
+    $('bRows').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-hapus]');
+      if (!b) return;
+      var r = b.closest('.mb-baris');
+      if ($('bRows').children.length > 1) r.parentNode.removeChild(r);
+      else Array.prototype.forEach.call(r.querySelectorAll('input,select'), function (x) { x.value = ''; });
+    });
+    $('bSimpan').addEventListener('click', function () {
+      var list = [], salah = '', dipakai = {};
+      Array.prototype.forEach.call($('bRows').children, function (r, i) {
+        if (salah) return;
+        var v = function (f) { return r.querySelector('[data-f="' + f + '"]').value.trim(); };
+        var me = v('mentee'), mo = v('mentor'), bd = v('bidang'), no = 'Baris ' + (i + 1) + ': ';
+        if (!me && !mo) return;
+        var kme = IX.nama[norm(me)], kmo = IX.nama[norm(mo)];
+        if (!kme) { salah = no + (me ? '"' + me + '" tidak ada di Database. Pilih dari daftar nama.' : 'isi nama mentee.'); return; }
+        if (!kmo) { salah = no + (mo ? '"' + mo + '" tidak ada di Database. Pilih dari daftar nama.' : 'isi nama mentor.'); return; }
+        if (kme === kmo) { salah = no + 'mentor dan mentee tidak boleh orang yang sama.'; return; }
+        if (!bd) { salah = no + 'pilih bidang.'; return; }
+        if (sudah[kme]) { salah = no + IX.orang[kme][1] + ' sudah punya mentor di cycle ini (' + sudah[kme] + ').'; return; }
+        if (dipakai[kme]) { salah = IX.orang[kme][1] + ' diisi dua kali sebagai mentee (baris ' + dipakai[kme] + ' dan ' + (i + 1) + ').'; return; }
+        dipakai[kme] = i + 1;
+        list.push({ mentee: IX.orang[kme][1], mentor: IX.orang[kmo][1], bidang: bd });
+      });
+      if (salah) { $('bSalah').textContent = salah; return; }
+      if (!list.length) { $('bSalah').textContent = 'Isi minimal satu pasangan.'; return; }
+      $('bSimpan').disabled = true; $('bSalah').textContent = '';
+      panggil('hsSimpanPasanganBanyak', [TOK, cycId, list], function (r) { tutupModal(); toast(r.pesan); MM.cyc = cycId; muat(true); },
+        function (m) { $('bSalah').textContent = m; $('bSimpan').disabled = false; });
+    });
+    setTimeout(function () { var x = $('bRows').querySelector('input'); if (x) x.focus(); }, 60);
   }
   function editorPasangan(id) {
     var p = id ? IX.pas[id] : null, val = { mentor: p ? p[3] : '', mentee: p ? p[4] : '' };
