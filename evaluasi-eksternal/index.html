@@ -145,7 +145,7 @@
     <div class="eyebrow">JPCC Worship<span class="people">People</span></div>
     <h1>Masukan Ibadah</h1></div></div>
   </header>
-  <p class="intro">Terima kasih sudah ikut beribadah! Masukanmu untuk tim Praise &amp; Worship, Sound, dan Choir membantu kami bertumbuh. Pilih ibadah yang kamu ikuti dan tim yang mau kamu beri masukan. Mulai dari apresiasi, lalu saran pengembangan kalau ada. Cukup pilih dari daftar, sekitar 2 menit.</p>
+  <p class="intro">Terima kasih sudah ikut beribadah! Masukanmu untuk tim Praise &amp; Worship, Sound, dan Choir membantu kami bertumbuh. Pilih ibadah yang kamu ikuti dan tim yang mau kamu beri masukan. Boleh isi apresiasi, saran pengembangan, atau keduanya. Cukup pilih dari daftar, sekitar 2 menit.</p>
 
   <div class="l"><span class="no">1</span>Nama kamu</div>
   <div class="kotak">
@@ -308,15 +308,10 @@ var DATA = window.__DATA__;
     setTimeout(function () { $('s3').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   });
 
-  /* ---------- 3-5. tim -> apresiasi (+) -> saran pengembangan (+, terbuka setelah ada minimal 1 apresiasi untuk tim itu) ---------- */
+  /* ---------- 3-5. tim -> apresiasi (+) / saran pengembangan (+): keduanya terbuka, boleh isi salah satu atau keduanya ---------- */
   var APR = SIFAT[0], PP = SIFAT[1];
   st.tim = '';
   function poinTim(kat, sf) { return st.poin.filter(function (x) { return x.kat === kat && (!sf || x.sifat === sf); }); }
-  function timKurangApr() {
-    var t = [];
-    st.poin.forEach(function (x) { if (t.indexOf(x.kat) < 0 && !poinTim(x.kat, APR).length) t.push(x.kat); });
-    return t;
-  }
   function gambarTim() {
     $('pilihTim').innerHTML = P.urut.length ? P.urut.map(function (k) {
       var n = poinTim(k).length;
@@ -330,9 +325,6 @@ var DATA = window.__DATA__;
   }
   function kotakTambah(sf) {
     var apr = sf === APR;
-    if (!apr && !poinTim(st.tim, APR).length) {
-      return '<div class="tambah kunci" aria-disabled="true"><span class="ikon">🔒</span><span>Isi minimal 1 apresiasi dulu untuk membuka saran pengembangan</span></div>';
-    }
     if (st.kirim) return '';
     if (st.poin.length >= MAKS) return '<div class="tambah kunci" aria-disabled="true"><span>Maksimal ' + MAKS + ' poin dalam satu kiriman.</span></div>';
     return '<button type="button" class="tambah ' + (apr ? 'apr' : 'pp') + '" data-tambah="' + esc(sf) + '"><span class="ikon">+</span><span>Tambah ' +
@@ -365,20 +357,18 @@ var DATA = window.__DATA__;
     var ada = !!st.tim && !!P.k[st.tim];
     $('isiTim').hidden = !ada;
     if (ada) {
-      var nApr = poinTim(st.tim, APR).length;
-      $('subApr').innerHTML = 'Mulai dari hal yang sudah baik dari <b>' + esc(st.tim) + '</b>. Minimal 1 apresiasi.';
-      $('subPp').innerHTML = nApr ? 'Hal yang bisa dikembangkan <b>' + esc(st.tim) + '</b>. Boleh dilewati.' : 'Terbuka setelah ada minimal 1 apresiasi.';
+      $('subApr').innerHTML = 'Hal yang sudah baik dari <b>' + esc(st.tim) + '</b>. Boleh isi apresiasi saja, saran pengembangan saja, atau keduanya.';
+      $('subPp').innerHTML = 'Hal yang bisa dikembangkan <b>' + esc(st.tim) + '</b>.';
       [[APR, 'Apr'], [PP, 'Pp']].forEach(function (z) {
         $('daftar' + z[1]).innerHTML = poinTim(st.tim, z[0]).map(kartuPoin).join('');
         $('slot' + z[1]).innerHTML = st.draf && st.draf.sifat === z[0] ? panelDraf() : kotakTambah(z[0]);
       });
     }
-    var kurang = timKurangApr();
     $('barKirim').hidden = !st.poin.length;
-    $('kirim').disabled = st.kirim || !st.poin.length || !!st.draf || kurang.length > 0;
+    $('kirim').disabled = st.kirim || !st.poin.length || !!st.draf;
     $('kirim').textContent = st.kirim ? 'Mengirim…' : 'Kirim masukan (' + st.poin.length + ' poin)';
     $('infoKirim').textContent = st.kirim ? '' : st.draf ? 'Simpan atau batalkan poin yang sedang diisi.' :
-      kurang.length ? 'Tambahkan minimal 1 apresiasi untuk ' + kurang.join(', ') + '.' : st.poin.length >= MAKS ? 'Maksimal ' + MAKS + ' poin.' : '';
+      st.poin.length >= MAKS ? 'Maksimal ' + MAKS + ' poin.' : '';
   }
   function simpanPoin() {
     var d = st.draf;
