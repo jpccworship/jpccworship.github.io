@@ -297,6 +297,7 @@
   .simpan.tunggu, .simpan.kirim { background: #FFF3D6; color: #8A5300; }
   .simpan.kirim::before { animation: kedip .8s ease-in-out infinite alternate; }
   .simpan.gagal { background: var(--badbg); color: var(--bad); cursor: pointer; }
+  .det b.wlmd { color: var(--brand); }
   @keyframes kedip { from { opacity: .25; } to { opacity: 1; } }
   #sibuk { position: fixed; inset: 0; z-index: 65; background: rgba(24, 12, 48, .5); display: flex; align-items: center; justify-content: center; padding: 24px; }
   #sibuk[hidden] { display: none; }
@@ -965,18 +966,41 @@ function muatUlang(daftar) { return api('scMuat', daftar || null, SIG).then(func
 
 /* ---------- antrian simpan sel nama (langsung tampil, dikirim ke spreadsheet di belakang layar) ---------- */
 var ANTRI = {}, KIRIM = null, TIMER = 0, ULANG = 0;
+function jumlahAntri() { return MN.reduce(function (s, m) { return s + Object.keys(ANTRI[m] || {}).length; }, 0); }
 function statusSimpan(st, ket) {
   var e = $('simpanSt'); if (!e) return;
+  var n = st === 'gagal' ? jumlahAntri() : 0;
   e.className = 'simpan ' + st;
-  e.textContent = st === 'tunggu' || st === 'kirim' ? 'Menyimpan…' : st === 'gagal' ? 'Gagal menyimpan' : 'Tersimpan';
-  e.title = ket || (st === 'ok' ? 'Semua perubahan sudah tersimpan di file Admin' : '');
+  e.textContent = st === 'tunggu' || st === 'kirim' ? 'Menyimpan…' : st === 'gagal' ? (n ? 'Belum tersimpan (' + n + ')' : 'Gagal menyimpan') : 'Tersimpan';
+  e.title = st === 'gagal' && n ? (ket ? ket + ' ' : '') + 'Isianmu tetap ada di halaman ini dan dikirim ulang otomatis. Klik untuk mencoba sekarang.' : ket || (st === 'ok' ? 'Semua perubahan sudah tersimpan di file Admin' : '');
 }
+/* isian yang belum tersimpan juga dicatat di browser ini (per akun), jadi tidak hilang kalau koneksi / server bermasalah atau halaman tertutup */
+function kunciLokal() { return S.akun ? 'jpccSusunAntri_' + S.akun.id : ''; }
+function simpanLokal() {
+  var k = kunciLokal(); if (!k) return;
+  try { if (adaAntrian()) localStorage.setItem(k, JSON.stringify({ t: Date.now(), q: ANTRI })); else localStorage.removeItem(k); } catch (x) {}
+}
+function pulihkanLokal() {
+  var k = kunciLokal(), d = null, n = 0; if (!k) return 0;
+  try { d = JSON.parse(localStorage.getItem(k) || 'null'); } catch (x) { d = null; }
+  if (!d || !d.q || Date.now() - (d.t || 0) > 14 * 864e5) { try { localStorage.removeItem(k); } catch (x) {} return 0; }
+  MN.forEach(function (mn) {
+    var q = d.q[mn] || {};
+    Object.keys(q).forEach(function (key) {
+      var e = q[key], c = e && kolBySid(mn, e.sid);
+      if (!c || !(e.idx >= 0) || e.idx >= c.n.length) return;
+      (ANTRI[mn] = ANTRI[mn] || {})[key] = e; c.n[e.idx] = e.v; n++;
+    });
+  });
+  return n;
+}
+function kirimOtomatis() { kirimAntrian().catch(function () {}); }
 function adaAntrian() { return MN.some(function (m) { return ANTRI[m] && Object.keys(ANTRI[m]).length; }); }
 function antriSel(mn, c, idx, v, lama) {
   var q = ANTRI[mn] = ANTRI[mn] || {}, key = c.sid + '\u0001' + idx;
   if (q[key]) q[key].v = v; else q[key] = { sid: c.sid, i: D.input[mn].peran[idx][2], idx: idx, v: v, lama: lama };
-  statusSimpan('tunggu');
-  clearTimeout(TIMER); TIMER = setTimeout(kirimAntrian, 450);
+  statusSimpan('tunggu'); simpanLokal();
+  clearTimeout(TIMER); TIMER = setTimeout(kirimOtomatis, 450);
 }
 function kirimAntrian() {
   if (KIRIM) return KIRIM;
@@ -987,22 +1011,27 @@ function kirimAntrian() {
   statusSimpan('kirim');
   KIRIM = api('scTulis', mn, edits).then(function (r) {
     KIRIM = null; ULANG = 0;
-    terima(r);
+    terima(r); simpanLokal();
     var kf = r.konflik || [];
     if (kf.length) roti(kf[0].sebab === 'kolom' ? '⚠ Kolomnya sudah berubah di spreadsheet. ' + kf.length + ' isian tidak tersimpan, cek lagi.' : '⚠ ' + kf.length + ' sel sudah diubah orang lain lebih dulu (sekarang: ' + (kf[0].kini || 'kosong') + '). Isianmu tidak menimpanya.');
     gambarAman();
     return kirimAntrian();
   }, function (e) {
     KIRIM = null;
-    if (ULANG < 2 && !/Sesi berakhir|hak menyusun/.test(e.message)) {   // gangguan sesaat: coba lagi, isian yang lebih baru tetap menang
-      ULANG++;
-      var q = ANTRI[mn] = ANTRI[mn] || {};
-      Object.keys(batch).forEach(function (k) { if (q[k]) q[k].lama = batch[k].lama; else q[k] = batch[k]; });
-      return new Promise(function (ok) { setTimeout(ok, 1800); }).then(kirimAntrian);
+    // isian yang gagal TIDAK dibuang: kembali ke antrian (isian yang lebih baru tetap menang), tetap tampil, dan dikirim ulang otomatis
+    var q = ANTRI[mn] = ANTRI[mn] || {};
+    Object.keys(batch).forEach(function (k) { if (q[k]) q[k].lama = batch[k].lama; else q[k] = batch[k]; });
+    if (/hak menyusun/.test(e.message)) {   // memang tidak boleh: dibuang, tampilan dikembalikan
+      delete ANTRI[mn]; simpanLokal(); statusSimpan('gagal', e.message); roti('✗ ' + e.message);
+      if (TOKEN) muatUlang(['input']).then(gambarAman, function () {});
+      throw e;
     }
-    ULANG = 0; statusSimpan('gagal', e.message);
-    roti('✗ Gagal menyimpan: ' + e.message);
-    if (TOKEN && !/Sesi berakhir/.test(e.message)) return muatUlang(['input']).then(gambarAman, function () {});
+    simpanLokal(); statusSimpan('gagal', e.message);
+    if (/Sesi berakhir/.test(e.message)) throw e;   // dikirim lagi otomatis setelah PIN dimasukkan
+    ULANG++;
+    if (ULANG === 2) roti('⚠ Belum tersimpan: ' + e.message + ' Isianmu tetap ada dan dikirim ulang otomatis.');
+    clearTimeout(TIMER); TIMER = setTimeout(kirimOtomatis, [2, 5, 10, 20, 30][Math.min(ULANG - 1, 4)] * 1000);
+    throw e;
   });
   return KIRIM;
 }
@@ -1334,11 +1363,20 @@ function ringkasPaket(k, c, inf, semua) {
   }).join('');
 }
 /* profil singkat: campus pilihan, posisi, jenis suara, role */
+/* WL / MD dari Database (satu kolom "WL/MD"): WL kalau posisinya vokal, MD kalau musisi; pola sama dengan baris Worship leader & Music director */
+function wlmdOrang(a) {
+  if (!a || !a.wlmd) return [];
+  var teks = a.dasar + ', wl/md', out = [];
+  var uji = function (lb, cad) { var r = D.atur.peran.filter(function (x) { return x[0] === lb; })[0], re = r ? String(r[4] || '') : ''; try { return re ? new RegExp(re, 'i').test(teks) : cad.test(teks); } catch (x) { return cad.test(teks); } };
+  if (uji('Worship leader', /worship leader|(vocal|singer).*wl\/md/)) out.push('WL');
+  if (uji('Music director', /music director|(keyboard|guitar|bass|drum|musician).*wl\/md/)) out.push('MD');
+  return out.length ? out : ['WL/MD'];
+}
 function profilOrang(a) {
   if (!a) return '<small class="det" style="color:#A61B1B">Tidak ada di Database</small>';
   var pos = a.pos.filter(String).join(', ') + (a.lain ? (a.pos.filter(String).length ? ' · ' : '') + a.lain : '');
   return '<small class="det">Campus: <b>' + esc(a.kampL.join(' · ') || '–') + '</b>' + (a.home ? ' · home-base ' + esc(a.home) : '') + '</small>' +
-    '<small class="det">Posisi: <b>' + esc(pos || '–') + '</b>' + (a.suara ? ' · ' + esc(a.suara) : '') + (a.role && a.role !== 'Volunteer' ? ' · ' + esc(a.role) : '') + '</small>';
+    '<small class="det">Posisi: <b>' + esc(pos || '–') + '</b>' + (a.wlmd ? ' · <b class="wlmd">' + esc(wlmdOrang(a).join(' & ')) + (a.wlmdMn ? ' (' + esc(a.wlmdMn) + ')' : '') + '</b>' : '') + (a.suara ? ' · ' + esc(a.suara) : '') + (a.role && a.role !== 'Volunteer' ? ' · ' + esc(a.role) : '') + '</small>';
 }
 function barisCalon(a, c, mn, label, urutan, luar) {
   var inf = infoCalon(a.k, mn, c, label), td = [];
@@ -1587,7 +1625,7 @@ LAYAR.pelayan = function () {
   h += '<div class="tw" style="max-height:calc(100vh - 290px)"><table class="t"><thead><tr><th>No</th><th>Nama</th><th>Posisi</th><th>Campus</th><th>Active at</th><th>Jadwal</th><th>Tanggal & tugas di ' + lblnp(F.ym) + '</th><th>Terakhir</th><th>Blockout</th></tr></thead><tbody>' + L.slice(0, 300).map(function (x, i) {
     var a = x.a, per = {}; x.J.forEach(function (j) { (per[j.t + '|' + j.sv] = per[j.t + '|' + j.sv] || []).push(j.peran); });
     var bl = (BL[a.k] || []).map(function (b) { return ltp(b[2]) + ' – ' + ltp(b[3]); }).concat((CP[a.k] || []).map(function (q) { return 'cuti ' + q.per.join(', ') + ' ' + ltp(q.a) + ' – ' + ltp(q.b); })).join('; ');
-    return '<tr class="klik" data-orang="' + esc(a.k) + '"><td>' + (i + 1) + '</td><td><b>' + esc(a.n) + '</b>' + (a.role !== 'Volunteer' ? '<div class="kecil">' + esc(a.role) + '</div>' : '') + '</td><td>' + esc(a.pos.join(', ')) + (a.wlmd ? ' <span class="chip ungu" style="height:18px;font-size:10px">WL/MD</span>' : '') + (AT[a.k] ? ' <span class="chip biru" style="height:18px;font-size:10px" title="Punya aturan penjadwalan">aturan</span>' : '') + '</td><td>' + (a.kampL.join(' · ') || '–') + '</td><td>' + (a.aktL.join(' · ') || '–') + '</td>' +
+    return '<tr class="klik" data-orang="' + esc(a.k) + '"><td>' + (i + 1) + '</td><td><b>' + esc(a.n) + '</b>' + (a.role !== 'Volunteer' ? '<div class="kecil">' + esc(a.role) + '</div>' : '') + '</td><td>' + esc(a.pos.join(', ')) + (a.wlmd ? ' <span class="chip ungu" style="height:18px;font-size:10px">' + esc(wlmdOrang(a).join(' & ')) + '</span>' : '') + (AT[a.k] ? ' <span class="chip biru" style="height:18px;font-size:10px" title="Punya aturan penjadwalan">aturan</span>' : '') + '</td><td>' + (a.kampL.join(' · ') || '–') + '</td><td>' + (a.aktL.join(' · ') || '–') + '</td>' +
       '<td><span class="chip ' + (x.n >= 2 ? 'warn' : x.n ? 'ok' : 'abu') + '">' + x.n + '</span></td><td>' + (Object.keys(per).map(function (k) { return ltp(k.split('|')[0]) + ' ' + esc(k.split('|')[1]) + ' <span class="kecil">(' + esc(unik(per[k]).join(', ')) + ')</span>'; }).join('<br>') || '–') + '</td><td style="white-space:nowrap">' + (x.akhir ? ltp(x.akhir) : '–') + '</td><td>' + (bl ? '<span class="chip bad">' + bl + '</span>' : '') + '</td></tr>';
   }).join('') + '</tbody></table></div>' + (L.length > 300 ? '<p class="kecil" style="margin-top:6px">Menampilkan 300 pertama. Persempit dengan filter.</p>' : '');
   return h;
@@ -1602,7 +1640,7 @@ function kartuOrang(k) {
   var sk = ['Keys', 'Bass', 'Drum', 'Gitar'].map(function (n, i) { return a.sk[i] !== '' ? n + ' ' + a.sk[i] : ''; }).filter(String).join(' · '), at = AT[k];
   var brBlok = function (b, peran) { var st = peran ? b[8] : b[7]; return '<li><span class="sp"><b>' + ltp(b[2]) + ' – ' + lt(b[3]).replace(/^\w+, /, '') + '</b><small>' + (peran ? 'Cuti peran ' + esc(b[5]) + (ibBaris(b, true) ? ' · hanya ' + esc(ibBaris(b, true)) : '') + ' · ' + esc(b[6]) + (b[7] ? ' · ' + esc(b[7]) : '') : esc(b[5]) + (bkIbadah(b) ? ' · hanya ' + esc(bkIbadah(b)) : '') + (b[6] ? ' · ' + esc(b[6]) : '')) + '</small></span><span class="chip ' + (st === 'Aktif' ? 'bad' : 'abu') + '">' + esc(st) + '</span></li>'; };
   bukaLaci('<div class="kp"><button type="button" class="x" data-tutup="laci">×</button><small>' + esc(a.role) + (a.aktif ? '' : ' · tidak aktif') + '</small><h3>' + esc(a.n) + '</h3></div><div class="bd">' +
-    '<dl style="display:grid;grid-template-columns:118px minmax(0,1fr);gap:6px 10px;margin:0 0 14px;font-size:13px">' + baris('Posisi', esc(a.pos.join(', ') + (a.lain ? ' · ' + a.lain : ''))) + baris('WL / MD', a.wlmd ? 'Ya' + (a.wlmdMn ? ' · di ' + esc(a.wlmdMn) : ' · semua ministry') : '') + baris('Vocal arranger', a.va ? 'Ya' : '') +
+    '<dl style="display:grid;grid-template-columns:118px minmax(0,1fr);gap:6px 10px;margin:0 0 14px;font-size:13px">' + baris('Posisi', esc(a.pos.join(', ') + (a.lain ? ' · ' + a.lain : ''))) + baris('WL / MD', a.wlmd ? esc(wlmdOrang(a).join(' & ')) + (a.wlmdMn ? ' · di ' + esc(a.wlmdMn) : ' · semua ministry') : '') + baris('Vocal arranger', a.va ? 'Ya' : '') +
     baris('Campus', a.kampL.join(' · ')) + baris('Home-base', a.home) + baris('Active at', a.aktL.join(' · ')) + baris('Khusus minggu 1', esc(a.m1)) + baris('Jenis suara', esc(a.suara)) + baris('Skor instrumen', sk) + baris('Skor akhir', a.skor !== '' ? String(a.skor) : '') + baris('Form Mapping', esc(a.form)) + '</dl>' +
     '<span class="lbl">Aturan penjadwalan · diutamakan</span>' + (at ? '<div class="pesan biru" style="font-size:13px">' + teksAturan(at) + '</div>' : '<div class="kecil" style="margin-bottom:6px">Belum ada. Campus & ministry tetap mengikuti Database.</div>') +
     (boleh('aturan') && a.aktif ? '<button type="button" class="btn garis kcl" data-aturan="' + esc(k) + '" style="margin:6px 0 14px">' + (at ? 'Ubah aturan' : '+ Maks per bulan / ibadah diutamakan') + '</button>' : '<div style="height:10px"></div>') +
@@ -1892,7 +1930,7 @@ document.addEventListener('click', function (e) {
   if (t.closest('#bKunci') || t.closest('[data-saya="kunci"]')) { tutupModal(); kunciLayar('Halaman dikunci. Pekerjaanmu tetap ada.'); return; }
   if ((b = t.closest('[data-saya]'))) { tutupModal(); if (b.getAttribute('data-saya') === 'tur') turMulai(); else if (b.getAttribute('data-saya') === 'keluar') keluar(); else modalGantiPin(); return; }
   if (t.closest('#mMasuk')) { masuk(); return; }
-  if (t.closest('#simpanSt')) { if (adaAntrian()) kirimAntrian(); return; }
+  if (t.closest('#simpanSt')) { if (adaAntrian()) { ULANG = 0; statusSimpan('kirim'); kirimOtomatis(); } return; }
   if ((b = t.closest('[data-hal]'))) { e.preventDefault(); buka(b.getAttribute('data-hal')); return; }
   if ((b = t.closest('[data-tutup]'))) { if (b.getAttribute('data-tutup') === 'modal') tutupModal(); else { tutupLaci(); if (S.hal === 'susun') gambar(); } return; }
   if ((b = t.closest('[data-mn]'))) { S.mn = b.getAttribute('data-mn'); S.tgl = ''; S.ym = statDraft(S.mn).bulan[0] || paketDraft()[0]; tutupLaci(); gambar(); return; }
@@ -2111,7 +2149,7 @@ function masuk() {
     if (MODE === 'kunci' && S.akun && S.akun.id === p.id && !p.ganti) {   // buka kunci: pekerjaan tetap ada
       S.akun.hak = p.hak; $('aHak').textContent = labelHak(p.hak);
       $('masuk').style.display = 'none'; aktifTerakhir = Date.now();
-      if (adaAntrian()) kirimAntrian();
+      if (adaAntrian()) kirimOtomatis();
       RT.aktif = true; denyut();
       return;
     }
@@ -2161,6 +2199,8 @@ function masukApp() {
   $('masuk').style.display = 'none'; $('app').hidden = false; aktifTerakhir = Date.now();
   statusSimpan('ok');
   gambar();
+  var nPulih = pulihkanLokal();   // isian yang belum sempat tersimpan di sesi sebelumnya (browser ini, akun ini)
+  if (nPulih) { indeks(); gambar(); statusSimpan('tunggu'); roti('↻ ' + nPulih + ' isian yang belum tersimpan sebelumnya sedang dikirim ulang.'); kirimOtomatis(); }
   if (!a.tur) setTimeout(turMulai, 450);
 }
 function kunciLayar(pesan) { if (!S.akun) return; if (!$('tur').hidden) turSelesai(false); TOKEN = ''; hentikanRealtime(); bukaObrol(false); gambarMasuk('kunci', pesan); }
