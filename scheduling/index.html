@@ -202,6 +202,9 @@
   #roti { position: fixed; z-index: 60; left: 50%; bottom: 22px; transform: translate(-50%, 20px); padding: 11px 16px; border-radius: 12px; background: #1F1B24; color: #fff; font-weight: 700; font-size: 13.5px; opacity: 0; pointer-events: none; transition: all .25s var(--ease); max-width: 92vw; }
   #roti.buka { opacity: 1; transform: translate(-50%, 0); }
   #roti.aksi { display: flex; align-items: center; gap: 12px; }
+  .cek-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; }
+  .cek-t b { font-weight: 700; line-height: 1.35; }
+  .cek-t small { font-size: 12.5px; font-weight: 600; color: var(--muted); line-height: 1.35; }
   #roti.aksi.buka { pointer-events: auto; }
   #roti .roti-b { flex: none; height: 30px; padding: 0 12px; border: 0; border-radius: 8px; background: #fff; color: #1F1B24; font-weight: 800; font-size: 12.5px; cursor: pointer; }
   #roti .roti-b:hover { background: #EDE7F6; }
@@ -636,7 +639,7 @@ function ketDaftar(c, i) {
   var key = c.kd && c.kd[i] >= 0 ? D.pilihan.keys[c.kd[i]] : '';
   if (!key) return '';
   var p = key.split('§');
-  if (p[0] === 'S') return 'special event Central: semua yang posisinya cocok, dari ministry & campus mana pun';
+  if (p[0] === 'S') return 'special event ' + (c.lk === 'Eksternal' ? 'Eksternal' : 'Central') + ': semua yang posisinya cocok, dari ministry & campus mana pun';
   var kamp = { TK: 'The Kasablanka', UR: 'UpperRoom', SH: 'Sutera Hall' }[p[2]] || 'semua campus';
   var mnT = p[1] === 'Umum+YI' ? 'Umum + daftar Youth Invasion' : /\+M1$/.test(p[1]) ? p[1].replace('+M1', '') + ' (minggu pertama, termasuk campus khusus minggu 1)' : p[1];
   return (p[3] === 'PIC' ? 'daftar PIC ' : 'active at ') + mnT + ' · ' + kamp + (p[3] === 'PIC' ? '' : ' · posisi cocok');
@@ -761,65 +764,118 @@ function tandaSel(mn, c, i) {
 var NAMA_TANDA = { blok: 'Sedang blockout / cuti peran ini', asing: 'Tidak ada di Database', bentrok: 'Bentrok di tanggal yang sama', turut: 'Berturut-turut', lebih: 'Lebih dari 1x sebulan', aturan: 'Di luar aturan pelayan' };
 var KLS_TANDA = { blok: 'bad', asing: 'bad', bentrok: 'warn', turut: 'ungu', lebih: 'kuning', aturan: 'biru' };
 
-/* ---------- cek draft (kategori & hitungan sama dengan "Hasil Cek Draft" di spreadsheet, + blockout, aturan, formasi) ---------- */
+/* ---------- cek draft (kategori & hitungan sama dengan "Hasil Cek Draft" di spreadsheet, + blockout, aturan, formasi) ----------
+   Tiap catatan 2 baris: teks = masalahnya (orang + apa yang tidak cocok), kapan = dia terjadwal di mana & kapan. */
+function tglTh(t) { if (!t) return '–'; var d = tglObj(t); return d.getDate() + ' ' + BLN[d.getMonth()] + ' ' + d.getFullYear(); }
+function rentangTgl(a, b) { return a === b ? tglTh(a) : tglTh(a) + ' – ' + tglTh(b); }
+/* tanggal seseorang di satu bulan, per ministry: "Umum 3 Jan, 17 Jan (PIC only) · Youth 10 Jan" (choir & hari lanjutan special event tidak dihitung) */
+function tglBulanOrang(k, ym) {
+  var per = {};
+  (IX.orang[k] || []).forEach(function (x) {
+    if (x.choir || x.lanjut || x.ym !== ym) return;
+    var q = per[x.mn] = per[x.mn] || {}, d = q[x.t] = q[x.t] || { pic: false, lain: false };
+    if (x.pic) d.pic = true; else d.lain = true;
+  });
+  return MN.concat(Object.keys(per).filter(function (m) { return MN.indexOf(m) < 0; })).filter(function (m) { return per[m]; }).map(function (m) {
+    return m + ' ' + Object.keys(per[m]).sort().map(function (t) { var d = per[m][t]; return ltp(t) + (d.pic ? (d.lain ? ' (PIC)' : ' (PIC only)') : ''); }).join(', ');
+  }).join(' · ');
+}
+/* kenapa nama ini tidak ada di daftar pilihan sel itu (aturan sama dengan daftar dropdown di spreadsheet) */
+var KAMPUS_NAMA = { TK: 'The Kasablanka', UR: 'UpperRoom', SH: 'Sutera Hall' };
+function alasanLuar(a, c, i, label) {
+  var key = c.kd && c.kd[i] >= 0 ? D.pilihan.keys[c.kd[i]] || '' : '', p = key.split('§');
+  if (p[0] !== 'R') return a.n + ' tidak ada di daftar pilihan ' + label + ' untuk service ini';
+  var m0 = p[1].replace(/\+.*$/, ''), kc = p[2] || '', m1 = /\+M1$/.test(p[1]), yi = p[1] === 'Umum+YI', out = [];
+  var teks = a.dasar + (a.wlmd && (!a.wlmdMn || a.wlmdMn.split(/\s*,\s*/).indexOf(m0) >= 0) ? ', wl/md' : '');
+  var pola = function (lb) { var r = D.atur.peran.filter(function (x) { return x[0] === lb; })[0]; return r ? String(r[4] || '') : ''; };
+  var alat = function (lb) { return /^Keys/.test(lb) ? 0 : lb === 'Bass' ? 1 : lb === 'Drums' ? 2 : /^Guitar/.test(lb) ? 3 : -1; };
+  var cocok = function (lb) {   // null = tidak bisa dipastikan dari data di halaman ini
+    if (lb === 'Vocal arranger' && AGL.some(function (o) { return o.va; })) return !!a.va;
+    var re = pola(lb), al = alat(lb);
+    try { if (re && new RegExp(re, 'i').test(teks)) return true; } catch (x) {}
+    if (al >= 0) { var s = a.sk ? a.sk[al] : ''; return s === '' || s === undefined || s === null ? null : +s >= 0; }
+    return !re;
+  };
+  if (!a.aktif) out.push('statusnya ' + (a.role || 'tidak aktif') + ' di Database');
+  var vokal = PR[label] && PR[label].grup === 'Vocal' && !/^(Choir|Vocal arranger|Worship leader)$/.test(label);
+  var ck = cocok(label);
+  if (vokal && cocok('Worship leader')) out.push('terdaftar sebagai WL di ' + m0 + ', jadi masuk daftar Worship leader, bukan ' + label);
+  else if (ck === false) out.push('belum terdaftar sebagai ' + label + ' (posisinya: ' + (a.pos.concat(a.lain ? [a.lain] : []).filter(String).join(', ') || '–') + ')');
+  if (a.akt[m0] !== 'Y') out.push('belum aktif di ' + m0 + ' (aktif di: ' + (a.aktL.join(', ') || '–') + ')');
+  var kM1 = m1 && kc && new RegExp({ TK: '\\btk\\b|kasablanka', UR: '\\bur\\b|upper', SH: '\\bsh\\b|sutera' }[kc], 'i').test(a.m1 || '');
+  if (kc && a.kamp[kc] !== 'Y' && !kM1) out.push('tidak melayani di ' + KAMPUS_NAMA[kc] + ' (campus-nya: ' + (a.kampL.join(' · ') || '–') + ')');
+  if (!out.length) return a.n + ' tidak ada di daftar pilihan ' + label + ' (cek posisi, ibadah aktif & campus-nya di Database' + (yi ? ', atau tab Youth Invasion' : '') + ')';
+  return a.n + ' ' + out.join(', dan ');
+}
 function cekDraft(mnSaja) {
   var out = [], lihat = {}, punyaPic = {}, tglDraft = {};
-  var tambah = function (j, mn, kol, i, teks) { if (!mnSaja || mn === mnSaja) out.push({ j: j, mn: mn, kol: kol, i: i, teks: teks }); };
+  var tambah = function (j, mn, kol, i, teks, kapan) { if (!mnSaja || mn === mnSaja) out.push({ j: j, mn: mn, kol: kol, i: i, teks: teks, kapan: kapan || '' }); };
   MN.forEach(function (mn) {
     var P = D.input[mn].peran;
     D.input[mn].kol.forEach(function (c) {
-      var lbl = (c.sv || c.acara || '(tanpa service)') + ' · ' + lt(c.t), dk = mn + '|' + c.t;
+      var sv = c.sv || c.acara || '(tanpa service)', dk = mn + '|' + c.t;
       if (!tglDraft[dk]) tglDraft[dk] = c;
-      if (!SV[c.sv]) tambah('kode', mn, c.id, -1, (c.jenis === 'Special event' ? 'Special event "' + (c.acara || '–') + '": Service ' : 'Kode service ') + '"' + (c.sv || '(kosong)') + '" tidak ada di Pengaturan · ' + lt(c.t));
-      var kosong = 0, iKosong = -1;
+      var eks = c.jenis === 'Special event' && c.lk === 'Eksternal';   // event eksternal: lokasi ditulis bebas, tidak harus kode service
+      if (!SV[c.sv] && !eks) tambah('kode', mn, c.id, -1, c.jenis === 'Special event' ? 'Special event "' + (c.acara || '–') + '"' + (c.sv ? ': service "' + c.sv + '" tidak ada di daftar Pengaturan' : ' belum ada service-nya') :
+        c.sv ? 'Service "' + c.sv + '" tidak ada di daftar Pengaturan' : 'Service belum diisi', 'Kolom ' + lt(c.t) + (c.jenis === 'Special event' ? ' · kalau di luar campus JPCC, ubah jadi Eksternal' : c.acara ? ' · ' + c.acara : ''));
+      var kosong = [], iKosong = -1;
       c.n.forEach(function (v, i) {
         var label = P[i][1];
-        if (!v || v === '-') { if (!v && wajib(mn, c, i) && !peranPIC(label)) { kosong++; if (iKosong < 0) iKosong = i; } return; }
+        if (!v || v === '-') { if (!v && wajib(mn, c, i) && !peranPIC(label)) { kosong.push(label); if (iKosong < 0) iKosong = i; } return; }
         if (peranPIC(label)) punyaPic[dk] = 1;
         var p = pisah(v), k = kn(p.n), choir = label === 'Choir', ym = c.t.slice(0, 7), a = AT[k];
-        if (!AG[k] && !choir) tambah('asing', mn, c.id, i, p.n + ' · ' + label + ' · ' + lbl);
+        var di = 'Terjadwal ' + label + ' · ' + sv + ' · ' + lt(c.t);
+        if (!AG[k] && !choir) tambah('asing', mn, c.id, i, p.n + ' tidak ada di Database', di);
         // di luar daftar pilihan sel ini: tidak aktif di ministry ini / bukan campus-nya / posisi tidak cocok / (Youth Invasion) tidak ada di tab Youth Invasion
-        if (AG[k] && c.jenis !== 'Special event' && !peranPIC(label) && !choir && c.kd && c.kd[i] >= 0 && PL[c.kd[i]] && !layakSel(AG[k], c, i)) tambah('luar', mn, c.id, i, p.n + ' · ' + label + ' · ' + lbl + ' · daftar: ' + ketDaftar(c, i));
+        if (AG[k] && c.jenis !== 'Special event' && !peranPIC(label) && !choir && c.kd && c.kd[i] >= 0 && PL[c.kd[i]] && !layakSel(AG[k], c, i)) tambah('luar', mn, c.id, i, alasanLuar(AG[k], c, i, label), di);
         var bo = blokPada(k, c.t, mn), cp = cutiPada(k, c.t, label, mn);
-        if (bo) tambah('blok', mn, c.id, i, p.n + ' blockout ' + ltp(bo[2]) + '–' + ltp(bo[3]) + (bkIbadah(bo) ? ' (hanya ' + bkIbadah(bo) + ')' : '') + ' · ' + label + ' · ' + lbl);
-        else if (cp) tambah('blok', mn, c.id, i, p.n + ' cuti sebagai ' + cp.per.join(', ') + ' ' + ltp(cp.a) + '–' + ltp(cp.b) + (cp.ib ? ' (hanya ' + cp.ib + ')' : '') + ' · ' + label + ' · ' + lbl);
+        if (bo) tambah('blok', mn, c.id, i, p.n + ' blockout ' + rentangTgl(bo[2], bo[3]) + (bkIbadah(bo) ? ' (khusus ' + bkIbadah(bo) + ')' : ''), di);
+        else if (cp) tambah('blok', mn, c.id, i, p.n + ' cuti dari peran ' + cp.per.join(', ') + ', ' + rentangTgl(cp.a, cp.b) + (cp.ib ? ' (khusus ' + cp.ib + ')' : ''), di);
         if (choir) return;
         var bt = IX.bentrok[c.t + '|' + k];
-        if (bt && !lihat['b' + c.t + k]) { lihat['b' + c.t + k] = 1; tambah('bentrok', mn, c.id, i, p.n + ' · ' + ltp(c.t) + ' · ' + unik(bt.map(function (e) { return e.mn + ' ' + e.ef; })).join(' + ')); }
+        if (bt && !lihat['b' + c.t + k]) {
+          lihat['b' + c.t + k] = 1;
+          var tempat = unik(bt.map(function (e) { return e.peran + ' ' + e.mn + ' ' + e.ef; })), slot = unik(bt.map(function (e) { return e.slot; })).length;
+          var nCamp = unik(bt.map(function (e) { return (svInfo(e.ef) || {}).cp; })).length;
+          tambah('bentrok', mn, c.id, i, p.n + (nCamp > 1 ? ' terjadwal di ' + nCamp + ' campus berbeda di hari yang sama' : ' terjadwal di ' + slot + ' service yang jamnya bertabrakan'), 'Terjadwal ' + tempat.join(' dan ') + ' · ' + lt(c.t));
+        }
         var tr = IX.turut[mn + '|' + k];
         if (tr && tr.kena[c.t] && !peranPIC(label) && !c.lanjut && !lihat['t' + mn + k]) {
           lihat['t' + mn + k] = 1;
           var kn2 = Object.keys(tr.kena).sort(), lo = tambahHari(kn2[0], -7), hi = tambahHari(kn2[kn2.length - 1], 7);
-          tambah('turut', mn, c.id, i, p.n + ' · ' + mn + ' ' + tr.semua.filter(function (d) { return d >= lo && d <= hi; }).map(ltp).join(', '));
+          tambah('turut', mn, c.id, i, p.n + ' melayani berturut-turut di ' + mn, 'Terjadwal ' + tr.semua.filter(function (d) { return d >= lo && d <= hi; }).map(ltp).join(', ') + ' ' + c.t.slice(0, 4));
         }
         var n = IX.lebih[ym + '|' + k] || 0;
-        if (n > 1 && !c.lanjut && !lihat['l' + ym + k]) { lihat['l' + ym + k] = 1; tambah('lebih', mn, c.id, i, p.n + ' · ' + lblnp(ym) + ' (' + n + ' tanggal)'); }
-        if (a && a.maks && n > a.maks && !c.lanjut && !lihat['m' + ym + k]) { lihat['m' + ym + k] = 1; tambah('aturan', mn, c.id, i, p.n + ' · ' + n + ' tanggal di ' + lblnp(ym) + ', diminta maks ' + a.maks + 'x sebulan'); }
-        if (a && c.jenis !== 'Special event' && luarIbadah(k, mn, c.sv)) tambah('aturan', mn, c.id, i, p.n + ' · ' + lbl + ' · di luar ibadah yang diutamakan (' + a.ibadah.filter(function (x) { return mnSv(x) === mn; }).join(', ') + ')');
+        if (n > 1 && !c.lanjut && !lihat['l' + ym + k]) { lihat['l' + ym + k] = 1; tambah('lebih', mn, c.id, i, p.n + ' melayani ' + n + 'x di ' + lbln(ym), 'Terjadwal ' + tglBulanOrang(k, ym)); }
+        if (a && a.maks && n > a.maks && !c.lanjut && !lihat['m' + ym + k]) { lihat['m' + ym + k] = 1; tambah('aturan', mn, c.id, i, p.n + ' minta maksimal ' + a.maks + 'x sebulan, tapi terjadwal ' + n + 'x di ' + lbln(ym), 'Terjadwal ' + tglBulanOrang(k, ym)); }
+        if (a && c.jenis !== 'Special event' && luarIbadah(k, mn, c.sv)) tambah('aturan', mn, c.id, i, p.n + ' mengutamakan ibadah ' + a.ibadah.filter(function (x) { return mnSv(x) === mn; }).join(', ') + ', tapi dijadwalkan di ' + sv, di);
       });
-      if (kosong) tambah('kosong', mn, c.id, iKosong, kosong + ' peran belum terisi · ' + lbl);
+      if (kosong.length) tambah('kosong', mn, c.id, iKosong, kosong.length + ' peran belum terisi: ' + unik(kosong).map(function (l) { var j = kosong.filter(function (x) { return x === l; }).length; return l + (j > 1 ? ' (' + j + ')' : ''); }).join(', '), sv + ' · ' + lt(c.t));
     });
   });
   Object.keys(tglDraft).forEach(function (dk) {   // belum ada PIC: per ministry & tanggal (Youth tidak dicek)
     var mn = dk.split('|')[0], c = tglDraft[dk];
     if (mn === 'Youth' || punyaPic[dk]) return;
     var iPic = -1; D.input[mn].peran.forEach(function (p, i) { if (iPic < 0 && peranPIC(p[1])) iPic = i; });
-    tambah('pic', mn, c.id, iPic, mn + ' · ' + lt(c.t));
+    var svHari = unik(D.input[mn].kol.filter(function (x) { return x.t === c.t; }).map(function (x) { return x.sv || x.acara; }));
+    tambah('pic', mn, c.id, iPic, 'Belum ada PIC di ' + mn + ' hari itu', lt(c.t) + ' · ' + svHari.join(', '));
   });
   return out;
 }
 var JENIS_CEK = [
-  ['blok', 'Terjadwal saat blockout / cuti peran', 'bad', 'Orangnya sudah mengisi blockout di tanggal itu, atau sedang cuti untuk peran itu. Ganti, atau batalkan blockout-nya kalau sudah tidak berlaku.'],
-  ['bentrok', 'Bentrok di tanggal yang sama', 'warn', 'Satu orang di dua service pada tanggal yang sama (beda campus, atau nomor ibadahnya tumpang tindih).'],
-  ['asing', 'Nama tidak ada di Database', 'bad', 'Cek ejaan atau daftarkan dulu di Database. Nama ini tidak bisa dievaluasi dan tidak muncul di pencarian.'],
-  ['luar', 'Di luar daftar pilihan', 'bad', 'Nama ini tidak ada di daftar pilihan sel itu: tidak aktif di ministry ini, bukan campus-nya, posisinya tidak cocok, atau (kolom Youth Invasion) tidak ada di tab Youth Invasion. Ganti, kecuali memang disengaja.'],
-  ['kode', 'Kode service tidak dikenal', 'abu', 'Service harus sama dengan daftar di Pengaturan supaya campus, call time & pilihan namanya terbaca. Special event di luar campus boleh diabaikan.'],
-  ['turut', 'Berturut-turut', 'ungu', 'Melayani lagi dalam 7 hari di ministry yang sama (PIC tidak dihitung).'],
+  ['blok', 'Terjadwal saat blockout / cuti', 'bad', 'Orang ini sudah bilang tidak bisa di tanggal itu (blockout), atau sedang cuti dari peran itu. Ganti orangnya, atau batalkan blockout-nya kalau ternyata dia bisa.'],
+  ['bentrok', 'Bentrok di hari yang sama', 'warn', 'Satu orang terjadwal di dua service yang tidak bisa dirangkap: beda campus, atau jam ibadahnya bertabrakan. Pilih salah satu.'],
+  ['asing', 'Nama tidak ada di Database', 'bad', 'Cek ejaan namanya, atau daftarkan dulu di Database. Selama belum terdaftar, dia tidak bisa mengisi evaluasi dan tidak muncul di pencarian.'],
+  ['luar', 'Tidak sesuai data di Database', 'bad', 'Menurut Database, orang ini belum terdaftar untuk peran, ibadah, atau campus tersebut. Ganti orangnya, atau perbarui datanya di Database kalau dia memang sudah boleh.'],
+  ['kode', 'Service belum diisi / tidak dikenal', 'abu', 'Service harus kode dari daftar Pengaturan (mis. TK 1-2) supaya campus, call time, dan pilihan namanya terbaca. Special event di luar campus JPCC: ubah jenis event-nya jadi Eksternal, lalu tulis lokasinya.'],
+  ['turut', 'Berturut-turut', 'ungu', 'Melayani lagi di ministry yang sama dalam 7 hari (minggu sebelum atau sesudahnya). Tugas PIC tidak dihitung.'],
   ['lebih', 'Lebih dari 1x sebulan', 'kuning', 'Boleh, tapi pastikan memang disengaja.'],
-  ['aturan', 'Di luar aturan pelayan', 'biru', 'Melebihi maks per bulan yang diminta, atau di luar ibadah yang diutamakan orang itu. Sifatnya diutamakan, bukan larangan.'],
-  ['pic', 'Belum ada PIC', 'abu', 'Tanggal yang belum punya PIC sama sekali (Youth tidak dicek).'],
-  ['kosong', 'Belum terisi sesuai Formasi', 'abu', 'Peran yang menurut Formasi Tim seharusnya terisi. Boleh sengaja dikosongkan (mis. WL cukup satu), dan baris di luar Formasi boleh diisi; jadwal tetap bisa terbit.']
+  ['aturan', 'Di luar aturan pelayan', 'biru', 'Tidak sesuai permintaan orang itu di Aturan pelayan: jumlah maksimal per bulan, atau ibadah yang dia utamakan. Sifatnya permintaan, bukan larangan.'],
+  ['pic', 'Belum ada PIC', 'abu', 'Hari yang belum punya PIC sama sekali. Youth tidak dicek.'],
+  ['kosong', 'Belum terisi sesuai Formasi', 'abu', 'Menurut Formasi Tim, peran ini seharusnya terisi. Boleh sengaja dikosongkan (mis. WL cukup satu); jadwal tetap bisa terbit.']
 ];
+/* satu catatan cek: baris 1 = masalahnya, baris 2 = terjadwal di mana & kapan */
+function teksCek(x) { return '<span class="cek-t"><b>' + esc(x.teks) + '</b>' + (x.kapan ? '<small>' + esc(x.kapan) + '</small>' : '') + '</span>'; }
 var CEK_BERAT = /^(blok|asing|bentrok)$/;
 function statDraft(mn) {
   var K = D.input[mn].kol, hi = hitungIsi(mn, K);
@@ -1211,7 +1267,7 @@ LAYAR.susun = function () {
     return '<th colspan="' + g.k.length + '">' + HARIP[tglObj(g.t).getDay()].toUpperCase() + ', ' + ltp(g.t).toUpperCase() + (perlu ? ' <span style="font-weight:600;opacity:.75">· ' + isi + '/' + perlu + '</span>' : '') + '</th>';
   }).join('') + '</tr><tr class="r2"><th class="pr">Peran</th>' + K.map(function (c) {
     var se = c.jenis === 'Special event', kc = kcDari(c.sv), warna = { TK: '#4B2E83', UR: '#1565C0', SH: '#00695C' }[kc] || '#9A93A6';
-    return '<th><button type="button" class="sv" data-info="' + c.id + '" title="Klik untuk mengubah info service"><span class="k"><i style="background:' + warna + '"></i>' + esc(c.sv || '(isi lokasi)') + (c.tarik ? ' <span class="chip warn" style="height:18px;font-size:10px">edit terbit</span>' : '') + '</span>' +
+    return '<th><button type="button" class="sv" data-info="' + c.id + '" title="Klik untuk mengubah info service"><span class="k"><i style="background:' + warna + '"></i>' + esc(c.sv || (c.lk === 'Eksternal' ? '(isi lokasi)' : '(pilih service)')) + (c.tarik ? ' <span class="chip warn" style="height:18px;font-size:10px">edit terbit</span>' : '') + '</span>' +
       '<small>' + esc(c.acara || '–') + (c.ct ? ' · ' + esc(c.ct) : '') + '</small><small>' + esc(psTampil(S.mn, c) || (se ? (c.lk || 'Central') + ' · special event' : 'Pastor belum diisi')) + '</small>' +
       (c.cat ? '<span class="cat' + (se ? ' se' : '') + '">' + esc(c.cat) + '</span>' : '') + '</button></th>';
   }).join('') + '</tr></thead><tbody>';
@@ -1231,7 +1287,7 @@ LAYAR.susun = function () {
   if (cekTampil.length) {
     h += '<div class="kartu masalah"><h3>Catatan di tampilan ini <span class="chip abu">' + cekTampil.length + '</span></h3><ul class="daftar">' + cekTampil.slice(0, 14).map(function (x) {
       var j = JENIS_CEK.filter(function (q) { return q[0] === x.j; })[0];
-      return '<li><button type="button" data-lompat="' + x.kol + ':' + x.i + '"><span class="chip ' + j[2] + '">' + j[1] + '</span><b style="font-weight:600">' + esc(x.teks) + '</b></button></li>';
+      return '<li><button type="button" data-lompat="' + x.kol + ':' + x.i + '"><span class="chip ' + j[2] + '">' + j[1] + '</span>' + teksCek(x) + '</button></li>';
     }).join('') + '</ul>' + (cekTampil.length > 14 ? '<p class="kecil" style="margin-top:6px">… dan ' + (cekTampil.length - 14) + ' lagi. Lihat semuanya di Cek & terbit.</p>' : '') + '</div>';
   }
   return h;
@@ -1358,28 +1414,38 @@ function modalBuat(mn) {
     '<div class="pesan" style="margin-top:12px">Isi otomatis memakai aturan yang sama dengan spreadsheet: tidak dobel di tanggal yang sama, tidak berturut-turut, blockout dilewati, gender WL & singer seimbang, PIC & Vocal arranger dari yang bertugas, dan yang paling jarang dijadwalkan didahulukan. Special event tidak diisi otomatis.</div>' +
     '<div class="aksi"><button type="button" class="btn garis" data-tutup="modal">Batal</button><button type="button" class="btn" data-ok="buat" data-untuk="' + mn + '">Buat jadwal</button></div>');
 }
+/* jenis event special event = baris Lingkup tab Input: Central / Local (internal, Service = kode) atau Eksternal (lokasi ditulis bebas) */
+var PILIH_LK = [['Central', 'Internal · nama dari semua campus'], ['Local', 'Internal · seperti Sunday service'], ['Eksternal', 'Eksternal · di luar campus JPCC']];
+function opsiLk(pilih) { return PILIH_LK.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === pilih ? ' selected' : '') + '>' + x[1] + '</option>'; }).join(''); }
+/* modal Info service: Special event Eksternal = lokasi ditulis bebas; selain itu Service dipilih dari kode */
+function aturInfoSv() {
+  var se = val('ifJenis') === 'Special event', eks = se && val('ifLk') === 'Eksternal';
+  $('ifLkWrap').hidden = !se; $('ifSvKode').hidden = eks; $('ifSvBebas').hidden = !eks;
+  $('ifSvLbl').textContent = eks ? 'Lokasi / detail' : 'Service (kode)';
+}
 function modalSE() {
   bukaModal('<button type="button" class="x" data-tutup="modal">×</button><h3>Tambah special event · ' + S.mn + '</h3><p class="ket">Kolom diselipkan sesuai urutan tanggal. Lebih dari 1 hari: tim cukup diisi di Hari 1, hari berikutnya otomatis ikut (masih bisa dibedakan per hari).</p>' +
     '<div class="bidang"><div class="penuh"><label class="lbl">Nama acara</label><input class="isian" id="seNama" placeholder="mis. Lead Together, Mission Trip"></div>' +
     '<div><label class="lbl">Tanggal mulai</label><input class="isian" id="seT1" type="date" value="' + (S.tgl || S.ym + '-15') + '"></div><div><label class="lbl">Tanggal selesai (kosong = 1 hari)</label><input class="isian" id="seT2" type="date"></div>' +
     '<div><label class="lbl">Jumlah kolom per tanggal</label><select class="isian" id="seJml">' + [1, 2, 3, 4, 5].map(function (n) { return '<option>' + n + '</option>'; }).join('') + '</select><div class="kecil" style="margin-top:4px">mis. 3 kalau diadakan di 3 campus</div></div>' +
-    '<div><label class="lbl">Pilihan nama</label><select class="isian" id="seLk"><option value="Central">Central · semua campus & ministry</option><option value="Local">Local · seperti Sunday service</option></select><div class="kecil" style="margin-top:4px">Menentukan siapa yang muncul di pemilih pelayan</div></div></div>' +
+    '<div><label class="lbl">Jenis event</label><select class="isian" id="seLk">' + opsiLk('Central') + '</select><div class="kecil" style="margin-top:4px">Internal: Service dipilih dari kode (TK, UR, SH). Eksternal: lokasinya ditulis sendiri.</div></div></div>' +
     '<div class="aksi"><button type="button" class="btn garis" data-tutup="modal">Batal</button><button type="button" class="btn" data-ok="se">Tambah kolom</button></div>');
 }
 function modalInfo(id) {
-  var o = kolById(id), c = o.c, bisa = boleh('susun', o.mn), se = c.jenis === 'Special event', dis = bisa ? '' : ' disabled';
+  var o = kolById(id), c = o.c, bisa = boleh('susun', o.mn), se = c.jenis === 'Special event', eks = se && c.lk === 'Eksternal', dis = bisa ? '' : ' disabled';
   var kode = Object.keys(SV).filter(function (k) { return mnDariSv(k) === o.mn || k === c.sv; });
   bukaModal('<button type="button" class="x" data-tutup="modal">×</button><h3>Info service</h3><p class="ket">' + esc(o.mn) + ' · ' + lt(c.t) + (c.tarik ? ' · sedang diedit dari versi terbit' : '') + '</p><div class="bidang">' +
     '<div><label class="lbl">Tanggal</label><input class="isian" id="ifT" type="date" value="' + c.t + '"' + dis + '></div>' +
     '<div><label class="lbl">Jenis</label><select class="isian" id="ifJenis"' + dis + '><option' + (!se ? ' selected' : '') + '>Reguler</option><option' + (se ? ' selected' : '') + '>Special event</option></select></div>' +
-    '<div><label class="lbl">Service' + (se ? ' (lokasi / campus)' : ' (kode)') + '</label>' + (se ? '<input class="isian" id="ifSv" value="' + esc(c.sv) + '" placeholder="mis. TK, UR, SH, atau nama tempat"' + dis + '>' :
-      '<select class="isian" id="ifSv"' + dis + '>' + (SV[c.sv] ? '' : '<option value="' + esc(c.sv) + '" selected>' + esc(c.sv || '(kosong)') + ' · tidak dikenal</option>') + kode.map(function (k) { return '<option' + (k === c.sv ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('') + '</select>') + '</div>' +
+    '<div class="penuh" id="ifLkWrap"' + (se ? '' : ' hidden') + '><label class="lbl">Jenis event</label><select class="isian" id="ifLk"' + dis + '>' + opsiLk(c.lk || 'Central') + '</select></div>' +
+    '<div><label class="lbl" id="ifSvLbl">' + (eks ? 'Lokasi / detail' : 'Service (kode)') + '</label>' +
+      '<select class="isian" id="ifSvKode"' + dis + (eks ? ' hidden' : '') + '>' + (SV[c.sv] ? '' : '<option value="' + (eks ? '' : esc(c.sv)) + '" selected>' + (c.sv && !eks ? esc(c.sv) + ' · tidak dikenal' : '(pilih service)') + '</option>') + kode.map(function (k) { return '<option' + (k === c.sv ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('') + '</select>' +
+      '<input class="isian" id="ifSvBebas" value="' + esc(SV[c.sv] ? '' : c.sv) + '" placeholder="mis. Bali, GBI Bandung"' + dis + (eks ? '' : ' hidden') + '></div>' +
     '<div><label class="lbl">Acara / kelas</label><input class="isian" id="ifAcara" value="' + esc(c.acara) + '"' + dis + '></div>' +
     '<div><label class="lbl">Call time</label><input class="isian" id="ifCt" value="' + esc(c.ct) + '"' + dis + '></div>' +
     '<div><label class="lbl">Pastor (firman)</label><input class="isian" id="ifPs" list="dlPastor" value="' + esc(c.ps) + '"' + (!c.ps && psTampil(o.mn, c) ? ' placeholder="sama dengan kolom sebelumnya: ' + esc(psTampil(o.mn, c)) + '"' : '') + dis + '><datalist id="dlPastor">' + D.atur.pastor.map(function (p) { return '<option value="' + esc(p) + '">'; }).join('') + '</datalist></div>' +
     '<div class="penuh"><label class="lbl">Latihan</label><input class="isian" id="ifLat" value="' + esc(c.lat) + '"' + dis + '></div>' +
     '<div class="penuh"><label class="lbl">Catatan (tampil di jadwal, mis. PERJAMUAN KUDUS, YOUTH INVASION)</label><input class="isian" id="ifCat" value="' + esc(c.cat) + '"' + dis + '></div>' +
-    (se ? '<div class="penuh"><label class="lbl">Pilihan nama</label><select class="isian" id="ifLk"' + dis + '><option' + (c.lk !== 'Local' ? ' selected' : '') + '>Central</option><option' + (c.lk === 'Local' ? ' selected' : '') + '>Local</option></select></div>' : '') +
     '</div>' + (o.mn === 'Umum' && !se && /youth\s*invasion/i.test(c.acara + ' ' + c.cat) ? '<div class="pesan" style="margin-top:12px">⚡ Kolom Youth Invasion: pemilih pelayan juga menampilkan nama di daftar Youth Invasion.</div>' : '') +
     '<div class="aksi">' + (bisa ? '<button type="button" class="btn bahaya" data-ok="hapuskol" data-id="' + id + '" style="margin-right:auto">Hapus kolom</button>' : '') + '<button type="button" class="btn garis" data-tutup="modal">Tutup</button>' + (bisa ? '<button type="button" class="btn" data-ok="info" data-id="' + id + '">Simpan</button>' : '') + '</div>');
 }
@@ -1418,7 +1484,7 @@ LAYAR.cek = function () {
       if (!L.length) return;
       var bukaSemua = S.cekJ === j[0], tampil = bukaSemua ? L : L.slice(0, 6);
       h += '<div class="kartu"><h3><span class="chip ' + j[2] + '">' + L.length + '</span> ' + j[1] + '</h3><p class="ket">' + j[3] + '</p><ul class="daftar masalah" style="margin:0">' + tampil.map(function (x) {
-        return '<li><button type="button" data-lompat="' + x.kol + ':' + x.i + '"><span class="chip ' + x.mn + '">' + x.mn + '</span><b style="font-weight:600">' + esc(x.teks) + '</b><span style="margin-left:auto;color:#B9B2C6;font-weight:800">›</span></button></li>';
+        return '<li><button type="button" data-lompat="' + x.kol + ':' + x.i + '"><span class="chip ' + x.mn + '">' + x.mn + '</span>' + teksCek(x) + '<span style="margin-left:auto;color:#B9B2C6;font-weight:800">›</span></button></li>';
       }).join('') + '</ul>' + (L.length > 6 ? '<button type="button" class="btn garis kcl" data-cekbuka="' + (bukaSemua ? '' : j[0]) + '" style="margin-top:8px">' + (bukaSemua ? 'Ringkas' : 'Tampilkan semua ' + L.length) + '</button>' : '') + '</div>';
     });
   } else if (S.pv === 'pv') {
@@ -1903,7 +1969,7 @@ document.addEventListener('click', function (e) {
     if (k === 'se') { var t1 = val('seT1'), ds = { t1: t1, t2: val('seT2'), jumlah: +val('seJml'), lk: val('seLk'), acara: val('seNama') }; if (!t1) return roti('✗ Isi tanggal mulai.'); tutupModal(); kerja('Menambah kolom special event…', function () { return api('scSpecial', S.mn, ds, KL()); }, function () { S.ym = t1.slice(0, 7); S.tgl = ''; }); }
     if (k === 'info') {
       var o2 = kolById(id), c2 = o2.c;
-      var baru2 = { t: val('ifT') || c2.t, jenis: val('ifJenis'), sv: val('ifSv'), acara: val('ifAcara'), ct: val('ifCt'), ps: val('ifPs'), lat: val('ifLat'), cat: val('ifCat'), lk: $('ifLk') ? val('ifLk') : c2.lk };
+      var baru2 = { t: val('ifT') || c2.t, jenis: val('ifJenis'), sv: val('ifJenis') === 'Special event' && val('ifLk') === 'Eksternal' ? val('ifSvBebas') : val('ifSvKode'), acara: val('ifAcara'), ct: val('ifCt'), ps: val('ifPs'), lat: val('ifLat'), cat: val('ifCat'), lk: val('ifLk') || c2.lk };
       var lama2 = { t: c2.t, acara: c2.acara, jenis: c2.jenis, sv: c2.sv, ct: c2.ct, lat: c2.lat, ps: c2.ps, cat: c2.cat };
       tutupModal(); tutupLaci();
       kerja('Menyimpan info service…', function () { return api('scInfoKolom', o2.mn, { sid: c2.sid, baru: baru2, lama: lama2 }, KL()); }, function () { S.ym = baru2.t.slice(0, 7); if (S.tgl) S.tgl = baru2.t; });
@@ -1962,6 +2028,7 @@ document.addEventListener('input', function (e) {
 });
 document.addEventListener('change', function (e) {
   var t = e.target, v;
+  if (t.id === 'ifJenis' || t.id === 'ifLk') { aturInfoSv(); return; }
   if (t.id === 'bkJenis') { $('bkPeranWrap').hidden = t.value !== 'peran'; isiPeranBk(); isiIbadahBk(); return; }
   if (t.id === 'bkNama') { isiPeranBk(); isiIbadahBk(); return; }
   if (t.name === 'bkIb') { aturIbBk(t); return; }
