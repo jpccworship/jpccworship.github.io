@@ -647,15 +647,17 @@ function ketDaftar(c, i) {
 
 /* ---------- indeks tugas (draft semua ministry + terbit) & tanda menurut rumus spreadsheet ---------- */
 var IX = { orang: {}, bentrok: {}, lebih: {}, turut: {} };
-function svInfo(sv) {
+function svInfo(sv, eks) {
   sv = String(sv || '');
+  if (eks) return { cp: 'X|' + sv, lo: 0, hi: -1, eks: true };   // event eksternal: sehari penuh di luar campus (lokasi sama = event yang sama, tidak bentrok)
   var m = /^(TK|UR|SH)( |$)/.exec(sv);
   if (!m) return null;
   var lo = /(\d+)(?:-\d+)?$/.exec(sv), hi = /(\d+)$/.exec(sv);
   return { cp: m[1], lo: lo ? +lo[1] : 1, hi: hi ? +hi[1] : 9 };
 }
-/* dua service di tanggal yang sama bentrok kalau campus-nya beda, atau nomor ibadahnya tumpang tindih */
-function svBentrok(a, b) { var x = svInfo(a), y = svInfo(b); return !!x && !!y && (x.cp !== y.cp || (x.lo <= y.hi && x.hi >= y.lo)); }
+/* dua service di tanggal yang sama bentrok kalau campus-nya beda, nomor ibadahnya tumpang tindih, atau salah satunya event eksternal */
+function svBentrok(a, b, ea, eb) { var x = svInfo(a, ea), y = svInfo(b, eb); return !!x && !!y && (x.cp !== y.cp || (x.lo <= y.hi && x.hi >= y.lo)); }
+function kolEks(c) { return c.jenis === 'Special event' && c.lk === 'Eksternal'; }
 function svEf(sv, kh) { return kh ? kh.slice(0, 2) + ' ' + kh.slice(2) : sv; }
 function indeks() {
   var O = {}, ditarik = {};
@@ -667,22 +669,22 @@ function indeks() {
       c.n.forEach(function (v, i) {
         if (!v || v === '-') return;
         var ps = pisah(v);
-        catat(kn(ps.n), { t: c.t, mn: mn, sv: c.sv || c.acara, ef: svEf(c.sv, ps.kh), peran: P[i][1], src: 'draft', kolId: c.id, i: i, slot: mn + '|' + c.t + '|' + c.sv, lanjut: c.lanjut, g: c.g });
+        catat(kn(ps.n), { t: c.t, mn: mn, sv: c.sv || c.acara, eks: kolEks(c), acara: c.acara, ef: svEf(c.sv, ps.kh), peran: P[i][1], src: 'draft', kolId: c.id, i: i, slot: mn + '|' + c.t + '|' + c.sv, lanjut: c.lanjut, g: c.g });
       });
     });
   });
   D.terbit.forEach(function (s) {
     if (ditarik[s.mn + '|' + s.t.slice(0, 7)]) return;   // versi terbit bulan yang sedang diedit diganti draft-nya
     var lanjut = s.jenis === 'Special event' && /hari\s*([2-9]|[1-9]\d)\s*(dari|\/)/i.test(s.cat);
-    s.tim.forEach(function (x) { if (x[1]) catat(kn(x[1]), { t: s.t, mn: s.mn, sv: s.sv || s.acara, ef: svEf(s.sv, x[2]), peran: x[0], src: 'terbit', kolId: 'T' + s.k, i: -1, slot: s.k, lanjut: lanjut, g: '' }); });
+    s.tim.forEach(function (x) { if (x[1]) catat(kn(x[1]), { t: s.t, mn: s.mn, sv: s.sv || s.acara, eks: kolEks(s), acara: s.acara, ef: svEf(s.sv, x[2]), peran: x[0], src: 'terbit', kolId: 'T' + s.k, i: -1, slot: s.k, lanjut: lanjut, g: '' }); });
   });
   var B = {}, L = {}, T = {};
   Object.keys(O).forEach(function (k) {
     var E = O[k].filter(function (e) { return !e.choir; }), perT = {};
-    E.forEach(function (e) { if (svInfo(e.ef)) (perT[e.t] = perT[e.t] || []).push(e); });
+    E.forEach(function (e) { if (svInfo(e.ef, e.eks)) (perT[e.t] = perT[e.t] || []).push(e); });
     Object.keys(perT).forEach(function (t) {
       var a = perT[t], kena = [];
-      a.forEach(function (x) { if (a.some(function (y) { return y.slot !== x.slot && svBentrok(x.ef, y.ef); })) kena.push(x); });
+      a.forEach(function (x) { if (a.some(function (y) { return y.slot !== x.slot && svBentrok(x.ef, y.ef, x.eks, y.eks); })) kena.push(x); });
       if (kena.length) B[t + '|' + k] = kena;
     });
     var perB = {};
@@ -706,7 +708,7 @@ function infoCalon(k, mn, c, label) {
   var sebelum = lain.filter(function (x) { return x.t < c.t; }).map(function (x) { return x.t; }).sort();
   return {
     blok: blokPada(k, c.t, mn), cuti: cutiPada(k, c.t, label, mn),
-    bentrok: label === 'Choir' ? [] : lain.filter(function (x) { return x.t === c.t && !x.choir && svBentrok(x.ef, c.sv); }),
+    bentrok: label === 'Choir' ? [] : lain.filter(function (x) { return x.t === c.t && !x.choir && svBentrok(x.ef, c.sv, x.eks, kolEks(c)); }),
     turut: !hitung || peranPIC(label) ? [] : lain.filter(function (x) { var s = Math.abs(selisih(x.t, c.t)); return x.mn === mn && !x.pic && !x.choir && !x.lanjut && s >= 1 && s <= 7; }),
     bulan: tglLain.length,
     maks: a && a.maks && hitung && tglLain.length >= a.maks ? a.maks : 0,
@@ -835,9 +837,9 @@ function cekDraft(mnSaja) {
         var bt = IX.bentrok[c.t + '|' + k];
         if (bt && !lihat['b' + c.t + k]) {
           lihat['b' + c.t + k] = 1;
-          var tempat = unik(bt.map(function (e) { return e.peran + ' ' + e.mn + ' ' + e.ef; })), slot = unik(bt.map(function (e) { return e.slot; })).length;
-          var nCamp = unik(bt.map(function (e) { return (svInfo(e.ef) || {}).cp; })).length;
-          tambah('bentrok', mn, c.id, i, p.n + (nCamp > 1 ? ' terjadwal di ' + nCamp + ' campus berbeda di hari yang sama' : ' terjadwal di ' + slot + ' service yang jamnya bertabrakan'), 'Terjadwal ' + tempat.join(' dan ') + ' · ' + lt(c.t));
+          var tempat = unik(bt.map(function (e) { return e.peran + ' ' + e.mn + ' ' + (e.eks ? (e.acara || 'event eksternal') + (e.ef ? ' (' + e.ef + ')' : '') : e.ef); })), slot = unik(bt.map(function (e) { return e.slot; })).length;
+          var nCamp = unik(bt.map(function (e) { return (svInfo(e.ef, e.eks) || {}).cp; })).length, nEks = unik(bt.filter(function (e) { return e.eks; }).map(function (e) { return e.slot; })).length;
+          tambah('bentrok', mn, c.id, i, p.n + (nEks && nEks < slot ? ' ikut event eksternal, tapi juga terjadwal di service lain di hari yang sama' : nEks ? ' terjadwal di ' + nEks + ' event eksternal berbeda di hari yang sama' : nCamp > 1 ? ' terjadwal di ' + nCamp + ' campus berbeda di hari yang sama' : ' terjadwal di ' + slot + ' service yang jamnya bertabrakan'), 'Terjadwal ' + tempat.join(' dan ') + ' · ' + lt(c.t));
         }
         var tr = IX.turut[mn + '|' + k];
         if (tr && tr.kena[c.t] && !peranPIC(label) && !c.lanjut && !lihat['t' + mn + k]) {
@@ -864,7 +866,7 @@ function cekDraft(mnSaja) {
 }
 var JENIS_CEK = [
   ['blok', 'Terjadwal saat blockout / cuti', 'bad', 'Orang ini sudah bilang tidak bisa di tanggal itu (blockout), atau sedang cuti dari peran itu. Ganti orangnya, atau batalkan blockout-nya kalau ternyata dia bisa.'],
-  ['bentrok', 'Bentrok di hari yang sama', 'warn', 'Satu orang terjadwal di dua service yang tidak bisa dirangkap: beda campus, atau jam ibadahnya bertabrakan. Pilih salah satu.'],
+  ['bentrok', 'Bentrok di hari yang sama', 'warn', 'Satu orang terjadwal di dua service yang tidak bisa dirangkap: beda campus, jam ibadahnya bertabrakan, atau salah satunya event eksternal. Pilih salah satu.'],
   ['asing', 'Nama tidak ada di Database', 'bad', 'Cek ejaan namanya, atau daftarkan dulu di Database. Selama belum terdaftar, dia tidak bisa mengisi evaluasi dan tidak muncul di pencarian.'],
   ['luar', 'Tidak sesuai data di Database', 'bad', 'Menurut Database, orang ini belum terdaftar untuk peran, ibadah, atau campus tersebut. Ganti orangnya, atau perbarui datanya di Database kalau dia memang sudah boleh.'],
   ['kode', 'Service belum diisi / tidak dikenal', 'abu', 'Service harus kode dari daftar Pengaturan (mis. TK 1-2) supaya campus, call time, dan pilihan namanya terbaca. Special event di luar campus JPCC: ubah jenis event-nya jadi Eksternal, lalu tulis lokasinya.'],
@@ -1344,7 +1346,7 @@ function barisCalon(a, c, mn, label, urutan, luar) {
   if (inf.cuti) td.push('<span class="chip bad">Cuti ' + esc(inf.cuti.per.join(', ')) + ' ' + ltp(inf.cuti.a) + '–' + ltp(inf.cuti.b) + '</span>');
   if (inf.maks) td.push('<span class="chip biru">Sudah ' + inf.bulan + '/' + inf.maks + ' bulan ini</span>');
   if (inf.luar) td.push('<span class="chip biru">Diutamakan: ' + esc(inf.luar.join(', ')) + '</span>');
-  if (inf.bentrok.length) td.push('<span class="chip warn">Sudah di ' + esc(unik(inf.bentrok.map(function (x) { return (x.mn !== mn ? x.mn + ' ' : '') + x.sv; })).join(', ')) + ' hari itu</span>');
+  if (inf.bentrok.length) td.push('<span class="chip warn">Sudah di ' + esc(unik(inf.bentrok.map(function (x) { return (x.mn !== mn ? x.mn + ' ' : '') + (x.eks ? x.acara || x.sv || 'event eksternal' : x.sv); })).join(', ')) + ' hari itu</span>');
   if (inf.turut.length) td.push('<span class="chip ungu">Berdekatan: ' + unik(inf.turut.map(function (x) { return ltp(x.t); })).join(', ') + '</span>');
   if (inf.diKol.length) td.push('<span class="chip abu">Di service ini: ' + esc(unik(inf.diKol.map(function (x) { return x.peran; })).join(', ')) + '</span>');
   if (luar) td.push('<span class="chip abu">Di luar pilihan dropdown</span>');
