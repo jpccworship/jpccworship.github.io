@@ -1084,13 +1084,37 @@ var DATA = window.__DATA__;
     var d = r.d || {}, o = IX.orang[k] || [k, d.n || k], A = D.opsi.aspek, kini = D.kini, h = '';
     var prog = r.program || [];
     var skorT = d.skorT || [];
+    // MD Trainee: periode (tab Riwayat MD Trainee) + pelayanan sebagai MD bersama Co-MD / sebagai Co-MD (jadwal terbit)
+    var M = r.mdt || {}, mPer = M.periode || [], mOtj = M.otj || [], mDp = M.dampingi || [];
+    var mBuka = mPer.filter(function (p) { return p[2] === 'MD Trainee' && !p[1]; })[0], mAngkat = mPer.filter(function (p) { return p[2] === 'Diangkat jadi MD'; }).slice(-1)[0];
+    var lamaBln = function (a, b) { if (!a) return ''; var x = tglObj(a), y = tglObj(b || kini), n = (y - x) / 864e5; return n < 1 ? '' : n < 60 ? Math.round(n / 7) + ' minggu' : Math.round(n / 30.4) + ' bulan'; };
     // kepala
     h += '<div class="kartu"><div class="vc-kepala"><div><div class="eyebrow2">Volunteer Card</div><h2>' + esc(d.n || o[1]) + '</h2>' +
       '<div class="vc-info">' + (d.pos ? '<span><b>Posisi</b>' + esc(d.pos) + '</span>' : '') + (d.camp ? '<span><b>Campus</b>' + esc(d.camp) + '</span>' : '') +
       (d.mns ? '<span><b>Ministry</b>' + esc(d.mns) + '</span>' : '') + (d.home ? '<span><b>Home-base</b>' + esc(d.home) + '</span>' : '') +
-      (d.suara ? '<span><b>Jenis suara</b>' + esc(d.suara) + '</span>' : '') + (d.role ? '<span><b>Status</b>' + esc(d.role) + '</span>' : '') + '</div></div>' +
+      (d.suara ? '<span><b>Jenis suara</b>' + esc(d.suara) + '</span>' : '') + (d.role ? '<span><b>Status</b>' + esc(d.role) + '</span>' : '') +
+      (mBuka ? '<span><b>MD Trainee</b><i class="tag" style="--c:#AD1457;font-style:normal">sedang MD Trainee</i> sejak ' + esc(lp(mBuka[0])) + '</span>' :
+        mAngkat ? '<span><b>Music director</b>diangkat ' + esc(lp(mAngkat[1])) + (mAngkat[0] ? ' · MD Trainee sejak ' + esc(lp(mAngkat[0])) : '') + '</span>' : '') + '</div></div>' +
       '<div class="skor-blok"><div><small>Skor akhir</small><b class="fc' + ks(d.akhir).slice(1) + '">' + nilai(d.akhir) + '</b></div><div><small>Skor evaluasi</small><b class="fc' + ks(d.ev).slice(1) + '">' + nilai(d.ev) + '</b></div>' +
       '<div><small>Mapping</small><b>' + nilai(d.mapRata) + '</b></div><div><small>Pelayanan dinilai</small><b>' + (d.nLay || 0) + '</b></div></div></div></div>';
+    // MD Trainee & Co-MD
+    if (mPer.length || mOtj.length || mDp.length) {
+      var mLalu = mOtj.filter(function (x) { return x[0] <= kini; }).length, mCo = {};
+      mOtj.forEach(function (x) { if (x[0] <= kini) String(x[2] || '').split(', ').filter(String).forEach(function (n) { mCo[n] = (mCo[n] || 0) + 1; }); });
+      h += '<div class="kartu"><h3>MD Trainee</h3><p class="ket">MD Trainee = OTJ langsung sebagai Music director, didampingi MD berpengalaman sebagai Co-MD. Periode dari tab Riwayat MD Trainee (file Admin); pelayanan dari jadwal terbit.</p>' +
+        (mPer.length ? '<div style="background:#FCE8F1;color:#8E1450;margin-bottom:12px;padding:10px 14px;border-radius:10px;font-size:14px;line-height:1.5">' + (mBuka ? '<b>Sedang MD Trainee</b> sejak ' + esc(lp(mBuka[0])) + (lamaBln(mBuka[0]) ? ' (' + lamaBln(mBuka[0]) + ')' : '') :
+          mAngkat ? '<b>Diangkat jadi MD</b> ' + esc(lp(mAngkat[1])) + (mAngkat[0] ? ' setelah MD Trainee sejak ' + esc(lp(mAngkat[0])) + (lamaBln(mAngkat[0], mAngkat[1]) ? ' (' + lamaBln(mAngkat[0], mAngkat[1]) + ')' : '') : '') :
+          'Tidak lagi MD Trainee') + (mOtj.length ? ' · ' + mLalu + '× melayani sebagai MD' + (Object.keys(mCo).length ? ' bersama Co-MD ' + esc(Object.keys(mCo).map(function (n) { return n + (mCo[n] > 1 ? ' (' + mCo[n] + '×)' : ''); }).join(', ')) : '') : '') + '</div>' +
+          '<div class="tbl-wrap"><table class="t"><thead><tr><th>Mulai MD Trainee</th><th>Selesai</th><th>Status</th><th>Catatan</th></tr></thead><tbody>' + mPer.slice().reverse().map(function (p) {
+            return '<tr><td style="white-space:nowrap">' + esc(lp(p[0])) + '</td><td style="white-space:nowrap">' + (p[1] ? esc(lp(p[1])) : '<span class="kecil">masih berjalan</span>') + '</td><td><span class="tag" style="--c:' + (p[2] === 'Diangkat jadi MD' ? '#0F7B6C' : p[2] === 'Berhenti' ? '#6B7280' : '#AD1457') + '">' + esc(p[2]) + '</span></td><td class="kecil">' + esc(p[3]) + '</td></tr>';
+          }).join('') + '</tbody></table></div>' : '') +
+        (mOtj.length ? '<h3 style="font-size:14px;margin:16px 0 6px">Melayani sebagai MD · didampingi Co-MD</h3><div class="tbl-wrap"><table class="t"><thead><tr><th>Tanggal</th><th>Service</th><th>Co-MD</th></tr></thead><tbody>' + mOtj.slice(0, 30).map(function (x) {
+          return '<tr><td style="white-space:nowrap">' + esc(lt(x[0])) + (x[0] > kini ? ' <span class="tag" style="--c:#6B7280">akan datang</span>' : '') + '</td><td>' + esc(x[1]) + '</td><td>' + (x[2] ? esc(x[2]) : '<span class="kecil" style="color:#B3261E">tanpa Co-MD</span>') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' + (mOtj.length > 30 ? '<p class="kecil" style="margin-top:6px">' + (mOtj.length - 30) + ' pelayanan lebih lama tidak ditampilkan.</p>' : '') : '') +
+        (mDp.length ? '<h3 style="font-size:14px;margin:16px 0 6px">Mendampingi sebagai Co-MD</h3><div class="tbl-wrap"><table class="t"><thead><tr><th>Tanggal</th><th>Service</th><th>MD Trainee</th></tr></thead><tbody>' + mDp.map(function (x) {
+          return '<tr><td style="white-space:nowrap">' + esc(lt(x[0])) + (x[0] > kini ? ' <span class="tag" style="--c:#6B7280">akan datang</span>' : '') + '</td><td>' + esc(x[1]) + '</td><td>' + esc(x[2] || '–') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' : '') + '</div>';
+    }
     // grafik
     h += '<div class="kartu"><h3>Progres skor evaluasi</h3><p class="ket">Skor 0–100 per pelayanan dari rekan. Garis putus-putus = program yang diikuti; pita ungu = periode mentoring.</p>' + grafikKartu(k, d, prog) + '</div>';
     // aspek & kekuatan
