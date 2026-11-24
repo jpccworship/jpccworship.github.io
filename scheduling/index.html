@@ -78,7 +78,7 @@
   .seg button .ttk { width: 8px; height: 8px; border-radius: 50%; }
   .chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; background: var(--soft); color: #4A4155; font-size: 12px; font-weight: 700; white-space: nowrap; }
   .chip.ok { background: var(--okbg); color: #0B5A2A; } .chip.bad { background: var(--badbg); color: var(--bad); } .chip.warn { background: var(--warnbg); color: var(--warn); }
-  .chip.trn { background: #D6F1EA; color: #0A5C50; }
+  .chip.trn { background: #D6F1EA; color: #0A5C50; } .chip.mdt { background: #FBDDEA; color: #8E1450; }
   .chip.ungu { background: #EDE4FB; color: var(--brand); } .chip.kuning { background: #FFF3B8; color: #6B5300; } .chip.abu { background: #EEECF1; color: #6B6575; }
   .chip.Umum { background: #EDE4FB; color: var(--umum); } .chip.Youth { background: #DDF1EE; color: var(--youth); } .chip.Kids { background: #FBE6D8; color: var(--kids); }
   .isian { height: 40px; border: 1.5px solid #CFC7DD; border-radius: 11px; padding: 0 12px; background: #fff; outline: none; min-width: 0; }
@@ -162,6 +162,9 @@
   /* role Trainee di Database: warna toska + pita miring TRAINEE (hanya di halaman Scheduling, jadwal publik tetap biasa) */
   .sel.trn { position: relative; background: #E0F4EF; color: #0A5C50; font-weight: 700; padding-right: 30px; }
   .sel .rib { position: absolute; right: -20px; bottom: 10px; width: 74px; height: 12px; transform: rotate(-45deg); background: #0F7B6C; color: #fff; font-style: normal; font-size: 6.5px; font-weight: 800; letter-spacing: .04em; line-height: 12px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,.2); pointer-events: none; }
+  /* MD Trainee yang dijadwalkan sebagai Music director (OTJ, didampingi Co-MD): merah muda + pita lebih landai "MD TRAINEE" */
+  .sel.mdt { position: relative; background: #FCE8F1; color: #8E1450; font-weight: 700; padding-right: 44px; }
+  .sel .rib.mdt { right: -24px; bottom: 11px; width: 104px; transform: rotate(-30deg); background: linear-gradient(90deg, #AD1457, #D81B60); font-size: 6.5px; letter-spacing: .06em; }
   .sel.f-asing, .sel.f-blok { background: var(--badbg); color: var(--bad); font-weight: 700; }
   .sel.f-blok span { text-decoration: line-through; }
   .sel.f-bentrok { background: #FFE3C2; color: #8A3D00; font-weight: 700; }
@@ -742,6 +745,7 @@ function formasiSv(sv, t) {
 }
 function ordinal(mn, i) { var p = D.input[mn].peran, n = 0; for (var j = 0; j < i; j++) if (p[j][1] === p[i][1]) n++; return n; }
 function wajib(mn, c, i) {
+  if (D.input[mn].peran[i][1] === 'Co-MD') return mdTraineeJadiMD(mn, c);   // MD-nya MD Trainee: perlu Co-MD (juga di special event)
   if (c.jenis === 'Special event') return false;
   var P = D.input[mn].peran, label = P[i][1], f = formasiSv(c.sv, c.t), GS = D.formasi.grupString || ['Violin', 'Saxophone'];
   if (GS.indexOf(label) >= 0) {   // Violin & Saxophone = satu slot: salah satu saja
@@ -857,7 +861,7 @@ function cekDraft(mnSaja) {
         if (a && a.maks && n > a.maks && !c.lanjut && !lihat['m' + ym + k]) { lihat['m' + ym + k] = 1; tambah('aturan', mn, c.id, i, p.n + ' minta maksimal ' + a.maks + 'x sebulan, tapi terjadwal ' + n + 'x di ' + lbln(ym), 'Terjadwal ' + tglBulanOrang(k, ym)); }
         if (a && c.jenis !== 'Special event' && luarIbadah(k, mn, c.sv)) tambah('aturan', mn, c.id, i, p.n + ' mengutamakan ibadah ' + a.ibadah.filter(function (x) { return mnSv(x) === mn; }).join(', ') + ', tapi dijadwalkan di ' + sv, di);
       });
-      if (kosong.length) tambah('kosong', mn, c.id, iKosong, kosong.length + ' peran belum terisi: ' + unik(kosong).map(function (l) { var j = kosong.filter(function (x) { return x === l; }).length; return l + (j > 1 ? ' (' + j + ')' : ''); }).join(', '), sv + ' · ' + lt(c.t));
+      if (kosong.length) tambah('kosong', mn, c.id, iKosong, kosong.length + ' peran belum terisi: ' + unik(kosong).map(function (l) { var j = kosong.filter(function (x) { return x === l; }).length; return l + (j > 1 ? ' (' + j + ')' : ''); }).join(', '), sv + ' · ' + lt(c.t) + (kosong.indexOf('Co-MD') >= 0 ? ' · MD-nya MD Trainee, perlu Co-MD yang mendampingi' : ''));
     });
   });
   Object.keys(tglDraft).forEach(function (dk) {   // belum ada PIC: per ministry & tanggal (Youth tidak dicek)
@@ -1313,13 +1317,14 @@ LAYAR.susun = function () {
     h += '<tr><td class="pr">' + esc(p[1]) + '</td>' + K.map(function (c) {
       var v = c.n[i], ps = pisah(v), akt = S.aktif && S.aktif.kol === c.id && S.aktif.i === i;
       if (!v || v === '-') { var w = !v && wajib(S.mn, c, i); return '<td><button type="button" class="sel ' + (w ? 'kosong-wajib' : 'tak') + (akt ? ' aktif' : '') + '" data-sel="' + c.id + ':' + i + '">' + (w ? '+ isi' : v === '-' ? '–' : '') + '</button></td>'; }
-      var td = tandaSel(S.mn, c, i), ubah = c.lama && c.lama[i] !== v, kl = c.kilat && c.kilat[i] && Date.now() - c.kilat[i] < 6000, trn = traineeOrg(AG[kn(ps.n)]);
-      return '<td><button type="button" class="sel' + (trn ? ' trn' : '') + (td.length ? ' f-' + td[0] : '') + (kl ? ' kilat' : '') + (akt ? ' aktif' : '') + (S.sorot && kn(ps.n) === S.sorot && !akt ? ' sama' : '') + '" data-sel="' + c.id + ':' + i + '" title="' + esc(ps.n + (trn ? ' · Trainee' : '') + (td.length ? ' · ' + td.map(function (x) { return NAMA_TANDA[x]; }).join(', ') : '')) + '">' +
-        (ps.kh ? '<i class="kh">' + esc(ps.kh) + '</i>' : '') + '<span>' + esc(ps.n) + '</span>' + (ubah ? '<i class="ub" title="Berubah dari versi terbit"></i>' : '') + (trn ? '<i class="rib" aria-hidden="true">TRAINEE</i>' : '') + '</button></td>';
+      var td = tandaSel(S.mn, c, i), ubah = c.lama && c.lama[i] !== v, kl = c.kilat && c.kilat[i] && Date.now() - c.kilat[i] < 6000, agS = AG[kn(ps.n)];
+      var mdt = p[1] === 'Music director' && mdTraineeOrg(agS), trn = !mdt && traineeOrg(agS);
+      return '<td><button type="button" class="sel' + (mdt ? ' mdt' : trn ? ' trn' : '') + (td.length ? ' f-' + td[0] : '') + (kl ? ' kilat' : '') + (akt ? ' aktif' : '') + (S.sorot && kn(ps.n) === S.sorot && !akt ? ' sama' : '') + '" data-sel="' + c.id + ':' + i + '" title="' + esc(ps.n + (mdt ? ' · MD Trainee (OTJ sebagai MD, didampingi Co-MD)' : trn ? ' · Trainee' : '') + (td.length ? ' · ' + td.map(function (x) { return NAMA_TANDA[x]; }).join(', ') : '')) + '">' +
+        (ps.kh ? '<i class="kh">' + esc(ps.kh) + '</i>' : '') + '<span>' + esc(ps.n) + '</span>' + (ubah ? '<i class="ub" title="Berubah dari versi terbit"></i>' : '') + (mdt ? '<i class="rib mdt" aria-hidden="true">MD TRAINEE</i>' : trn ? '<i class="rib" aria-hidden="true">TRAINEE</i>' : '') + '</button></td>';
     }).join('') + '</tr>';
   });
   h += '</tbody></table></div><div class="geser" id="geser"><i></i></div>';
-  h += '<div class="legenda"><span class="chip bad">Merah · blockout / tidak ada di Database</span><span class="chip warn" style="background:#FFE3C2;color:#8A3D00">Oranye · bentrok tanggal sama</span><span class="chip ungu">Ungu · berturut-turut</span><span class="chip kuning">Kuning · lebih dari 1x sebulan</span><span class="chip biru">Biru · di luar aturan pelayan</span><span class="chip abu">Bergaris · seharusnya terisi (Formasi)</span><span class="chip trn">Toska + pita TRAINEE · role Trainee (hanya di Scheduling)</span></div>';
+  h += '<div class="legenda"><span class="chip bad">Merah · blockout / tidak ada di Database</span><span class="chip warn" style="background:#FFE3C2;color:#8A3D00">Oranye · bentrok tanggal sama</span><span class="chip ungu">Ungu · berturut-turut</span><span class="chip kuning">Kuning · lebih dari 1x sebulan</span><span class="chip biru">Biru · di luar aturan pelayan</span><span class="chip abu">Bergaris · seharusnya terisi (Formasi)</span><span class="chip trn">Toska + pita TRAINEE · role Trainee</span><span class="chip mdt">Merah muda + pita MD TRAINEE · MD Trainee sebagai MD (Co-MD wajib diisi)</span></div>';
   if (cekTampil.length) {
     h += '<div class="kartu masalah"><h3>Catatan di tampilan ini <span class="chip abu">' + cekTampil.length + '</span></h3><ul class="daftar">' + cekTampil.slice(0, 14).map(function (x) {
       var j = JENIS_CEK.filter(function (q) { return q[0] === x.j; })[0];
@@ -1380,7 +1385,9 @@ function wlmdOrang(a) {
 /* role Trainee (Database kolom Role) & MD Trainee (Posisi lainnya berisi "MD Trainee"): ditandai hanya di halaman Scheduling */
 function traineeOrg(a) { return !!a && /trainee/i.test(a.role || ''); }
 function mdTraineeOrg(a) { return !!a && /md\s*trainee/i.test(a.dasar || ''); }
-function chipTrainee(a) { return (traineeOrg(a) ? '<span class="chip trn">Trainee</span>' : '') + (mdTraineeOrg(a) ? '<span class="chip trn">MD Trainee</span>' : ''); }
+function chipTrainee(a) { return (traineeOrg(a) ? '<span class="chip trn">Trainee</span>' : '') + (mdTraineeOrg(a) ? '<span class="chip mdt">MD Trainee</span>' : ''); }
+/* MD-nya kolom ini MD Trainee (OTJ) -> Co-MD perlu diisi */
+function mdTraineeJadiMD(mn, c) { var P = D.input[mn].peran; return P.some(function (p, j) { return p[1] === 'Music director' && c.n[j] && c.n[j] !== '-' && mdTraineeOrg(AG[kn(pisah(c.n[j]).n)]); }); }
 function profilOrang(a) {
   if (!a) return '<small class="det" style="color:#A61B1B">Tidak ada di Database</small>';
   var pos = a.pos.filter(String).join(', ') + (a.lain ? (a.pos.filter(String).length ? ' · ' : '') + a.lain : '');
@@ -1391,7 +1398,7 @@ function profilOrang(a) {
 function barisCalon(a, c, mn, label, urutan, luar) {
   var inf = infoCalon(a.k, mn, c, label), td = [];
   if (traineeOrg(a)) td.push('<span class="chip trn">Trainee</span>');
-  if (mdTraineeOrg(a)) td.push('<span class="chip trn">MD Trainee</span>');
+  if (mdTraineeOrg(a)) td.push('<span class="chip mdt">MD Trainee</span>');
   if (inf.blok) td.push('<span class="chip bad">Blockout ' + ltp(inf.blok[2]) + '–' + ltp(inf.blok[3]) + '</span>');
   if (inf.cuti) td.push('<span class="chip bad">Cuti ' + esc(inf.cuti.per.join(', ')) + ' ' + ltp(inf.cuti.a) + '–' + ltp(inf.cuti.b) + '</span>');
   if (inf.maks) td.push('<span class="chip biru">Sudah ' + inf.bulan + '/' + inf.maks + ' bulan ini</span>');
@@ -1411,7 +1418,7 @@ function gambarPemilih() {
   if (!o) { tutupLaci(); return; }
   var c = o.c, mn = o.mn, i = S.aktif.i, label = D.input[mn].peran[i][1], v = c.n[i], ps = pisah(v), bisa = boleh('susun', mn), kcKol = kcDari(c.sv), se = c.jenis === 'Special event';
   var semua = AGL.filter(function (a) { return a.aktif; }), lay = semua.filter(function (a) { return layakSel(a, c, i); });
-  var rangkap = /^(Music director|MD Trainee|Vocal arranger|PIC)/.test(label), INF = {};
+  var rangkap = /^(Music director|Co-MD|Vocal arranger|PIC)/.test(label), INF = {};
   var info = function (a) { return INF[a.k] || (INF[a.k] = infoCalon(a.k, mn, c, label)); };
   var nilai = function (a) { var inf = info(a), u = nilaiUrut(a, c, inf, kcKol); if (rangkap) u.unshift(inf.diKol.length ? 0 : 1); return u; };
   lay = lay.map(function (a) { return [nilai(a), a]; }).sort(function (x, y) { return banding(x[0], y[0]); }).map(function (x) { return x[1]; });
