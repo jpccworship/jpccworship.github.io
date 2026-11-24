@@ -78,6 +78,7 @@
   .seg button .ttk { width: 8px; height: 8px; border-radius: 50%; }
   .chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; background: var(--soft); color: #4A4155; font-size: 12px; font-weight: 700; white-space: nowrap; }
   .chip.ok { background: var(--okbg); color: #0B5A2A; } .chip.bad { background: var(--badbg); color: var(--bad); } .chip.warn { background: var(--warnbg); color: var(--warn); }
+  .chip.trn { background: #D6F1EA; color: #0A5C50; }
   .chip.ungu { background: #EDE4FB; color: var(--brand); } .chip.kuning { background: #FFF3B8; color: #6B5300; } .chip.abu { background: #EEECF1; color: #6B6575; }
   .chip.Umum { background: #EDE4FB; color: var(--umum); } .chip.Youth { background: #DDF1EE; color: var(--youth); } .chip.Kids { background: #FBE6D8; color: var(--kids); }
   .isian { height: 40px; border: 1.5px solid #CFC7DD; border-radius: 11px; padding: 0 12px; background: #fff; outline: none; min-width: 0; }
@@ -158,6 +159,9 @@
   .sel:hover { background: #F6F3FB; }
   .sel.kosong-wajib { background: repeating-linear-gradient(-45deg, #fff 0 6px, #F6F1FF 6px 12px); color: #9A8BC0; font-weight: 700; font-size: 11.5px; }
   .sel.tak { color: #CFC9DA; }
+  /* role Trainee di Database: warna toska + pita miring TRAINEE (hanya di halaman Scheduling, jadwal publik tetap biasa) */
+  .sel.trn { position: relative; background: #E0F4EF; color: #0A5C50; font-weight: 700; padding-right: 30px; }
+  .sel .rib { position: absolute; right: -20px; bottom: 10px; width: 74px; height: 12px; transform: rotate(-45deg); background: #0F7B6C; color: #fff; font-style: normal; font-size: 6.5px; font-weight: 800; letter-spacing: .04em; line-height: 12px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,.2); pointer-events: none; }
   .sel.f-asing, .sel.f-blok { background: var(--badbg); color: var(--bad); font-weight: 700; }
   .sel.f-blok span { text-decoration: line-through; }
   .sel.f-bentrok { background: #FFE3C2; color: #8A3D00; font-weight: 700; }
@@ -1287,6 +1291,7 @@ LAYAR.susun = function () {
     var d = tglObj(t), ada = cek.some(function (x) { var c = kolById(x.kol); return c && c.c.t === t && /blok|asing|bentrok|turut/.test(x.j); }), se = semuaBulan.some(function (c) { return c.t === t && c.jenis === 'Special event'; });
     return '<button type="button" data-tgl="' + t + '" class="' + (S.tgl === t ? 'on' : '') + '"><b>' + HARI[d.getDay()] + ' ' + d.getDate() + (ada ? '<i class="m"></i>' : '') + '</b><small>' + (se ? '★ special' : semuaBulan.filter(function (c) { return c.t === t; }).length + ' service') + '</small></button>';
   }).join('') + '</div><div class="alat-tabel">' +
+    (bisa && S.tgl ? '<button class="btn garis kcl" type="button" data-aksi="hapustgl" style="color:#B3261E" title="Hapus semua kolom service di tanggal ini dari draft. Satu kolom saja: klik judul kolomnya lalu Hapus kolom.">Hapus tanggal ini</button>' : '') +
     (bisa ? '<button class="btn garis kcl" type="button" data-aksi="urung"' + (RIWAYAT.length ? ' title="' + esc('Urungkan: ' + ketUrung(RIWAYAT[RIWAYAT.length - 1]) + ' (Ctrl+Z)') + '"' : ' disabled title="Belum ada isian yang bisa diurungkan"') + '>↶ Urungkan</button>' : '') +
     '<div class="seg zoomk" role="group" aria-label="Zoom tabel jadwal"><button type="button" data-zoom="-1" title="Perkecil tabel"' + (zoomSusun() <= ZOOM[0] ? ' disabled style="opacity:.35"' : '') + '>−</button>' +
     '<button type="button" class="zl on" data-zoom="0" title="Kembali ke 100%">' + Math.round(zoomSusun() * 100) + '%</button><button type="button" data-zoom="1" title="Perbesar tabel"' + (zoomSusun() >= ZOOM[ZOOM.length - 1] ? ' disabled style="opacity:.35"' : '') + '>+</button>' +
@@ -1308,13 +1313,13 @@ LAYAR.susun = function () {
     h += '<tr><td class="pr">' + esc(p[1]) + '</td>' + K.map(function (c) {
       var v = c.n[i], ps = pisah(v), akt = S.aktif && S.aktif.kol === c.id && S.aktif.i === i;
       if (!v || v === '-') { var w = !v && wajib(S.mn, c, i); return '<td><button type="button" class="sel ' + (w ? 'kosong-wajib' : 'tak') + (akt ? ' aktif' : '') + '" data-sel="' + c.id + ':' + i + '">' + (w ? '+ isi' : v === '-' ? '–' : '') + '</button></td>'; }
-      var td = tandaSel(S.mn, c, i), ubah = c.lama && c.lama[i] !== v, kl = c.kilat && c.kilat[i] && Date.now() - c.kilat[i] < 6000;
-      return '<td><button type="button" class="sel' + (td.length ? ' f-' + td[0] : '') + (kl ? ' kilat' : '') + (akt ? ' aktif' : '') + (S.sorot && kn(ps.n) === S.sorot && !akt ? ' sama' : '') + '" data-sel="' + c.id + ':' + i + '" title="' + esc(ps.n + (td.length ? ' · ' + td.map(function (x) { return NAMA_TANDA[x]; }).join(', ') : '')) + '">' +
-        (ps.kh ? '<i class="kh">' + esc(ps.kh) + '</i>' : '') + '<span>' + esc(ps.n) + '</span>' + (ubah ? '<i class="ub" title="Berubah dari versi terbit"></i>' : '') + '</button></td>';
+      var td = tandaSel(S.mn, c, i), ubah = c.lama && c.lama[i] !== v, kl = c.kilat && c.kilat[i] && Date.now() - c.kilat[i] < 6000, trn = traineeOrg(AG[kn(ps.n)]);
+      return '<td><button type="button" class="sel' + (trn ? ' trn' : '') + (td.length ? ' f-' + td[0] : '') + (kl ? ' kilat' : '') + (akt ? ' aktif' : '') + (S.sorot && kn(ps.n) === S.sorot && !akt ? ' sama' : '') + '" data-sel="' + c.id + ':' + i + '" title="' + esc(ps.n + (trn ? ' · Trainee' : '') + (td.length ? ' · ' + td.map(function (x) { return NAMA_TANDA[x]; }).join(', ') : '')) + '">' +
+        (ps.kh ? '<i class="kh">' + esc(ps.kh) + '</i>' : '') + '<span>' + esc(ps.n) + '</span>' + (ubah ? '<i class="ub" title="Berubah dari versi terbit"></i>' : '') + (trn ? '<i class="rib" aria-hidden="true">TRAINEE</i>' : '') + '</button></td>';
     }).join('') + '</tr>';
   });
   h += '</tbody></table></div><div class="geser" id="geser"><i></i></div>';
-  h += '<div class="legenda"><span class="chip bad">Merah · blockout / tidak ada di Database</span><span class="chip warn" style="background:#FFE3C2;color:#8A3D00">Oranye · bentrok tanggal sama</span><span class="chip ungu">Ungu · berturut-turut</span><span class="chip kuning">Kuning · lebih dari 1x sebulan</span><span class="chip biru">Biru · di luar aturan pelayan</span><span class="chip abu">Bergaris · seharusnya terisi (Formasi)</span></div>';
+  h += '<div class="legenda"><span class="chip bad">Merah · blockout / tidak ada di Database</span><span class="chip warn" style="background:#FFE3C2;color:#8A3D00">Oranye · bentrok tanggal sama</span><span class="chip ungu">Ungu · berturut-turut</span><span class="chip kuning">Kuning · lebih dari 1x sebulan</span><span class="chip biru">Biru · di luar aturan pelayan</span><span class="chip abu">Bergaris · seharusnya terisi (Formasi)</span><span class="chip trn">Toska + pita TRAINEE · role Trainee (hanya di Scheduling)</span></div>';
   if (cekTampil.length) {
     h += '<div class="kartu masalah"><h3>Catatan di tampilan ini <span class="chip abu">' + cekTampil.length + '</span></h3><ul class="daftar">' + cekTampil.slice(0, 14).map(function (x) {
       var j = JENIS_CEK.filter(function (q) { return q[0] === x.j; })[0];
@@ -1372,14 +1377,21 @@ function wlmdOrang(a) {
   if (uji('Music director', /music director|(keyboard|guitar|bass|drum|musician).*wl\/md/)) out.push('MD');
   return out.length ? out : ['WL/MD'];
 }
+/* role Trainee (Database kolom Role) & MD Trainee (Posisi lainnya berisi "MD Trainee"): ditandai hanya di halaman Scheduling */
+function traineeOrg(a) { return !!a && /trainee/i.test(a.role || ''); }
+function mdTraineeOrg(a) { return !!a && /md\s*trainee/i.test(a.dasar || ''); }
+function chipTrainee(a) { return (traineeOrg(a) ? '<span class="chip trn">Trainee</span>' : '') + (mdTraineeOrg(a) ? '<span class="chip trn">MD Trainee</span>' : ''); }
 function profilOrang(a) {
   if (!a) return '<small class="det" style="color:#A61B1B">Tidak ada di Database</small>';
   var pos = a.pos.filter(String).join(', ') + (a.lain ? (a.pos.filter(String).length ? ' · ' : '') + a.lain : '');
   return '<small class="det">Campus: <b>' + esc(a.kampL.join(' · ') || '–') + '</b>' + (a.home ? ' · home-base ' + esc(a.home) : '') + '</small>' +
-    '<small class="det">Posisi: <b>' + esc(pos || '–') + '</b>' + (a.wlmd ? ' · <b class="wlmd">' + esc(wlmdOrang(a).join(' & ')) + (a.wlmdMn ? ' (' + esc(a.wlmdMn) + ')' : '') + '</b>' : '') + (a.suara ? ' · ' + esc(a.suara) : '') + (a.role && a.role !== 'Volunteer' ? ' · ' + esc(a.role) : '') + '</small>';
+    '<small class="det">Posisi: <b>' + esc(pos || '–') + '</b>' + (a.wlmd ? ' · <b class="wlmd">' + esc(wlmdOrang(a).join(' & ')) + (a.wlmdMn ? ' (' + esc(a.wlmdMn) + ')' : '') + '</b>' : '') + (a.suara ? ' · ' + esc(a.suara) : '') + (a.role && a.role !== 'Volunteer' && !traineeOrg(a) ? ' · ' + esc(a.role) : '') + '</small>' +
+    (chipTrainee(a) ? '<span class="tanda">' + chipTrainee(a) + '</span>' : '');
 }
 function barisCalon(a, c, mn, label, urutan, luar) {
   var inf = infoCalon(a.k, mn, c, label), td = [];
+  if (traineeOrg(a)) td.push('<span class="chip trn">Trainee</span>');
+  if (mdTraineeOrg(a)) td.push('<span class="chip trn">MD Trainee</span>');
   if (inf.blok) td.push('<span class="chip bad">Blockout ' + ltp(inf.blok[2]) + '–' + ltp(inf.blok[3]) + '</span>');
   if (inf.cuti) td.push('<span class="chip bad">Cuti ' + esc(inf.cuti.per.join(', ')) + ' ' + ltp(inf.cuti.a) + '–' + ltp(inf.cuti.b) + '</span>');
   if (inf.maks) td.push('<span class="chip biru">Sudah ' + inf.bulan + '/' + inf.maks + ' bulan ini</span>');
@@ -1389,7 +1401,7 @@ function barisCalon(a, c, mn, label, urutan, luar) {
   if (inf.diKol.length) td.push('<span class="chip abu">Di service ini: ' + esc(unik(inf.diKol.map(function (x) { return x.peran; })).join(', ')) + '</span>');
   if (luar) td.push('<span class="chip abu">Di luar pilihan dropdown</span>');
   var m = /^(Keys|Bass|Drums|Guitar)/.exec(label), sk = m && a.sk[ALAT[m[1]]] !== '' ? a.sk[ALAT[m[1]]] : a.skor;
-  var info = [a.kampL.join('·') || 'campus –', a.suara, sk !== '' ? 'skor ' + sk : '', a.role !== 'Volunteer' ? a.role : ''].filter(String).join(' · ');
+  var info = [a.kampL.join('·') || 'campus –', a.suara, sk !== '' ? 'skor ' + sk : '', a.role !== 'Volunteer' && !traineeOrg(a) ? a.role : ''].filter(String).join(' · ');
   return '<button type="button" class="calon" data-pilih="' + esc(a.n) + '"><span class="ava" style="background:' + (a.g === 'F' ? '#AC1356' : '#1565C0') + '">' + inisial(a.n) + '</span><span class="who"><b>' + esc(a.n) + '</b><small>' + esc(info) + '</small>' +
     '<small>' + ringkasPaket(a.k, c, inf) + '</small>' +
     (td.length ? '<span class="tanda">' + td.join('') + '</span>' : '') + '</span>' + (urutan ? '<span class="ke">#' + urutan + '</span>' : '') + '</button>';
@@ -1399,7 +1411,7 @@ function gambarPemilih() {
   if (!o) { tutupLaci(); return; }
   var c = o.c, mn = o.mn, i = S.aktif.i, label = D.input[mn].peran[i][1], v = c.n[i], ps = pisah(v), bisa = boleh('susun', mn), kcKol = kcDari(c.sv), se = c.jenis === 'Special event';
   var semua = AGL.filter(function (a) { return a.aktif; }), lay = semua.filter(function (a) { return layakSel(a, c, i); });
-  var rangkap = /^(Music director|Vocal arranger|PIC)/.test(label), INF = {};
+  var rangkap = /^(Music director|MD Trainee|Vocal arranger|PIC)/.test(label), INF = {};
   var info = function (a) { return INF[a.k] || (INF[a.k] = infoCalon(a.k, mn, c, label)); };
   var nilai = function (a) { var inf = info(a), u = nilaiUrut(a, c, inf, kcKol); if (rangkap) u.unshift(inf.diKol.length ? 0 : 1); return u; };
   lay = lay.map(function (a) { return [nilai(a), a]; }).sort(function (x, y) { return banding(x[0], y[0]); }).map(function (x) { return x[1]; });
@@ -1991,6 +2003,16 @@ document.addEventListener('click', function (e) {
     if (b.disabled) return;
     var a = b.getAttribute('data-aksi');
     if (a === 'urung') { $('roti').classList.remove('buka'); urungkan(); return; }
+    if (a === 'hapustgl' && S.tgl) {
+      var kh = D.input[S.mn].kol.filter(function (c) { return c.t === S.tgl; });
+      var nIsi = kh.reduce(function (n, c) { return n + c.n.filter(function (v) { return v && v !== '-'; }).length; }, 0);
+      TUNDA = { mn: S.mn, tgl: S.tgl };
+      konfirmasi('Hapus tanggal ' + esc(lt(S.tgl)) + '?', 'Semua <b>' + kh.length + ' kolom</b> di tanggal ini (' + esc(kh.map(function (c) { return c.sv || c.acara || 'tanpa service'; }).join(', ')) + ')' +
+        (nIsi ? ' beserta <b>' + nIsi + ' nama</b> di dalamnya' : '') + ' dihapus dari draft ' + esc(S.mn) + '. Kolom di kanannya dirapatkan. <b>Tidak bisa di-Urungkan</b>, jadi pastikan tanggalnya benar.' +
+        (kh.some(function (c) { return c.tarik; }) ? '<br><br><b>Bulan ini sedang diedit dari versi terbit:</b> service di tanggal ini ikut hilang dari jadwal saat diterbitkan ulang.' : '') +
+        '<br><br>Hanya mau menghapus satu kolom? Batal, lalu klik judul kolom itu dan pilih <b>Hapus kolom</b>.', 'Hapus tanggal', 'hapustgl2', 'bahaya');
+      return;
+    }
     if (a === 'buat') modalBuat(S.mn);
     if (a === 'se') modalSE();
     if (a === 'oto') kerja('Mengisi nama otomatis sesuai Formasi Tim…', function () { return api('scIsiOtomatis', S.mn, S.ym, S.tgl || '', KL()); });
@@ -2015,6 +2037,7 @@ document.addEventListener('click', function (e) {
       kerja('Menyimpan info service…', function () { return api('scInfoKolom', o2.mn, { sid: c2.sid, baru: baru2, lama: lama2 }, KL()); }, function () { S.ym = baru2.t.slice(0, 7); if (S.tgl) S.tgl = baru2.t; });
     }
     if (k === 'hapuskol') { var o3 = kolById(id); TUNDA = { mn: o3.mn, sid: o3.c.sid }; konfirmasi('Hapus kolom ini?', esc((o3.c.sv || o3.c.acara) + ' · ' + lt(o3.c.t)) + ' beserta semua nama di dalamnya dihapus dari draft.' + (o3.c.tarik ? ' Karena bulan ini sedang diedit dari versi terbit, service ini ikut hilang dari jadwal saat diterbitkan ulang.' : ''), 'Hapus kolom', 'hapuskol2', 'bahaya'); }
+    if (k === 'hapustgl2') { tutupModal(); tutupLaci(); kerja('Menghapus tanggal…', function () { return api('scHapusTanggal', TUNDA.mn, TUNDA.tgl, KL()); }, function () { S.tgl = ''; }); }
     if (k === 'hapuskol2') { tutupModal(); tutupLaci(); kerja('Menghapus kolom…', function () { return api('scHapusKolom', TUNDA.mn, TUNDA.sid, KL()); }); }
     if (k === 'terbit') { tutupModal(); kerja('Menerbitkan jadwal… bisa sampai 1 menit.', function () { return api('scTerbit', TUNDA.mn, TUNDA.ym, KL()); }, function () { S.tb.mn = TUNDA.mn || 'Umum'; S.tb.ym = ''; S.tbTab = 'jadwal'; S.hal = 'terbit'; $('isi').scrollTop = 0; }); }
     if (k === 'tarik') { tutupModal(); kerja('Menyalin jadwal terbit ke draft…', function () { return api('scTarik', TUNDA.mn, TUNDA.ym, KL()); }, function () { S.mn = TUNDA.mn; S.ym = TUNDA.ym; S.tgl = ''; S.hal = 'susun'; $('isi').scrollTop = 0; }); }
